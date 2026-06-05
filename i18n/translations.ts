@@ -460,7 +460,8 @@ additivesLabel: "Additives",
       ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
     verdictHealthy: "Gezond",
     verdictModerate: "Matig",
-    verdictUnhealthy: "Ongezond",
+    verdictUnhealthy: "Ongezond", 
+
     // procentajul cu bulina///////////
     scoreOutOf: "van 100",
     saturatedFat: "Verzadigde vetten",

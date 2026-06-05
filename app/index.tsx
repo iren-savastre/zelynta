@@ -138,18 +138,23 @@ export default function Index() {
   const sugars = n["sugars_100g"] ?? null;
   const satFat = n["saturated-fat_100g"] ?? null;
   const salt = n["salt_100g"] ?? null;
-
-  function computeScore() {
+function computeScore() {
     let score = 100;
-    if (calories != null) score -= Math.min(20, (calories / 500) * 20);
-    if (sugars != null) score -= Math.min(25, (sugars / 30) * 25);
-    if (satFat != null) score -= Math.min(25, (satFat / 15) * 25);
-    if (salt != null) score -= Math.min(20, (salt / 2) * 20);
+    // Zahărul - penalizare dură (principalul factor)
+    if (sugars != null) score -= Math.min(45, (sugars / 12) * 45);
+    // Calorii
+    if (calories != null) score -= Math.min(20, (calories / 250) * 20);
+    // Grăsimi saturate
+    if (satFat != null) score -= Math.min(25, (satFat / 8) * 25);
+    // Sare
+    if (salt != null) score -= Math.min(15, (salt / 1.5) * 15);
+    // Aditivi
     additives.forEach((a) => {
-      if (a.level === "caution") score -= 5;
-      else if (a.level === "moderate") score -= 2;
+      if (a.level === "caution") score -= 8;
+      else if (a.level === "moderate") score -= 3;
     });
     return Math.max(0, Math.round(score));
+  
   }
   const score = product ? computeScore() : 0;
 
