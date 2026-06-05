@@ -47,6 +47,10 @@ export const translations = {
      // procentajul cu bulina///////////
      scoreOutOf: "din 100",
     saturatedFat: "Grăsimi saturate",
+    // /////////////   scanare camera    /////////////////////
+    scanButton: "Scanează cu camera",
+    scanInstructions: "Îndreaptă camera spre codul de bare",
+    cancel: "Anulează",
   },
   en: {
     title: "Zelynta",
@@ -96,6 +100,10 @@ additivesLabel: "Additives",
     // procentajul cu bulina///////////
     scoreOutOf: "out of 100",
     saturatedFat: "Saturated fat",
+     // /////////////   scanare camera    /////////////////////
+     scanButton: "Scan with camera",
+    scanInstructions: "Point the camera at the barcode",
+    cancel: "Cancel",
   },
   fr: {
     title: "Zelynta",
@@ -145,6 +153,10 @@ additivesLabel: "Additives",
     // procentajul cu bulina///////////
     scoreOutOf: "sur 100",
     saturatedFat: "Graisses saturées",
+    // /////////////   scanare camera    /////////////////////
+    scanButton: "Scanner avec la caméra",
+    scanInstructions: "Pointez la caméra vers le code-barres",
+    cancel: "Annuler",
   },
   it: {
     title: "Zelynta",
@@ -180,7 +192,6 @@ additivesLabel: "Additives",
     magnesium: "Magnesio",
     sodium: "Sodio",
     // ///////////////////////////////////////////aditivi/////////////////////
-
     additivesLabel: "Additivi",
     noAdditives: "Nessun additivo rilevato",
     levelSafe: "Considerato sicuro",
@@ -194,6 +205,10 @@ additivesLabel: "Additives",
     // procentajul cu bulina///////////
     scoreOutOf: "su 100",
     saturatedFat: "Grassi saturi",
+     // /////////////   scanare camera    /////////////////////
+     scanButton: "Scansiona con la fotocamera",
+    scanInstructions: "Punta la fotocamera sul codice a barre",
+    cancel: "Annulla",
   },
   es: {
     title: "Zelynta",
@@ -242,6 +257,10 @@ additivesLabel: "Additives",
     // procentajul cu bulina///////////
     scoreOutOf: "de 100",
     saturatedFat: "Grasas saturadas",
+    // /////////////   scanare camera    /////////////////////
+    scanButton: "Escanear con la cámara",
+    scanInstructions: "Apunta la cámara al código de barras",
+    cancel: "Cancelar",
   },
   de: {
     title: "Zelynta",
@@ -339,6 +358,10 @@ additivesLabel: "Additives",
     // procentajul cu bulina///////////
     scoreOutOf: "из 100",
     saturatedFat: "Насыщенные жиры",
+     // /////////////   scanare camera    /////////////////////
+     scanButton: "Сканировать камерой",
+    scanInstructions: "Наведите камеру на штрих-код",
+    cancel: "Отмена",
   },
   pl: {
     title: "Zelynta",
@@ -388,6 +411,10 @@ additivesLabel: "Additives",
      // procentajul cu bulina///////////
      scoreOutOf: "na 100",
     saturatedFat: "Tłuszcze nasycone",
+      // /////////////   scanare camera    /////////////////////
+      scanButton: "Skanuj aparatem",
+    scanInstructions: "Skieruj aparat na kod kreskowy",
+    cancel: "Anuluj",
   },
   nl: {
     title: "Zelynta",
@@ -437,5 +464,9 @@ additivesLabel: "Additives",
     // procentajul cu bulina///////////
     scoreOutOf: "van 100",
     saturatedFat: "Verzadigde vetten",
+    // /////////////   scanare camera    /////////////////////
+    scanButton: "Scannen met camera",
+    scanInstructions: "Richt de camera op de barcode",
+    cancel: "Annuleren",
   },
 };
