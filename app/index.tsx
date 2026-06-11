@@ -33,6 +33,7 @@ const levelColors: Record<string, string> = {
   safe: "#038141",
   moderate: "#FECB02",
   caution: "#EE8100",
+  risk: "#E63E11",
 };
 
 function scoreColor(score: number) {
@@ -55,6 +56,7 @@ export default function Index() {
   const [error, setError] = useState("");
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [selectedAdditive, setSelectedAdditive] = useState<any>(null);
   const [permission, requestPermission] = useCameraPermissions();
 
   const currentLang =
@@ -69,6 +71,9 @@ export default function Index() {
     setLoading(true);
     setError("");
     setProduct(null);
+    setSelectedAdditive(null);
+    setScannerOpen(false);
+    setLangMenuOpen(false);
     try {
       const response = await fetch(
         `https://world.openfoodfacts.org/api/v2/product/${code}.json`,
@@ -124,13 +129,15 @@ export default function Index() {
       name: info?.name ?? "",
       use: info?.use ?? "",
       level: info?.level ?? null,
+      descRo: info?.descRo ?? "",
+      descEn: info?.descEn ?? "",
     };
   });
-
-  function levelText(level: string | null) {
+function levelText(level: string | null) {
     if (level === "safe") return t("levelSafe");
     if (level === "moderate") return t("levelModerate");
     if (level === "caution") return t("levelCaution");
+    if (level === "risk") return t("levelRisk");
     return "";
   }
 
@@ -138,41 +145,63 @@ export default function Index() {
   const sugars = n["sugars_100g"] ?? null;
   const satFat = n["saturated-fat_100g"] ?? null;
   const salt = n["salt_100g"] ?? null;
-function computeScore() {
+
+  function computeScore() {
     let score = 100;
-    // Zahărul - penalizare dură (principalul factor)
-    if (sugars != null) score -= Math.min(45, (sugars / 12) * 45);
-    // Calorii
-    if (calories != null) score -= Math.min(20, (calories / 250) * 20);
-    // Grăsimi saturate
-    if (satFat != null) score -= Math.min(25, (satFat / 8) * 25);
-    // Sare
-    if (salt != null) score -= Math.min(15, (salt / 1.5) * 15);
-    // Aditivi
+    const isBeverage = /water|eau|apa|drink|beverage|boisson|soda|juice|jus|cola|limonad/i.test(
+      (product?.categories ?? "") + (product?.product_name ?? "") + (product?.brands ?? "")
+    );
+
+    if (isBeverage) {
+      // Băuturi: zahărul e devastator. 5g/100ml deja taie masiv.
+      if (sugars != null) score -= Math.min(80, (sugars / 5) * 80);
+      if (calories != null) score -= Math.min(15, (calories / 40) * 15);
+    } else {
+      if (sugars != null) score -= Math.min(45, (sugars / 22) * 45);
+      if (calories != null) score -= Math.min(20, (calories / 450) * 20);
+      if (satFat != null) score -= Math.min(25, (satFat / 8) * 25);
+      if (salt != null) score -= Math.min(15, (salt / 1.5) * 15);
+    }
     additives.forEach((a) => {
       if (a.level === "caution") score -= 8;
       else if (a.level === "moderate") score -= 3;
     });
     return Math.max(0, Math.round(score));
-  
   }
   const score = product ? computeScore() : 0;
 
-  function buildNutrientBadges() {
-    const rows: { label: string; value: number; unit: string; color: string }[] = [];
+ function buildNutrientBadges() {
+    const rows: {
+      label: string;
+      value: number;
+      unit: string;
+      color: string;
+      percent: number;
+    }[] = [];
+
+    // Calculează poziția săgeții ASTFEL încât să se alinieze cu culorile:
+    // sub mid = zona verde (0-50%), între mid-high = galben/portocaliu (50-75%), peste high = roșu (75-100%)
+    function pos(value: number, mid: number, high: number) {
+      if (value <= mid) return (value / mid) * 50;
+      if (value <= high) return 50 + ((value - mid) / (high - mid)) * 25;
+      return Math.min(100, 75 + ((value - high) / high) * 25);
+    }
+
     if (calories != null)
       rows.push({
         label: t("energy"),
         value: Math.round(calories),
         unit: "kcal",
         color: nutrientColor(calories, 150, 350),
+        percent: pos(calories, 150, 350),
       });
     if (sugars != null)
       rows.push({
         label: t("sugars"),
         value: Math.round(sugars * 10) / 10,
         unit: "g",
-        color: nutrientColor(sugars, 5, 15),
+      color: nutrientColor(sugars, 3, 10),
+        percent: pos(sugars, 3, 10),
       });
     if (satFat != null)
       rows.push({
@@ -180,6 +209,7 @@ function computeScore() {
         value: Math.round(satFat * 10) / 10,
         unit: "g",
         color: nutrientColor(satFat, 2, 5),
+        percent: pos(satFat, 2, 5),
       });
     if (salt != null)
       rows.push({
@@ -187,37 +217,160 @@ function computeScore() {
         value: Math.round(salt * 100) / 100,
         unit: "g",
         color: nutrientColor(salt, 0.3, 1.5),
+        percent: pos(salt, 0.3, 1.5),
       });
     return rows;
   }
   const nutrientBadges = product ? buildNutrientBadges() : [];
+  // Ambalaj
+  function detectPackaging() {
+    const pkg = (
+      (product?.packaging ?? "") + (product?.packaging_tags ?? "")
+    ).toLowerCase();
+    if (pkg.includes("glass") || pkg.includes("verre") || pkg.includes("sticl"))
+      return "glass";
+    if (
+      pkg.includes("metal") || pkg.includes("can") || pkg.includes("aluminium") ||
+      pkg.includes("canette") || pkg.includes("doza") || pkg.includes("alu")
+    )
+      return "metal";
+    if (pkg.includes("carton") || pkg.includes("brick") || pkg.includes("paper"))
+      return "carton";
+    if (pkg.includes("plastic") || pkg.includes("pet") || pkg.includes("plastique"))
+      return "plastic";
+    return "unknown";
+  }
+  const packaging = product ? detectPackaging() : "unknown";
+  const packagingColor =
+    packaging === "glass" ? "#038141"
+    : packaging === "metal" ? "#85BB2F"
+    : packaging === "carton" ? "#85BB2F"
+    : packaging === "plastic" ? "#EE8100"
+    : "#999";
+  const packagingText =
+    packaging === "glass" ? t("packagingGlass")
+    : packaging === "metal" ? t("packagingMetal")
+    : packaging === "carton" ? t("packagingCarton")
+    : packaging === "plastic" ? t("packagingPlastic")
+    : t("packagingUnknown");
+    const isBeverage = /water|eau|apa|drink|beverage|boisson|soda|juice|jus|cola|limonad/i.test(
+    (product?.categories ?? "") + (product?.product_name ?? "") + (product?.brands ?? "")
+  );
+
+  const additiveDesc = selectedAdditive
+    ? i18n.language === "ro"
+      ? selectedAdditive.descRo || selectedAdditive.descEn
+      : selectedAdditive.descEn || selectedAdditive.descRo
+    : "";
 
   return (
     <KeyboardAvoidingView
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Modal visible={scannerOpen} animationType="slide">
-        <View style={styles.scannerScreen}>
-          <CameraView
-            style={styles.camera}
-            facing="back"
-            barcodeScannerSettings={{
-              barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
-            }}
-            onBarcodeScanned={handleBarcodeScanned}
-          />
-          <View style={styles.scannerOverlay}>
-            <Text style={styles.scannerText}>{t("scanInstructions")}</Text>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setScannerOpen(false)}
-            >
-              <Text style={styles.cancelButtonText}>{t("cancel")}</Text>
-            </TouchableOpacity>
+      {/* Scanner camera */}
+      {scannerOpen && (
+        <Modal visible transparent={false} animationType="slide">
+          <View style={styles.scannerScreen}>
+            <CameraView
+              style={styles.camera}
+              facing="back"
+              barcodeScannerSettings={{
+                barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
+              }}
+              onBarcodeScanned={handleBarcodeScanned}
+            />
+            <View style={styles.scannerOverlay}>
+              <Text style={styles.scannerText}>{t("scanInstructions")}</Text>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setScannerOpen(false)}
+              >
+                <Text style={styles.cancelButtonText}>{t("cancel")}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      )}
+
+      {/* Meniu limbi */}
+      {langMenuOpen && (
+        <Modal visible transparent animationType="fade">
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setLangMenuOpen(false)}
+          >
+            <View style={styles.langMenu}>
+              {languages.map((lang) => (
+                <TouchableOpacity
+                  key={lang.code}
+                  style={[
+                    styles.langItem,
+                    i18n.language === lang.code && styles.langItemActive,
+                  ]}
+                  onPress={() => selectLanguage(lang.code)}
+                >
+                  <Text style={styles.langFlag}>{lang.flag}</Text>
+                  <Text
+                    style={[
+                      styles.langLabel,
+                      i18n.language === lang.code && styles.langLabelActive,
+                    ]}
+                  >
+                    {lang.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Pressable>
+        </Modal>
+      )}
+
+      {/* Detalii aditiv */}
+      {selectedAdditive && (
+        <Modal visible transparent animationType="fade">
+          <Pressable
+            style={styles.additiveModalOverlay}
+            onPress={() => setSelectedAdditive(null)}
+          >
+            <Pressable style={styles.additiveModal} onPress={() => {}}>
+              <View style={styles.additiveModalHeader}>
+                <View
+                  style={[
+                    styles.additiveModalDot,
+                    {
+                      backgroundColor: selectedAdditive.level
+                        ? levelColors[selectedAdditive.level]
+                        : "#999",
+                    },
+                  ]}
+                />
+                <Text style={styles.additiveModalTitle}>
+                  {selectedAdditive.code}
+                  {selectedAdditive.name ? ` · ${selectedAdditive.name}` : ""}
+                </Text>
+              </View>
+              {selectedAdditive.level && (
+                <Text
+                  style={[
+                    styles.additiveModalLevel,
+                    { color: levelColors[selectedAdditive.level] },
+                  ]}
+                >
+                  {levelText(selectedAdditive.level)}
+                </Text>
+              )}
+              <Text style={styles.additiveModalDesc}>{additiveDesc}</Text>
+              <TouchableOpacity
+                style={styles.additiveModalClose}
+                onPress={() => setSelectedAdditive(null)}
+              >
+                <Text style={styles.additiveModalCloseText}>{t("cancel")}</Text>
+              </TouchableOpacity>
+            </Pressable>
+          </Pressable>
+        </Modal>
+      )}
 
       <View style={styles.langCorner}>
         <TouchableOpacity
@@ -227,41 +380,6 @@ function computeScore() {
           <Text style={styles.flagButtonText}>{currentLang.flag}</Text>
         </TouchableOpacity>
       </View>
-
-      <Modal
-        visible={langMenuOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setLangMenuOpen(false)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setLangMenuOpen(false)}
-        >
-          <View style={styles.langMenu}>
-            {languages.map((lang) => (
-              <TouchableOpacity
-                key={lang.code}
-                style={[
-                  styles.langItem,
-                  i18n.language === lang.code && styles.langItemActive,
-                ]}
-                onPress={() => selectLanguage(lang.code)}
-              >
-                <Text style={styles.langFlag}>{lang.flag}</Text>
-                <Text
-                  style={[
-                    styles.langLabel,
-                    i18n.language === lang.code && styles.langLabelActive,
-                  ]}
-                >
-                  {lang.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Pressable>
-      </Modal>
 
       <ScrollView
         contentContainerStyle={styles.container}
@@ -325,17 +443,42 @@ function computeScore() {
                 </View>
               </View>
             </View>
-
-            {nutrientBadges.map((row, idx) => (
-              <View key={idx} style={styles.nutrientRow}>
-                <View style={[styles.nutrientDot, { backgroundColor: row.color }]} />
-                <Text style={styles.nutrientLabel}>{row.label}</Text>
-                <Text style={styles.nutrientValue}>
-                  {row.value} {row.unit}
-                </Text>
+{nutrientBadges.map((row, idx) => (
+              <View key={idx} style={styles.nutrientBlock}>
+                <View style={styles.nutrientRow}>
+                  <View style={[styles.nutrientDot, { backgroundColor: row.color }]} />
+                  <Text style={styles.nutrientLabel}>{row.label}</Text>
+                  <Text style={styles.nutrientValue}>
+                    {row.value} {row.unit}
+                  </Text>
+                </View>
+                <View style={styles.baremWrap}>
+                  <View style={styles.baremArrowRow}>
+                    <Text style={[styles.baremArrow, { marginLeft: `${row.percent}%` }]}>
+                      ▼
+                    </Text>
+                  </View>
+                  <View style={styles.baremBar}>
+                    <View style={[styles.baremSeg, { backgroundColor: "#038141" }]} />
+                    <View style={[styles.baremSeg, { backgroundColor: "#85BB2F" }]} />
+                    <View style={[styles.baremSeg, { backgroundColor: "#EE8100" }]} />
+                    <View style={[styles.baremSeg, { backgroundColor: "#E63E11" }]} />
+                  </View>
+                </View>
               </View>
             ))}
 
+           {packaging !== "unknown" && (
+              <>
+                <Text style={styles.scoreLabel}>{t("packagingLabel")}</Text>
+                <View style={[styles.novaBadge, { backgroundColor: packagingColor }]}>
+                  <Text style={styles.novaBadgeText}>{packagingText}</Text>
+                </View>
+                {packaging === "plastic" && isBeverage && (
+                  <Text style={styles.microNote}>{t("microplasticNote")}</Text>
+                )}
+              </>
+            )}
             <Text style={styles.scoreLabel}>{t("ingredientsLabel")}</Text>
             <Text style={styles.ingredients}>
               {product[`ingredients_text_${i18n.language}`] ||
@@ -349,7 +492,11 @@ function computeScore() {
               <Text style={styles.scoreUnknown}>{t("noAdditives")}</Text>
             ) : (
               additives.map((add, idx) => (
-                <View key={idx} style={styles.additiveRow}>
+                <TouchableOpacity
+                  key={idx}
+                  style={styles.additiveRow}
+                  onPress={() => setSelectedAdditive(add)}
+                >
                   <View
                     style={[
                       styles.additiveDot,
@@ -368,7 +515,8 @@ function computeScore() {
                       </Text>
                     )}
                   </View>
-                </View>
+                  <Text style={styles.additiveArrow}>›</Text>
+                </TouchableOpacity>
               ))
             )}
 
@@ -547,11 +695,73 @@ const styles = StyleSheet.create({
   additiveDot: { width: 12, height: 12, borderRadius: 6 },
   additiveName: { fontSize: 14, fontWeight: "600", color: "#222" },
   additiveUse: { fontSize: 13, color: "#777" },
+  additiveArrow: { fontSize: 22, color: "#CCC", fontWeight: "bold" },
+  additiveModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  additiveModal: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 24,
+    width: "100%",
+    maxWidth: 400,
+  },
+  additiveModalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 8,
+  },
+  additiveModalDot: { width: 16, height: 16, borderRadius: 8 },
+  additiveModalTitle: { fontSize: 18, fontWeight: "bold", color: "#222", flex: 1 },
+  additiveModalLevel: { fontSize: 14, fontWeight: "700", marginBottom: 12 },
+  additiveModalDesc: { fontSize: 15, color: "#444", lineHeight: 22 },
+  additiveModalClose: {
+    backgroundColor: "#2E7D32",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  additiveModalCloseText: { color: "#FFF", fontSize: 16, fontWeight: "600" },
   disclaimer: {
     fontSize: 12,
     color: "#999",
     fontStyle: "italic",
     marginTop: 20,
     lineHeight: 17,
+  },
+  nutrientBlock: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  baremWrap: { marginTop: 6, paddingHorizontal: 2 },
+  baremArrowRow: { width: "100%" },
+  baremArrow: { fontSize: 10, color: "#333" },
+  baremBar: {
+    flexDirection: "row",
+    height: 8,
+    borderRadius: 4,
+    overflow: "hidden",
+    marginTop: 2,
+  },
+  baremSeg: { flex: 1, height: "100%" },
+  novaBadge: {
+    alignSelf: "flex-start",
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  novaBadgeText: { color: "#FFFFFF", fontSize: 15, fontWeight: "700" },
+  microNote: {
+    fontSize: 13,
+    color: "#B45309",
+    marginTop: 8,
+    fontStyle: "italic",
   },
 });
