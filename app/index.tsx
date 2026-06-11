@@ -384,9 +384,14 @@ function levelText(level: string | null) {
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
-      >
-        <Text style={styles.title}>{t("title")}</Text>
+      ><Image
+          source={require("../assets/images/icon.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        
         <Text style={styles.subtitle}>{t("subtitle")}</Text>
+        
 
         <TouchableOpacity style={styles.scanBigButton} onPress={openScanner}>
           <Text style={styles.scanBigButtonText}>📷 {t("scanButton")}</Text>
@@ -763,5 +768,10 @@ const styles = StyleSheet.create({
     color: "#B45309",
     marginTop: 8,
     fontStyle: "italic",
+  },
+  logo: {
+    width: 140,
+    height: 140,
+    marginBottom: 8,
   },
 });
