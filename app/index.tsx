@@ -283,7 +283,7 @@ useEffect(() => {
 const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
   return (
-    <KeyboarAvoidingView
+    <KeyboardAvoidingView
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
