@@ -16,6 +16,9 @@ import {
   View,
 } from "react-native";
 import { additivesInfo } from "../i18n/additives";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
+import { saveToHistory } from "../utils/history";
 
 const languages = [
   { code: "ro", label: "Română", flag: "🇷🇴" },
@@ -50,6 +53,14 @@ function nutrientColor(value: number, midThreshold: number, highThreshold: numbe
 
 export default function Index() {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
+  const params = useLocalSearchParams<{ barcode?: string }>();
+  useEffect(() => {
+    if (params.barcode) {
+      setBarcode(params.barcode);
+      fetchProductByCode(params.barcode);
+    }
+  }, [params.barcode]);
   const [barcode, setBarcode] = useState("");
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<any>(null);
@@ -121,16 +132,18 @@ export default function Index() {
   const n = product?.nutriments ?? {};
 
   const additiveTags: string[] = product?.additives_tags ?? [];
+const lang = i18n.language;
   const additives = additiveTags.map((tag: string) => {
     const code = tag.replace("en:", "").toLowerCase();
     const info = (additivesInfo as any)[code];
+    const pick = (field: any) =>
+      field ? field[lang] ?? field.en ?? field.ro ?? "" : "";
     return {
       code: code.toUpperCase(),
-      name: info?.name ?? "",
-      use: info?.use ?? "",
+      name: pick(info?.name),
+      use: pick(info?.use),
       level: info?.level ?? null,
-      descRo: info?.descRo ?? "",
-      descEn: info?.descEn ?? "",
+      desc: pick(info?.desc),
     };
   });
 function levelText(level: string | null) {
@@ -169,7 +182,18 @@ function levelText(level: string | null) {
     return Math.max(0, Math.round(score));
   }
   const score = product ? computeScore() : 0;
-
+useEffect(() => {
+    if (product) {
+      saveToHistory({
+        barcode: product.code ?? barcode,
+        name: product.product_name || t("unknownName"),
+        brand: product.brands ? product.brands.split(",")[0] : t("unknownBrand"),
+        imageUrl: product.image_url ?? "",
+        score,
+        scannedAt: Date.now(),
+      });
+    }
+  }, [product]);
  function buildNutrientBadges() {
     const rows: {
       label: string;
@@ -256,15 +280,10 @@ function levelText(level: string | null) {
     const isBeverage = /water|eau|apa|drink|beverage|boisson|soda|juice|jus|cola|limonad/i.test(
     (product?.categories ?? "") + (product?.product_name ?? "") + (product?.brands ?? "")
   );
-
-  const additiveDesc = selectedAdditive
-    ? i18n.language === "ro"
-      ? selectedAdditive.descRo || selectedAdditive.descEn
-      : selectedAdditive.descEn || selectedAdditive.descRo
-    : "";
+const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
   return (
-    <KeyboardAvoidingView
+    <KeyboarAvoidingView
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
@@ -372,7 +391,13 @@ function levelText(level: string | null) {
         </Modal>
       )}
 
-      <View style={styles.langCorner}>
+     <View style={styles.langCorner}>
+        <TouchableOpacity
+          style={styles.flagButton}
+          onPress={() => router.push("/history")}
+        >
+          <Text style={styles.flagButtonText}>📜</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.flagButton}
           onPress={() => setLangMenuOpen(true)}
@@ -561,11 +586,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   cancelButtonText: { fontSize: 16, fontWeight: "600", color: "#222" },
-  langCorner: {
+ langCorner: {
     flexDirection: "row",
     justifyContent: "flex-end",
     paddingTop: 50,
     paddingHorizontal: 16,
+    gap: 10,
   },
   flagButton: {
     backgroundColor: "#FFFFFF",

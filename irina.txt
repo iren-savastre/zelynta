@@ -1,0 +1,48 @@
+
+Funcția OCR pentru ingrediente (cea nouă)
+Mai mulți aditivi în listă
+Pagina web de download (HTML/CSS)
+Traduceri descrieri aditivi
+Pregătire Play Store (cu cei 12 testeri, când ești gata)
+
+
+IDEI VIITOARE ZELYNTA:
+
+1. Funcția OCR pentru ingrediente (cea nouă)
+   - Camera citește lista de ingrediente din poză (Google ML Kit, gratuit)
+   - Analizează textul: găsește aditivi, ingrediente nesănătoase
+   - Util pentru produse fără cod de bare
+
+2. Mai mulți aditivi în listă (additives.ts)
+
+3. Pagina web de download (HTML/CSS)
+   - Găzduire gratuită pe GitHub Pages
+   - APK pe GitHub Releases
+   - Adresă publică pentru oricine, din orice țară
+
+4. Traduceri descrieri aditivi (restul limbilor: FR, IT, ES, DE, RU, PL, NL)
+
+5. Pregătire Play Store (cu cei 12 testeri, când ești gata)
+   - 25$ o singură dată (pe viață)
+   - Aplicație gratuită = fără comision
+
+COMENZI UTILE:
+- Pornire (aceeasi retea): npx expo start
+- Salvare GitHub: git add . / git commit -m "..." / git push
+- Build APK: eas build -p android --profile preview
+- Cont Expo: savastre / irina.savastre@cf2000.onmicrosoft.com
+
+CODURI TEST:
+- Nutella: 3017620422003
+- Coca-Cola: 5449000000996
+- Fanta: 5449000054227
+- Apa Evian: 3068320055008
+
+
+
+„Salut! Lucrez la o aplicație React Native
+ + Expo numită Zelynta (scanner alimente tip Yuka).
+  Codul e pe github.com/iren-savastre/zelynta.
+   E funcțională: scanare cameră, scor sănătate, aditivi,
+    9 limbi, logo, APK făcut.
+ Vreau să continui cu [ce vrei să faci]."
