@@ -16,6 +16,7 @@ import {
   View,
 } from "react-native";
 import { additivesInfo } from "../i18n/additives";
+import { cosmeticsInfo } from "../i18n/cosmetics";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { saveToHistory } from "../utils/history";
@@ -162,6 +163,32 @@ const lang = i18n.language;
       desc: pick(info?.desc),
     };
   });
+
+  // Caută substanțe cosmetice în textul de ingrediente
+  const ingredientsTextForScan = (
+    product?.[`ingredients_text_${lang}`] ||
+    product?.ingredients_text_en ||
+    product?.ingredients_text ||
+    ""
+  ).toLowerCase();
+
+  const pickC = (field: any) =>
+    field ? field[lang] ?? field.en ?? field.ro ?? "" : "";
+
+  const cosmetics = product
+    ? Object.keys(cosmeticsInfo)
+        .filter((key) => ingredientsTextForScan.includes(key))
+        .map((key) => {
+          const info = (cosmeticsInfo as any)[key];
+          return {
+            code: pickC(info.name),
+            name: "",
+            use: pickC(info.use),
+            level: info.level ?? null,
+            desc: pickC(info.desc),
+          };
+        })
+    : [];
 function levelText(level: string | null) {
     if (level === "safe") return t("levelSafe");
     if (level === "moderate") return t("levelModerate");
@@ -191,8 +218,9 @@ function levelText(level: string | null) {
       if (satFat != null) score -= Math.min(25, (satFat / 8) * 25);
       if (salt != null) score -= Math.min(15, (salt / 1.5) * 15);
     }
-  let hasRisk = false;
+let hasRisk = false;
     let hasCaution = false;
+    // Aditivi alimentari
     additives.forEach((a) => {
       if (a.level === "risk") {
         score -= 35;
@@ -202,10 +230,20 @@ function levelText(level: string | null) {
         hasCaution = true;
       } else if (a.level === "moderate") score -= 6;
     });
+    // Substanțe cosmetice (aceeași logică)
+    cosmetics.forEach((c) => {
+      if (c.level === "risk") {
+        score -= 35;
+        hasRisk = true;
+      } else if (c.level === "caution") {
+        score -= 18;
+        hasCaution = true;
+      } else if (c.level === "moderate") score -= 6;
+    });
     let finalScore = Math.max(0, Math.round(score));
-    // Un aditiv „risc" → niciodată verde (plafon 50)
+    // Un ingredient „risc" → niciodată verde (plafon 50)
     if (hasRisk && finalScore > 50) finalScore = 50;
-    // Un aditiv „prudență" → nu poate fi verde aprins (plafon 65)
+    // Un ingredient „prudență" → nu poate fi verde aprins (plafon 65)
     if (hasCaution && finalScore > 65) finalScore = 65;
     return finalScore;
   }
@@ -583,6 +621,35 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                   <Text style={styles.additiveArrow}>›</Text>
                 </TouchableOpacity>
               ))
+            )}
+            {cosmetics.length > 0 && (
+              <>
+                <Text style={styles.scoreLabel}>{t("cosmeticsLabel")}</Text>
+                {cosmetics.map((c, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.additiveRow}
+                    onPress={() => setSelectedAdditive(c)}
+                  >
+                    <View
+                      style={[
+                        styles.additiveDot,
+                        { backgroundColor: c.level ? levelColors[c.level] : "#999" },
+                      ]}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.additiveName}>{c.code}</Text>
+                      {c.use !== "" && (
+                        <Text style={styles.additiveUse}>
+                          {c.use}
+                          {c.level ? ` — ${levelText(c.level)}` : ""}
+                        </Text>
+                      )}
+                    </View>
+                    <Text style={styles.additiveArrow}>›</Text>
+                  </TouchableOpacity>
+                ))}
+              </>
             )}
 
             <Text style={styles.disclaimer}>{t("disclaimer")}</Text>
