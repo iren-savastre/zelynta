@@ -78,28 +78,44 @@ export default function Index() {
     setLangMenuOpen(false);
   }
 
-  async function fetchProductByCode(code: string) {
+ async function fetchProductByCode(code: string) {
     setLoading(true);
     setError("");
     setProduct(null);
     setSelectedAdditive(null);
     setScannerOpen(false);
     setLangMenuOpen(false);
+
+    // Caută pe rând în 3 baze: alimente, cosmetice, produse generale
+    const databases = [
+      "https://world.openfoodfacts.org",
+      "https://world.openbeautyfacts.org",
+      "https://world.openproductsfacts.org",
+    ];
+
     try {
-      const response = await fetch(
-        `https://world.openfoodfacts.org/api/v2/product/${code}.json`,
-        {
-          headers: {
-            "User-Agent": "Zelynta/1.0 (iren.savastre@example.com)",
-          },
+      for (const base of databases) {
+        try {
+          const response = await fetch(
+            `${base}/api/v2/product/${code}.json`,
+            {
+              headers: {
+                "User-Agent": "Zelynta/1.0 (iren.savastre@example.com)",
+              },
+            }
+          );
+          const data = await response.json();
+          if (data.status === 1) {
+            setProduct(data.product);
+            setLoading(false);
+            return; // produs găsit, ne oprim
+          }
+        } catch (e) {
+          // dacă o bază eșuează, continuăm cu următoarea
         }
-      );
-      const data = await response.json();
-      if (data.status === 1) {
-        setProduct(data.product);
-      } else {
-        setError(t("errorNotFound"));
       }
+      // dacă am terminat toate bazele fără rezultat
+      setError(t("errorNotFound"));
     } catch (e) {
       setError(t("errorConnection"));
     } finally {
@@ -175,11 +191,23 @@ function levelText(level: string | null) {
       if (satFat != null) score -= Math.min(25, (satFat / 8) * 25);
       if (salt != null) score -= Math.min(15, (salt / 1.5) * 15);
     }
+  let hasRisk = false;
+    let hasCaution = false;
     additives.forEach((a) => {
-      if (a.level === "caution") score -= 8;
-      else if (a.level === "moderate") score -= 3;
+      if (a.level === "risk") {
+        score -= 35;
+        hasRisk = true;
+      } else if (a.level === "caution") {
+        score -= 18;
+        hasCaution = true;
+      } else if (a.level === "moderate") score -= 6;
     });
-    return Math.max(0, Math.round(score));
+    let finalScore = Math.max(0, Math.round(score));
+    // Un aditiv „risc" → niciodată verde (plafon 50)
+    if (hasRisk && finalScore > 50) finalScore = 50;
+    // Un aditiv „prudență" → nu poate fi verde aprins (plafon 65)
+    if (hasCaution && finalScore > 65) finalScore = 65;
+    return finalScore;
   }
   const score = product ? computeScore() : 0;
 useEffect(() => {
@@ -299,6 +327,12 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               }}
               onBarcodeScanned={handleBarcodeScanned}
             />
+            <View style={styles.scanFrame}>
+              <View style={[styles.scanCorner, styles.scanCornerTL]} />
+              <View style={[styles.scanCorner, styles.scanCornerTR]} />
+              <View style={[styles.scanCorner, styles.scanCornerBL]} />
+              <View style={[styles.scanCorner, styles.scanCornerBR]} />
+            </View>
             <View style={styles.scannerOverlay}>
               <Text style={styles.scannerText}>{t("scanInstructions")}</Text>
               <TouchableOpacity
@@ -392,11 +426,12 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       )}
 
      <View style={styles.langCorner}>
-        <TouchableOpacity
-          style={styles.flagButton}
+       <TouchableOpacity
+          style={styles.historyButton}
           onPress={() => router.push("/history")}
         >
           <Text style={styles.flagButtonText}>📜</Text>
+          <Text style={styles.historyButtonText}>{t("historyTitle")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.flagButton}
@@ -562,6 +597,49 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "#F7F7F2" },
   scannerScreen: { flex: 1, backgroundColor: "#000" },
   camera: { flex: 1 },
+  scanFrame: {
+    position: "absolute",
+    top: "35%",
+    left: "15%",
+    right: "15%",
+    height: 160,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  scanCorner: {
+    position: "absolute",
+    width: 40,
+    height: 40,
+    borderColor: "#FFFFFF",
+  },
+  scanCornerTL: {
+    top: 0,
+    left: 0,
+    borderTopWidth: 4,
+    borderLeftWidth: 4,
+    borderTopLeftRadius: 12,
+  },
+  scanCornerTR: {
+    top: 0,
+    right: 0,
+    borderTopWidth: 4,
+    borderRightWidth: 4,
+    borderTopRightRadius: 12,
+  },
+  scanCornerBL: {
+    bottom: 0,
+    left: 0,
+    borderBottomWidth: 4,
+    borderLeftWidth: 4,
+    borderBottomLeftRadius: 12,
+  },
+  scanCornerBR: {
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: 4,
+    borderRightWidth: 4,
+    borderBottomRightRadius: 12,
+  },
   scannerOverlay: {
     position: "absolute",
     bottom: 0,
@@ -592,6 +670,22 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 16,
     gap: 10,
+  },
+  historyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: "#DDD",
+  },
+  historyButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#2E7D32",
   },
   flagButton: {
     backgroundColor: "#FFFFFF",
