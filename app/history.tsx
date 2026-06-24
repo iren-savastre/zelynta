@@ -1,8 +1,8 @@
 import { useRouter, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -10,26 +10,25 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  clearHistory,
-  getHistory,
-  HistoryItem,
-  removeFromHistory,
-} from "../utils/history";
+import { getHistory, HistoryItem } from "../utils/history";
+import { getFavorites } from "../utils/favorites";
+import { scoreColor } from "../utils/score";
+import { useTheme, type ThemeColors } from "../utils/theme";
 
-function scoreColor(score: number) {
-  if (score >= 66) return "#038141";
-  if (score >= 33) return "#EE8100";
-  return "#E63E11";
-}
+type Tab = "history" | "favorites";
 
 export default function History() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const [items, setItems] = useState<HistoryItem[]>([]);
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const [tab, setTab] = useState<Tab>("history");
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [favorites, setFavorites] = useState<HistoryItem[]>([]);
 
   const load = useCallback(() => {
-    getHistory().then(setItems);
+    getHistory().then(setHistory);
+    getFavorites().then(setFavorites);
   }, []);
 
   useFocusEffect(
@@ -38,27 +37,10 @@ export default function History() {
     }, [load])
   );
 
+  const items = tab === "history" ? history : favorites;
+
   function openProduct(barcode: string) {
     router.push({ pathname: "/", params: { barcode } });
-  }
-
-  async function handleRemove(barcode: string) {
-    await removeFromHistory(barcode);
-    load();
-  }
-
-  function handleClearAll() {
-    Alert.alert(t("historyClearTitle"), t("historyClearConfirm"), [
-      { text: t("cancel"), style: "cancel" },
-      {
-        text: t("historyClearAll"),
-        style: "destructive",
-        onPress: async () => {
-          await clearHistory();
-          load();
-        },
-      },
-    ]);
   }
 
   function formatDate(ts: number) {
@@ -73,24 +55,47 @@ export default function History() {
 
   return (
     <View style={styles.screen}>
+      <StatusBar style={colors.isDark ? "light" : "dark"} />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity
+          onPress={() => {
+            if (router.canGoBack()) router.back();
+            else router.replace("/");
+          }}
+        >
           <Text style={styles.backButton}>‹ {t("cancel")}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t("historyTitle")}</Text>
-        {items.length > 0 ? (
-          <TouchableOpacity onPress={handleClearAll}>
-            <Text style={styles.clearButton}>{t("historyClearAll")}</Text>
+        <TouchableOpacity
+          onPress={() => router.push("/compare")}
+          accessibilityRole="button"
+          accessibilityLabel={t("compareButton")}
+        >
+          <Text style={styles.compareLink}>⚖️</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Taburi Istoric / Favorite */}
+      <View style={styles.tabs}>
+        {(["history", "favorites"] as Tab[]).map((key) => (
+          <TouchableOpacity
+            key={key}
+            style={[styles.tab, tab === key && styles.tabActive]}
+            onPress={() => setTab(key)}
+          >
+            <Text style={[styles.tabText, tab === key && styles.tabTextActive]}>
+              {key === "history" ? t("tabHistory") : t("tabFavorites")}
+            </Text>
           </TouchableOpacity>
-        ) : (
-          <View style={{ width: 60 }} />
-        )}
+        ))}
       </View>
 
       {items.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>📭</Text>
-          <Text style={styles.emptyText}>{t("historyEmpty")}</Text>
+          <Text style={styles.emptyIcon}>{tab === "history" ? "📭" : "🤍"}</Text>
+          <Text style={styles.emptyText}>
+            {tab === "history" ? t("historyEmpty") : t("favoritesEmpty")}
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -115,10 +120,10 @@ export default function History() {
               )}
               <View style={styles.info}>
                 <Text style={styles.name} numberOfLines={1}>
-                  {item.brand}
+                  {item.name}
                 </Text>
                 <Text style={styles.brand} numberOfLines={1}>
-                  {item.name}
+                  {item.brand}
                 </Text>
                 <Text style={styles.date}>{formatDate(item.scannedAt)}</Text>
               </View>
@@ -126,12 +131,6 @@ export default function History() {
                 <Text style={[styles.score, { color: scoreColor(item.score) }]}>
                   {item.score}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleRemove(item.barcode)}
-                  hitSlop={10}
-                >
-                  <Text style={styles.removeButton}>✕</Text>
-                </TouchableOpacity>
               </View>
             </TouchableOpacity>
           )}
@@ -141,51 +140,61 @@ export default function History() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "#F7F7F2" },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingTop: 50,
-    paddingBottom: 12,
-    paddingHorizontal: 16,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#EEE",
-  },
-  backButton: { fontSize: 16, color: "#2E7D32", fontWeight: "600", width: 60 },
-  headerTitle: { fontSize: 18, fontWeight: "bold", color: "#222" },
-  clearButton: {
-    fontSize: 14,
-    color: "#C62828",
-    fontWeight: "600",
-    width: 60,
-    textAlign: "right",
-  },
-  empty: { flex: 1, justifyContent: "center", alignItems: "center", gap: 12 },
-  emptyIcon: { fontSize: 48 },
-  emptyText: { fontSize: 16, color: "#999" },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
-    gap: 12,
-  },
-  thumb: { width: 56, height: 56, borderRadius: 8 },
-  thumbPlaceholder: {
-    backgroundColor: "#F0F0F0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  info: { flex: 1 },
-  name: { fontSize: 15, fontWeight: "700", color: "#222" },
-  brand: { fontSize: 13, color: "#666" },
-  date: { fontSize: 12, color: "#999", marginTop: 2 },
-  scoreCol: { alignItems: "center", gap: 8 },
-  score: { fontSize: 20, fontWeight: "bold" },
-  removeButton: { fontSize: 16, color: "#CCC" },
-});
+const makeStyles = (c: ThemeColors) =>
+  StyleSheet.create({
+    screen: { flex: 1, backgroundColor: c.bg },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingTop: 50,
+      paddingBottom: 12,
+      paddingHorizontal: 16,
+      backgroundColor: c.navbarBg,
+      borderBottomWidth: 1,
+      borderBottomColor: c.border,
+    },
+    backButton: { fontSize: 16, color: c.primary, fontWeight: "600", width: 60 },
+    headerTitle: { fontSize: 18, fontWeight: "bold", color: c.text },
+    compareLink: { fontSize: 22, width: 60, textAlign: "right" },
+    tabs: {
+      flexDirection: "row",
+      gap: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: 10,
+      borderRadius: 12,
+      alignItems: "center",
+      backgroundColor: c.surfaceAlt,
+    },
+    tabActive: { backgroundColor: c.primary },
+    tabText: { fontSize: 15, fontWeight: "700", color: c.textMuted },
+    tabTextActive: { color: "#FFFFFF" },
+    empty: { flex: 1, justifyContent: "center", alignItems: "center", gap: 12 },
+    emptyIcon: { fontSize: 48 },
+    emptyText: { fontSize: 16, color: c.textFaint },
+    row: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: c.surface,
+      borderRadius: 12,
+      padding: 12,
+      marginBottom: 10,
+      gap: 12,
+    },
+    thumb: { width: 56, height: 56, borderRadius: 8 },
+    thumbPlaceholder: {
+      backgroundColor: c.surfaceAlt,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    info: { flex: 1 },
+    name: { fontSize: 15, fontWeight: "700", color: c.text },
+    brand: { fontSize: 13, color: c.textMuted },
+    date: { fontSize: 12, color: c.textFaint, marginTop: 2 },
+    scoreCol: { alignItems: "center", gap: 8 },
+    score: { fontSize: 20, fontWeight: "bold" },
+  });
