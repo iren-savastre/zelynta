@@ -15,6 +15,7 @@ import { getHistory, HistoryItem } from "../utils/history";
 import { getFavorites } from "../utils/favorites";
 import { analyzeProduct, scoreColor } from "../utils/score";
 import { useTheme, type ThemeColors } from "../utils/theme";
+import ZoomableImage from "../components/ZoomableImage";
 
 const DATABASES = [
   "https://world.openfoodfacts.org",
@@ -100,13 +101,11 @@ export default function Compare() {
     const a = analyzeProduct(p, lang);
     return (
       <View style={styles.col}>
-        {p.image_url ? (
-          <Image source={{ uri: p.image_url }} style={styles.colImage} resizeMode="contain" />
-        ) : (
-          <View style={[styles.colImage, styles.colImagePh]}>
-            <Text style={{ fontSize: 28 }}>🥫</Text>
-          </View>
-        )}
+        <ZoomableImage
+          uri={p.image_url}
+          style={styles.colImage}
+          accessibilityLabel={p.product_name}
+        />
         <Text style={styles.colName} numberOfLines={2}>
           {p.product_name || (p.brands ? p.brands.split(",")[0] : "")}
         </Text>

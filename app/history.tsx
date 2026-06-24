@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import { getHistory, HistoryItem } from "../utils/history";
 import { getFavorites } from "../utils/favorites";
 import { scoreColor } from "../utils/score";
 import { useTheme, type ThemeColors } from "../utils/theme";
+import ZoomableImage from "../components/ZoomableImage";
 
 type Tab = "history" | "favorites";
 
@@ -107,17 +107,11 @@ export default function History() {
               style={styles.row}
               onPress={() => openProduct(item.barcode)}
             >
-              {item.imageUrl ? (
-                <Image
-                  source={{ uri: item.imageUrl }}
-                  style={styles.thumb}
-                  resizeMode="contain"
-                />
-              ) : (
-                <View style={[styles.thumb, styles.thumbPlaceholder]}>
-                  <Text style={{ fontSize: 24 }}>🥫</Text>
-                </View>
-              )}
+              <ZoomableImage
+                uri={item.imageUrl}
+                style={styles.thumb}
+                accessibilityLabel={item.name}
+              />
               <View style={styles.info}>
                 <Text style={styles.name} numberOfLines={1}>
                   {item.name}

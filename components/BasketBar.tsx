@@ -2,7 +2,6 @@ import { useRouter, usePathname } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -14,6 +13,7 @@ import { useBasket } from "../utils/basket";
 import { addFavorite } from "../utils/favorites";
 import { scoreColor } from "../utils/score";
 import { useTheme, type ThemeColors } from "../utils/theme";
+import ZoomableImage from "./ZoomableImage";
 
 export default function BasketBar() {
   const { t } = useTranslation();
@@ -67,13 +67,7 @@ export default function BasketBar() {
 
             {items.map((it) => (
               <View key={it.barcode} style={styles.row}>
-                {it.imageUrl ? (
-                  <Image source={{ uri: it.imageUrl }} style={styles.thumb} resizeMode="contain" />
-                ) : (
-                  <View style={[styles.thumb, styles.thumbPh]}>
-                    <Text style={{ fontSize: 20 }}>🥫</Text>
-                  </View>
-                )}
+                <ZoomableImage uri={it.imageUrl} style={styles.thumb} accessibilityLabel={it.name} />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.name} numberOfLines={1}>{it.name}</Text>
                   <Text style={styles.brand} numberOfLines={1}>{it.brand}</Text>
