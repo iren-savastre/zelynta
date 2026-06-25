@@ -533,6 +533,27 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               }}
               onBarcodeScanned={ocrLoading ? undefined : handleBarcodeScanned}
             />
+            {permission && !permission.granted && (
+              <View style={styles.permDenied}>
+                <Text style={styles.permIcon}>📷</Text>
+                <Text style={styles.permTitle}>{t("cameraBlockedTitle")}</Text>
+                <Text style={styles.permHelp}>{t("cameraBlockedHelp")}</Text>
+                {permission.canAskAgain && (
+                  <TouchableOpacity
+                    style={styles.permButton}
+                    onPress={() => requestPermission().catch(() => {})}
+                  >
+                    <Text style={styles.permButtonText}>{t("retry")}</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  style={[styles.cancelButton, { marginTop: 12 }]}
+                  onPress={closeScanner}
+                >
+                  <Text style={styles.cancelButtonText}>{t("cancel")}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             <View style={styles.scanFrame}>
               <View style={[styles.scanCorner, styles.scanCornerTL]} />
               <View style={[styles.scanCorner, styles.scanCornerTR]} />
@@ -1222,6 +1243,35 @@ const makeStyles = (c: ThemeColors) =>
     alignItems: "center",
   },
   ingredientsButtonText: { fontSize: 16, fontWeight: "800", color: "#222" },
+  permDenied: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#10160F",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 32,
+    gap: 14,
+  },
+  permIcon: { fontSize: 56 },
+  permTitle: { fontSize: 20, fontWeight: "800", color: "#FFF", textAlign: "center" },
+  permHelp: {
+    fontSize: 15,
+    color: "#C9D2C9",
+    textAlign: "center",
+    lineHeight: 22,
+    maxWidth: 360,
+  },
+  permButton: {
+    backgroundColor: "#2E7D32",
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    marginTop: 8,
+  },
+  permButtonText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
   torchButton: {
     position: "absolute",
     top: 60,

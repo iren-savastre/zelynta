@@ -82,6 +82,9 @@ export const translations = {
     ocrTitle: "Ingrediente scanate",
     ocrNoText: "Nu am putut citi text. Apropie camera de lista de ingrediente.",
     ocrError: "Eroare la citirea textului. Încearcă din nou.",
+    cameraBlockedTitle: "Camera este blocată",
+    cameraBlockedHelp:
+      "Ai blocat accesul la cameră. Apasă pe lacătul 🔒 din bara de adrese → Permisiuni → Cameră → Permite, apoi reîncarcă pagina.",
   },
   en: {
     title: "Zelynta",
@@ -166,6 +169,9 @@ additivesLabel: "Additives",
     ocrTitle: "Scanned ingredients",
     ocrNoText: "Couldn't read any text. Move the camera closer to the ingredient list.",
     ocrError: "Error reading text. Try again.",
+    cameraBlockedTitle: "Camera is blocked",
+    cameraBlockedHelp:
+      "You blocked camera access. Tap the 🔒 lock in the address bar → Permissions → Camera → Allow, then reload the page.",
   },
   fr: {
     title: "Zelynta",
