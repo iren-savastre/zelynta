@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Animated,
   Easing,
   Image,
@@ -26,6 +27,7 @@ import { isFavorite, toggleFavorite } from "../utils/favorites";
 import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
 import { useTheme, type ThemeColors } from "../utils/theme";
 import { useBasket } from "../utils/basket";
+import { ocrImage, extractAdditiveTags } from "../utils/ocr";
 import JuicyButton from "../components/JuicyButton";
 
 const languages = [
@@ -195,6 +197,8 @@ export default function Index() {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [selectedAdditive, setSelectedAdditive] = useState<any>(null);
   const [torchOn, setTorchOn] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const cameraRef = useRef<CameraView>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [favorite, setFavorite] = useState(false);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
@@ -278,7 +282,7 @@ export default function Index() {
   }
 
   function handleBarcodeScanned({ data }: { data: string }) {
-    if (!scannerOpen) return; // evită declanșarea multiplă
+    if (!scannerOpen || ocrLoading) return; // evită declanșarea multiplă
     // Feedback haptic la scanare reușită
     if (Platform.OS !== "web") {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
@@ -288,6 +292,48 @@ export default function Index() {
     closeScanner();
     setBarcode(data);
     fetchProductByCode(data);
+  }
+
+  // Citește lista de ingrediente din poză (OCR) — aceeași cameră
+  async function captureIngredients() {
+    if (!cameraRef.current || ocrLoading) return;
+    setOcrLoading(true);
+    try {
+      const photo = await cameraRef.current.takePictureAsync({
+        base64: true,
+        quality: 0.5,
+      });
+      if (Platform.OS !== "web") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+      }
+      closeScanner();
+      setError("");
+      setProduct(null);
+      setLoading(true);
+      const text = await ocrImage(photo?.base64 ?? "");
+      if (!text || text.trim().length < 3) {
+        setError(t("ocrNoText"));
+        setLoading(false);
+        return;
+      }
+      const tags = extractAdditiveTags(text);
+      setProduct({
+        code: `ocr-${Date.now()}`,
+        product_name: t("ocrTitle"),
+        brands: "",
+        image_url: photo?.uri ?? "",
+        ingredients_text: text,
+        additives_tags: tags,
+        nutriments: {},
+        categories_tags: [],
+      });
+      setLoading(false);
+    } catch (e) {
+      setError(t("ocrError"));
+      setLoading(false);
+    } finally {
+      setOcrLoading(false);
+    }
   }
 
   const n = product?.nutriments ?? {};
@@ -476,13 +522,14 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
         <Modal visible transparent={false} animationType="slide">
           <View style={styles.scannerScreen}>
             <CameraView
+              ref={cameraRef}
               style={styles.camera}
               facing="back"
               enableTorch={torchOn}
               barcodeScannerSettings={{
                 barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
               }}
-              onBarcodeScanned={handleBarcodeScanned}
+              onBarcodeScanned={ocrLoading ? undefined : handleBarcodeScanned}
             />
             <View style={styles.scanFrame}>
               <View style={[styles.scanCorner, styles.scanCornerTL]} />
@@ -500,6 +547,21 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             </TouchableOpacity>
             <View style={styles.scannerOverlay}>
               <Text style={styles.scannerText}>{t("scanInstructions")}</Text>
+              <TouchableOpacity
+                style={styles.ingredientsButton}
+                onPress={captureIngredients}
+                disabled={ocrLoading}
+                accessibilityRole="button"
+                accessibilityLabel={t("readIngredients")}
+              >
+                {ocrLoading ? (
+                  <ActivityIndicator color="#222" />
+                ) : (
+                  <Text style={styles.ingredientsButtonText}>
+                    📝 {t("readIngredients")}
+                  </Text>
+                )}
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={closeScanner}
@@ -1149,6 +1211,15 @@ const makeStyles = (c: ThemeColors) =>
     borderRadius: 12,
   },
   cancelButtonText: { fontSize: 16, fontWeight: "600", color: "#222" },
+  ingredientsButton: {
+    backgroundColor: "#FFD54F",
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 14,
+    minWidth: 220,
+    alignItems: "center",
+  },
+  ingredientsButtonText: { fontSize: 16, fontWeight: "800", color: "#222" },
   torchButton: {
     position: "absolute",
     top: 60,
