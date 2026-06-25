@@ -124,6 +124,7 @@ export default function Index() {
   const glassStrong = useMemo(() => makeGlassStrong(colors), [colors]);
   const { width } = useWindowDimensions();
   const isDesktop = isWeb && width >= 900;
+  const isNarrow = width < 480; // telefon: navbar compact, fără text la Istoric
   const params = useLocalSearchParams<{ barcode?: string }>();
 
   // Roșia care țopăie 🍅
@@ -719,13 +720,18 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             <Text style={styles.iconButtonText}>{colors.isDark ? "☀️" : "🌙"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.historyButton, isWeb && glass]}
+            style={[
+              isNarrow ? styles.iconButton : styles.historyButton,
+              isWeb && glass,
+            ]}
             onPress={() => router.push("/history")}
             accessibilityRole="button"
             accessibilityLabel={t("historyTitle")}
           >
-            <Text style={styles.flagButtonText}>📜</Text>
-            <Text style={styles.historyButtonText}>{t("historyTitle")}</Text>
+            <Text style={styles.iconButtonText}>📜</Text>
+            {!isNarrow && (
+              <Text style={styles.historyButtonText}>{t("historyTitle")}</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.flagButton, isWeb && glass]}
