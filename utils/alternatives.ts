@@ -1,4 +1,4 @@
-import { analyzeProduct } from "./score";
+import { analyzeProduct, productDisplay } from "./score";
 
 export type Alternative = {
   barcode: string;
@@ -34,13 +34,16 @@ export async function getBetterAlternatives(
 
     const scored = products
       .filter((p) => p.code && p.code !== product.code && p.product_name)
-      .map((p) => ({
-        barcode: p.code,
-        name: p.product_name,
-        brand: p.brands ? p.brands.split(",")[0] : "",
-        imageUrl: p.image_url ?? "",
-        score: analyzeProduct(p, lang).score,
-      }))
+      .map((p) => {
+        const d = productDisplay(p);
+        return {
+          barcode: p.code,
+          name: d.title,
+          brand: d.subtitle,
+          imageUrl: p.image_url ?? "",
+          score: analyzeProduct(p, lang).score,
+        };
+      })
       // Doar produse clar mai bune
       .filter((p) => p.score >= currentScore + 10)
       .sort((a, b) => b.score - a.score);

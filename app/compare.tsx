@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { getHistory, HistoryItem } from "../utils/history";
 import { getFavorites } from "../utils/favorites";
-import { analyzeProduct, scoreColor } from "../utils/score";
+import { analyzeProduct, productDisplay, scoreColor } from "../utils/score";
 import { useTheme, type ThemeColors } from "../utils/theme";
 import ZoomableImage from "../components/ZoomableImage";
 
@@ -107,7 +107,7 @@ export default function Compare() {
           accessibilityLabel={p.product_name}
         />
         <Text style={styles.colName} numberOfLines={2}>
-          {p.product_name || (p.brands ? p.brands.split(",")[0] : "")}
+          {productDisplay(p).title}
         </Text>
         <View style={[styles.colScore, { borderColor: scoreColor(a.score) }]}>
           <Text style={[styles.colScoreNum, { color: scoreColor(a.score) }]}>

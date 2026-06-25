@@ -129,3 +129,36 @@ export function scoreColor(score: number) {
   if (score >= 33) return "#EE8100";
   return "#E63E11";
 }
+
+// Alege numele „de afișat" al produsului.
+// Datele OpenFoodFacts sunt inconsecvente: uneori numele recognoscibil e în
+// product_name (Nutella), alteori în brands (Coca-Cola, când product_name e
+// doar un descriptor gen „Original Taste"). Regula:
+//  - dacă product_name e chiar o marcă din listă → îl folosim ca titlu (Nutella)
+//  - altfel folosim prima marcă (Coca-Cola), iar product_name devine subtitlu
+export function productDisplay(product: any): { title: string; subtitle: string } {
+  const brandList = String(product?.brands || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const pname = String(product?.product_name || "").trim();
+  const brand0 = brandList[0] || "";
+  const pnameIsBrand =
+    !!pname && brandList.some((b) => b.toLowerCase() === pname.toLowerCase());
+
+  if (pname && pnameIsBrand) {
+    return {
+      title: pname,
+      subtitle:
+        brand0 && brand0.toLowerCase() !== pname.toLowerCase() ? brand0 : "",
+    };
+  }
+  if (brand0) {
+    return {
+      title: brand0,
+      subtitle:
+        pname && pname.toLowerCase() !== brand0.toLowerCase() ? pname : "",
+    };
+  }
+  return { title: pname, subtitle: "" };
+}

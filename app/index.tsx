@@ -22,7 +22,7 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { saveToHistory } from "../utils/history";
-import { analyzeProduct } from "../utils/score";
+import { analyzeProduct, productDisplay } from "../utils/score";
 import { isFavorite, toggleFavorite } from "../utils/favorites";
 import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
 import { useTheme, type ThemeColors } from "../utils/theme";
@@ -354,6 +354,9 @@ export default function Index() {
   const cosmetics = analysis.cosmetics;
   const scoreData = analysis;
   const score = analysis.score;
+  const display = product
+    ? productDisplay(product)
+    : { title: "", subtitle: "" };
 
   function levelText(level: string | null) {
     if (level === "safe") return t("levelSafe");
@@ -390,8 +393,8 @@ useEffect(() => {
     if (!product) return;
     saveToHistory({
       barcode: product.code ?? barcode,
-      name: product.product_name || t("unknownName"),
-      brand: product.brands ? product.brands.split(",")[0] : t("unknownBrand"),
+      name: display.title || t("unknownName"),
+      brand: display.subtitle,
       imageUrl: product.image_url ?? "",
       score,
       scannedAt: Date.now(),
@@ -410,8 +413,8 @@ useEffect(() => {
   function currentHistoryItem() {
     return {
       barcode: product.code ?? barcode,
-      name: product.product_name || t("unknownName"),
-      brand: product.brands ? product.brands.split(",")[0] : t("unknownBrand"),
+      name: display.title || t("unknownName"),
+      brand: display.subtitle,
       imageUrl: product.image_url ?? "",
       score,
       scannedAt: Date.now(),
@@ -852,14 +855,11 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               )}
               <View style={styles.headerInfo}>
                 <Text style={styles.productName}>
-                  {product.product_name ||
-                    (product.brands ? product.brands.split(",")[0] : t("unknownName"))}
+                  {display.title || t("unknownName")}
                 </Text>
-                <Text style={styles.productBrand}>
-                  {product.brands
-                    ? product.brands.split(",")[0]
-                    : t("unknownBrand")}
-                </Text>
+                {display.subtitle !== "" && (
+                  <Text style={styles.productBrand}>{display.subtitle}</Text>
+                )}
               </View>
               <View style={{ gap: 8 }}>
                 <TouchableOpacity
