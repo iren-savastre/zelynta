@@ -268,12 +268,14 @@ export default function Index() {
   }
 
   async function openScanner() {
-    if (!permission?.granted) {
-      const result = await requestPermission();
-      if (!result.granted) return;
-    }
     setTorchOn(false);
+    // Deschidem camera direct — utilizatorul a apăsat, e clar că vrea camera.
     setScannerOpen(true);
+    // Dacă permisiunea nu e încă acordată, o cerem în fundal (dialogul
+    // de securitate al browserului/sistemului e obligatoriu, nu îl putem evita).
+    if (!permission?.granted) {
+      requestPermission().catch(() => {});
+    }
   }
 
   function closeScanner() {
