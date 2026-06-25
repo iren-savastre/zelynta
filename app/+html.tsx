@@ -1,0 +1,48 @@
+import { ScrollViewStyleReset } from "expo-router/html";
+import { type PropsWithChildren } from "react";
+
+// Documentul HTML root pentru versiunea web (randare statică).
+// Aici fixăm viewport-ul ca aplicația să se încadreze corect pe telefon.
+export default function Root({ children }: PropsWithChildren) {
+  return (
+    <html lang="ro">
+      <head>
+        <meta charSet="utf-8" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        {/* Încadrare mobilă: lățime = ecranul, fără pinch-zoom, fără pan */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+        />
+        <meta name="theme-color" content="#2E7D32" />
+        <ScrollViewStyleReset />
+        <style dangerouslySetInnerHTML={{ __html: globalCss }} />
+      </head>
+      <body>{children}</body>
+    </html>
+  );
+}
+
+const globalCss = `
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+`;
