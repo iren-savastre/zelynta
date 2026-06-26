@@ -1,19 +1,8 @@
 
-⚠️ Un avertisment important (ca să nu pierzi munca de acasă):
-Ține minte că ai additives.ts cu accent UE doar pe PC-ul de acasă — 
-încă NU e pe GitHub. Azi la școală ai modificat alte fișiere. 
-Când ajungi acasă:
-
-Fă întâi git pull (aduce ce ai făcut azi la școală)
-Dacă apare un conflict pe additives.ts (fiindcă acasă ai versiunea 
-UE, iar pe GitHub e versiunea veche), nu te speria — copiază-mi mesajul 
-și te ghidez. E rezolvabil.
 
 
 
 
-
-Funcția OCR pentru ingrediente (cea nouă)
 Mai mulți aditivi în listă
 Pagina web de download (HTML/CSS)
 Traduceri descrieri aditivi
@@ -54,12 +43,7 @@ CODURI TEST:
 
 
 
-„Salut! Lucrez la o aplicație React Native
- + Expo numită Zelynta (scanner alimente tip Yuka).
-  Codul e pe github.com/iren-savastre/zelynta.
-   E funcțională: scanare cameră, scor sănătate, aditivi,
-    9 limbi, logo, APK făcut.
- Vreau să continui cu [ce vrei să faci]."
+
 
 
 pentru biletul de avion 

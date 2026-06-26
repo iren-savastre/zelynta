@@ -26,17 +26,26 @@ function pickField(field: any, lang: string) {
 
 export function getAdditives(product: any, lang: string): AnalyzedAdditive[] {
   const tags: string[] = product?.additives_tags ?? [];
-  return tags.map((tag) => {
+  const seen = new Set<string>();
+  const out: AnalyzedAdditive[] = [];
+  for (const tag of tags) {
     const code = tag.replace("en:", "").toLowerCase();
-    const info = (additivesInfo as any)[code];
-    return {
-      code: code.toUpperCase(),
+    // Daca sub-varianta (ex. e322i, e471a) nu exista, cade pe codul de baza (e322, e471).
+    const base = code.replace(/[a-z]+$/, "");
+    const info = (additivesInfo as any)[code] ?? (additivesInfo as any)[base];
+    // Evita duplicatele aceleiasi substante (ex. E322 + E322i = lecitine).
+    const dedupeKey = info ? base : code;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    out.push({
+      code: ((additivesInfo as any)[code] ? code : base || code).toUpperCase(),
       name: pickField(info?.name, lang),
       use: pickField(info?.use, lang),
       level: info?.level ?? null,
       desc: pickField(info?.desc, lang),
-    };
-  });
+    });
+  }
+  return out;
 }
 
 export function getCosmetics(product: any, lang: string): AnalyzedAdditive[] {

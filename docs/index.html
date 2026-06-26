@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zelynta — Scanează. Înțelege. Alege mai sănătos.</title>
+  <meta name="description" content="Zelynta scanează codul de bare sau lista de ingrediente și îți spune cât de sănătos e produsul: scor, aditivi, ambalaj și alternative mai bune. Gratuit." />
+  <meta property="og:title" content="Zelynta — alege mai sănătos" />
+  <meta property="og:description" content="Scanează un produs și află scorul de sănătate, aditivii și alternative mai bune. Gratuit." />
+  <meta property="og:image" content="icon.png" />
+  <meta name="theme-color" content="#2E7D32" />
+  <link rel="icon" href="favicon.png" />
+  <style>
+    :root {
+      --green: #2E7D32;
+      --green-dark: #1f3726;
+      --lime: #85BB2F;
+      --leaf: #038141;
+      --bg: #e6efe6;
+      --surface: #ffffff;
+      --text: #1f2d22;
+      --muted: #5a6b5e;
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 600px at 12% 8%, rgba(46,125,50,0.16), transparent 60%),
+        radial-gradient(800px 700px at 90% 100%, rgba(133,187,47,0.16), transparent 55%),
+        linear-gradient(135deg, #dfeada 0%, #eef3ec 45%, #e3ede6 100%);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+    /* Bara selector de limba */
+    .langbar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; justify-content: flex-end; align-items: center;
+      padding: 12px 20px;
+      background: rgba(241,246,239,0.82);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(46,125,50,0.10);
+    }
+    .lang-dropdown { position: relative; }
+    .lang-current {
+      background: var(--surface);
+      border: 1px solid rgba(46,125,50,0.16);
+      border-radius: 12px;
+      padding: 7px 12px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 3px 12px rgba(31,55,38,0.08);
+      font-size: 14px; color: var(--text); font-weight: 600;
+    }
+    .lang-current img { width: 28px; height: 20px; border-radius: 3px; display: block; }
+    .lang-current .chev { color: var(--muted); font-size: 12px; transition: transform .15s ease; }
+    .lang-dropdown.open .chev { transform: rotate(180deg); }
+    .lang-menu {
+      position: absolute; right: 0; top: calc(100% + 8px);
+      background: var(--surface);
+      border: 1px solid rgba(46,125,50,0.12);
+      border-radius: 14px; padding: 6px;
+      box-shadow: 0 14px 40px rgba(31,55,38,0.18);
+      min-width: 190px;
+      display: none; flex-direction: column; gap: 2px;
+    }
+    .lang-dropdown.open .lang-menu { display: flex; }
+    .lang-option {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 10px;
+      cursor: pointer; border: none; background: none; width: 100%;
+      font-size: 15px; color: var(--text); text-align: left;
+    }
+    .lang-option:hover { background: rgba(46,125,50,0.07); }
+    .lang-option img { width: 28px; height: 20px; border-radius: 3px; display: block; }
+    .lang-option.active { background: #EAF5EA; color: var(--green); font-weight: 700; }
+    .lang-option .check { margin-left: auto; color: var(--green); font-weight: 800; }
+
+    /* Hero */
+    header { padding: 40px 0 40px; text-align: center; }
+    .logo {
+      width: 140px; height: 140px;
+      margin-bottom: 22px;
+      animation: hop 2.2s ease-in-out infinite;
+      transform-origin: center bottom;
+      will-change: transform;
+    }
+    @keyframes hop {
+      0%   { transform: translateY(0) scale(1); }
+      18%  { transform: translateY(-32px) scale(1.06); }
+      36%  { transform: translateY(0) scale(1); }
+      44%  { transform: translateY(-9px) scale(1.02); }
+      54%  { transform: translateY(0) scale(1); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) { .logo { animation: none; } }
+    h1 {
+      font-size: clamp(34px, 6vw, 56px);
+      font-weight: 800; letter-spacing: -0.5px; color: var(--green-dark);
+    }
+    .tagline {
+      font-size: clamp(17px, 2.4vw, 22px);
+      color: var(--muted); margin: 14px auto 0; max-width: 560px;
+    }
+
+    /* Download */
+    .cta { margin-top: 34px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: linear-gradient(180deg, #3E9E3A 0%, var(--green) 100%);
+      color: #fff; text-decoration: none; font-weight: 700; font-size: 19px;
+      padding: 16px 34px; border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(46,125,50,0.35);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(46,125,50,0.42); }
+    .btn:active { transform: translateY(0); }
+    .btn svg { width: 26px; height: 26px; }
+    .cta small { color: var(--muted); font-size: 14px; }
+    .free-pill {
+      display: inline-block; background: rgba(3,129,65,0.12); color: var(--leaf);
+      font-weight: 700; font-size: 13px; padding: 5px 14px; border-radius: 999px;
+      letter-spacing: .3px;
+    }
+    .qr {
+      margin: 30px auto 0; display: inline-flex; flex-direction: column; align-items: center;
+      background: var(--surface); border-radius: 18px; padding: 18px 20px;
+      border: 1px solid rgba(46,125,50,0.10); box-shadow: 0 8px 28px rgba(31,55,38,0.08);
+    }
+    .qr img { width: 150px; height: 150px; display: block; }
+    .qr p { color: var(--muted); font-size: 13px; margin-top: 10px; line-height: 1.35; }
+
+    /* Features */
+    section { padding: 40px 0; }
+    h2 { text-align: center; font-size: clamp(24px, 3.4vw, 34px); color: var(--green-dark); margin-bottom: 30px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+    .card {
+      background: var(--surface); border-radius: var(--radius); padding: 26px 24px;
+      border: 1px solid rgba(46,125,50,0.10);
+      box-shadow: 0 8px 28px rgba(31,55,38,0.07);
+    }
+    .card .emoji { font-size: 34px; display: block; margin-bottom: 12px; }
+    .card h3 { font-size: 18px; color: var(--green-dark); margin-bottom: 6px; }
+    .card p { color: var(--muted); font-size: 15px; }
+
+    /* Steps */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+    .step { text-align: center; padding: 8px; }
+    .step .num {
+      width: 46px; height: 46px; border-radius: 50%; margin: 0 auto 12px;
+      background: var(--green); color: #fff; font-weight: 800; font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step h3 { font-size: 17px; color: var(--green-dark); margin-bottom: 4px; }
+    .step p { color: var(--muted); font-size: 15px; }
+
+    /* Disclaimer + footer */
+    .note {
+      background: rgba(255,255,255,0.6); border: 1px solid rgba(46,125,50,0.12);
+      border-radius: 16px; padding: 18px 22px; color: var(--muted); font-size: 14px;
+      max-width: 760px; margin: 0 auto; text-align: center;
+    }
+    footer { text-align: center; padding: 40px 0 56px; color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <!-- Selector de limba (dropdown): apesi casuta, apar limbile, pagina se traduce -->
+  <div class="langbar">
+    <div class="lang-dropdown" id="langDropdown">
+      <button type="button" class="lang-current" id="langCurrent" aria-haspopup="true" aria-expanded="false" aria-label="Limbă / Language" title="Limbă / Language"></button>
+      <div class="lang-menu" id="langMenu" role="menu"></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header>
+      <img class="logo" src="icon.png" alt="Logo Zelynta" />
+      <h1>Zelynta</h1>
+      <p class="tagline" data-i18n="tagline"></p>
+
+      <div class="cta">
+        <a class="btn" href="https://github.com/iren-savastre/zelynta/releases/latest" rel="noopener" aria-label="Zelynta — Android">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span data-i18n="btn"></span>
+        </a>
+        <small data-i18n="btnSub"></small>
+        <span class="free-pill" data-i18n="free"></span>
+      </div>
+
+      <div class="qr">
+        <img src="qr.svg" alt="QR" />
+        <p data-i18n="qr"></p>
+      </div>
+    </header>
+
+    <section>
+      <h2 data-i18n="featuresTitle"></h2>
+      <div class="grid">
+        <div class="card"><span class="emoji">📷</span><h3 data-i18n="f1t"></h3><p data-i18n="f1d"></p></div>
+        <div class="card"><span class="emoji">📝</span><h3 data-i18n="f2t"></h3><p data-i18n="f2d"></p></div>
+        <div class="card"><span class="emoji">⚗️</span><h3 data-i18n="f3t"></h3><p data-i18n="f3d"></p></div>
+        <div class="card"><span class="emoji">🍏</span><h3 data-i18n="f4t"></h3><p data-i18n="f4d"></p></div>
+        <div class="card"><span class="emoji">♻️</span><h3 data-i18n="f5t"></h3><p data-i18n="f5d"></p></div>
+        <div class="card"><span class="emoji">💄</span><h3 data-i18n="f6t"></h3><p data-i18n="f6d"></p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2 data-i18n="stepsTitle"></h2>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h3 data-i18n="s1t"></h3><p data-i18n="s1d"></p></div>
+        <div class="step"><div class="num">2</div><h3 data-i18n="s2t"></h3><p data-i18n="s2d"></p></div>
+        <div class="step"><div class="num">3</div><h3 data-i18n="s3t"></h3><p data-i18n="s3d"></p></div>
+      </div>
+    </section>
+
+    <section>
+      <p class="note" data-i18n="note"></p>
+    </section>
+
+    <footer>
+      <p data-i18n="footer1"></p>
+      <p>© Zelynta</p>
+    </footer>
+  </div>
+
+  <script>
+    const LANGS = [
+      { code: "ro", cc: "ro", label: "Română" },
+      { code: "en", cc: "gb", label: "English" },
+      { code: "fr", cc: "fr", label: "Français" },
+      { code: "it", cc: "it", label: "Italiano" },
+      { code: "es", cc: "es", label: "Español" },
+      { code: "de", cc: "de", label: "Deutsch" },
+      { code: "ru", cc: "ru", label: "Русский" },
+      { code: "pl", cc: "pl", label: "Polski" },
+      { code: "nl", cc: "nl", label: "Nederlands" },
+    ];
+
+    const I18N = {
+      ro: {
+        tagline: "Scanează un produs și află, în câteva secunde, cât de sănătos e: scor, aditivi, ambalaj și alternative mai bune.",
+        btn: "Descarcă pentru Android", btnSub: "Fișier APK · instalare directă · fără cont", free: "100% GRATUIT",
+        qr: "Scanează cu telefonul ca să deschizi pagina",
+        featuresTitle: "Ce face Zelynta",
+        f1t: "Scanează codul de bare", f1d: "Îndreaptă camera spre produs și primești instant scorul de sănătate din baze de date internaționale.",
+        f2t: "Citește ingredientele", f2d: "Fotografiază lista de ingrediente, iar aplicația găsește aditivii — util și pentru produse fără cod de bare.",
+        f3t: "Aditivi explicați", f3d: "Fiecare E-uri cu nivel de risc și explicație clară: ce e, unde apare și ce spun reglementările UE.",
+        f4t: "Alternative mai bune", f4d: "Îți sugerează produse similare cu scor mai mare, ca să alegi mai sănătos pe loc.",
+        f5t: "Ambalaj & nutriție", f5d: "Vezi tipul de ambalaj, zahărul, sarea și grăsimile saturate, cu repere de culoare ușor de citit.",
+        f6t: "Și cosmetice", f6d: "Funcționează și pentru produse cosmetice: parabeni, alergeni de parfum și alte substanțe de urmărit.",
+        stepsTitle: "În 3 pași",
+        s1t: "Scanează", s1d: "Cod de bare sau lista de ingrediente.",
+        s2t: "Înțelege", s2d: "Scor, aditivi și avertismente clare.",
+        s3t: "Alege", s3d: "Compară și ia o variantă mai bună.",
+        note: "ℹ️ Zelynta are scop informativ și educativ. Nu înlocuiește sfatul unui medic sau nutriționist. Datele despre produse provin din baze deschise (Open Food Facts, Open Beauty Facts) și pot fi incomplete.",
+        footer1: "Făcut cu 🍅 pentru alegeri mai bune",
+      },
+      en: {
+        tagline: "Scan a product and find out in seconds how healthy it is: score, additives, packaging and better alternatives.",
+        btn: "Download for Android", btnSub: "APK file · direct install · no account", free: "100% FREE",
+        qr: "Scan with your phone to open the page",
+        featuresTitle: "What Zelynta does",
+        f1t: "Scan the barcode", f1d: "Point the camera at the product and instantly get the health score from international databases.",
+        f2t: "Read the ingredients", f2d: "Photograph the ingredient list and the app finds the additives — handy for products without a barcode.",
+        f3t: "Additives explained", f3d: "Every E-number with a risk level and a clear explanation: what it is, where it appears and what EU rules say.",
+        f4t: "Better alternatives", f4d: "It suggests similar products with a higher score, so you choose healthier on the spot.",
+        f5t: "Packaging & nutrition", f5d: "See the packaging type, sugar, salt and saturated fat, with easy color cues.",
+        f6t: "Cosmetics too", f6d: "It also works for cosmetics: parabens, fragrance allergens and other substances to watch.",
+        stepsTitle: "In 3 steps",
+        s1t: "Scan", s1d: "A barcode or the ingredient list.",
+        s2t: "Understand", s2d: "Score, additives and clear warnings.",
+        s3t: "Choose", s3d: "Compare and pick a better option.",
+        note: "ℹ️ Zelynta is for informational and educational purposes. It does not replace advice from a doctor or nutritionist. Product data comes from open databases (Open Food Facts, Open Beauty Facts) and may be incomplete.",
+        footer1: "Made with 🍅 for better choices",
+      },
+      fr: {
+        tagline: "Scannez un produit et découvrez en quelques secondes s'il est sain : score, additifs, emballage et meilleures alternatives.",
+        btn: "Télécharger pour Android", btnSub: "Fichier APK · installation directe · sans compte", free: "100% GRATUIT",
+        qr: "Scannez avec votre téléphone pour ouvrir la page",
+        featuresTitle: "Ce que fait Zelynta",
+        f1t: "Scannez le code-barres", f1d: "Dirigez la caméra vers le produit et obtenez instantanément le score santé issu de bases de données internationales.",
+        f2t: "Lisez les ingrédients", f2d: "Photographiez la liste des ingrédients et l'application trouve les additifs — pratique pour les produits sans code-barres.",
+        f3t: "Additifs expliqués", f3d: "Chaque numéro E avec un niveau de risque et une explication claire : ce que c'est, où il apparaît et ce que dit la réglementation UE.",
+        f4t: "Meilleures alternatives", f4d: "Elle suggère des produits similaires avec un meilleur score, pour choisir plus sain immédiatement.",
+        f5t: "Emballage & nutrition", f5d: "Voyez le type d'emballage, le sucre, le sel et les graisses saturées, avec des repères de couleur faciles.",
+        f6t: "Cosmétiques aussi", f6d: "Fonctionne aussi pour les cosmétiques : parabènes, allergènes de parfum et autres substances à surveiller.",
+        stepsTitle: "En 3 étapes",
+        s1t: "Scannez", s1d: "Un code-barres ou la liste des ingrédients.",
+        s2t: "Comprenez", s2d: "Score, additifs et avertissements clairs.",
+        s3t: "Choisissez", s3d: "Comparez et prenez une meilleure option.",
+        note: "ℹ️ Zelynta a un but informatif et éducatif. Elle ne remplace pas l'avis d'un médecin ou d'un nutritionniste. Les données proviennent de bases ouvertes (Open Food Facts, Open Beauty Facts) et peuvent être incomplètes.",
+        footer1: "Fait avec 🍅 pour de meilleurs choix",
+      },
+      it: {
+        tagline: "Scansiona un prodotto e scopri in pochi secondi quanto è sano: punteggio, additivi, imballaggio e alternative migliori.",
+        btn: "Scarica per Android", btnSub: "File APK · installazione diretta · senza account", free: "100% GRATIS",
+        qr: "Inquadra con il telefono per aprire la pagina",
+        featuresTitle: "Cosa fa Zelynta",
+        f1t: "Scansiona il codice a barre", f1d: "Punta la fotocamera sul prodotto e ottieni subito il punteggio di salute da database internazionali.",
+        f2t: "Leggi gli ingredienti", f2d: "Fotografa la lista degli ingredienti e l'app trova gli additivi — utile per i prodotti senza codice a barre.",
+        f3t: "Additivi spiegati", f3d: "Ogni numero E con un livello di rischio e una spiegazione chiara: cos'è, dove compare e cosa dicono le norme UE.",
+        f4t: "Alternative migliori", f4d: "Suggerisce prodotti simili con un punteggio più alto, per scegliere più sano sul momento.",
+        f5t: "Imballaggio e nutrizione", f5d: "Vedi il tipo di imballaggio, zucchero, sale e grassi saturi, con indicatori di colore facili.",
+        f6t: "Anche cosmetici", f6d: "Funziona anche per i cosmetici: parabeni, allergeni dei profumi e altre sostanze da tenere d'occhio.",
+        stepsTitle: "In 3 passi",
+        s1t: "Scansiona", s1d: "Un codice a barre o la lista ingredienti.",
+        s2t: "Capisci", s2d: "Punteggio, additivi e avvisi chiari.",
+        s3t: "Scegli", s3d: "Confronta e prendi un'opzione migliore.",
+        note: "ℹ️ Zelynta ha scopo informativo ed educativo. Non sostituisce il parere di un medico o nutrizionista. I dati provengono da database aperti (Open Food Facts, Open Beauty Facts) e possono essere incompleti.",
+        footer1: "Fatto con 🍅 per scelte migliori",
+      },
+      es: {
+        tagline: "Escanea un producto y descubre en segundos lo saludable que es: puntuación, aditivos, envase y mejores alternativas.",
+        btn: "Descargar para Android", btnSub: "Archivo APK · instalación directa · sin cuenta", free: "100% GRATIS",
+        qr: "Escanea con el móvil para abrir la página",
+        featuresTitle: "Qué hace Zelynta",
+        f1t: "Escanea el código de barras", f1d: "Apunta la cámara al producto y obtén al instante la puntuación de salud de bases de datos internacionales.",
+        f2t: "Lee los ingredientes", f2d: "Fotografía la lista de ingredientes y la app encuentra los aditivos — útil para productos sin código de barras.",
+        f3t: "Aditivos explicados", f3d: "Cada número E con un nivel de riesgo y una explicación clara: qué es, dónde aparece y qué dice la normativa de la UE.",
+        f4t: "Mejores alternativas", f4d: "Sugiere productos similares con mayor puntuación, para elegir más sano al momento.",
+        f5t: "Envase y nutrición", f5d: "Mira el tipo de envase, el azúcar, la sal y las grasas saturadas, con señales de color fáciles.",
+        f6t: "También cosméticos", f6d: "También funciona con cosméticos: parabenos, alérgenos del perfume y otras sustancias a vigilar.",
+        stepsTitle: "En 3 pasos",
+        s1t: "Escanea", s1d: "Un código de barras o la lista de ingredientes.",
+        s2t: "Entiende", s2d: "Puntuación, aditivos y avisos claros.",
+        s3t: "Elige", s3d: "Compara y elige una opción mejor.",
+        note: "ℹ️ Zelynta tiene fines informativos y educativos. No sustituye el consejo de un médico o nutricionista. Los datos provienen de bases abiertas (Open Food Facts, Open Beauty Facts) y pueden estar incompletos.",
+        footer1: "Hecho con 🍅 para mejores elecciones",
+      },
+      de: {
+        tagline: "Scanne ein Produkt und erfahre in Sekunden, wie gesund es ist: Bewertung, Zusatzstoffe, Verpackung und bessere Alternativen.",
+        btn: "Für Android herunterladen", btnSub: "APK-Datei · Direktinstallation · ohne Konto", free: "100% KOSTENLOS",
+        qr: "Mit dem Handy scannen, um die Seite zu öffnen",
+        featuresTitle: "Was Zelynta macht",
+        f1t: "Barcode scannen", f1d: "Richte die Kamera auf das Produkt und erhalte sofort die Gesundheitsbewertung aus internationalen Datenbanken.",
+        f2t: "Zutaten lesen", f2d: "Fotografiere die Zutatenliste und die App findet die Zusatzstoffe — praktisch für Produkte ohne Barcode.",
+        f3t: "Zusatzstoffe erklärt", f3d: "Jede E-Nummer mit Risikostufe und klarer Erklärung: was es ist, wo es vorkommt und was die EU-Vorschriften sagen.",
+        f4t: "Bessere Alternativen", f4d: "Schlägt ähnliche Produkte mit höherer Bewertung vor, damit du sofort gesünder wählst.",
+        f5t: "Verpackung & Nährwerte", f5d: "Sieh Verpackungsart, Zucker, Salz und gesättigte Fette mit einfachen Farbhinweisen.",
+        f6t: "Auch Kosmetik", f6d: "Funktioniert auch für Kosmetik: Parabene, Duftallergene und andere zu beachtende Stoffe.",
+        stepsTitle: "In 3 Schritten",
+        s1t: "Scannen", s1d: "Ein Barcode oder die Zutatenliste.",
+        s2t: "Verstehen", s2d: "Bewertung, Zusatzstoffe und klare Warnungen.",
+        s3t: "Wählen", s3d: "Vergleiche und nimm die bessere Option.",
+        note: "ℹ️ Zelynta dient zu Informations- und Bildungszwecken. Es ersetzt nicht den Rat eines Arztes oder Ernährungsberaters. Die Daten stammen aus offenen Datenbanken (Open Food Facts, Open Beauty Facts) und können unvollständig sein.",
+        footer1: "Mit 🍅 für bessere Entscheidungen gemacht",
+      },
+      ru: {
+        tagline: "Отсканируйте продукт и за секунды узнайте, насколько он полезен: оценка, добавки, упаковка и лучшие альтернативы.",
+        btn: "Скачать для Android", btnSub: "Файл APK · прямая установка · без аккаунта", free: "100% БЕСПЛАТНО",
+        qr: "Отсканируйте телефоном, чтобы открыть страницу",
+        featuresTitle: "Что умеет Zelynta",
+        f1t: "Сканируйте штрихкод", f1d: "Наведите камеру на продукт и мгновенно получите оценку здоровья из международных баз данных.",
+        f2t: "Читайте состав", f2d: "Сфотографируйте список ингредиентов, и приложение найдёт добавки — удобно для продуктов без штрихкода.",
+        f3t: "Добавки с пояснением", f3d: "Каждый номер E с уровнем риска и понятным пояснением: что это, где встречается и что говорят нормы ЕС.",
+        f4t: "Лучшие альтернативы", f4d: "Предлагает похожие продукты с более высокой оценкой, чтобы сразу выбрать полезнее.",
+        f5t: "Упаковка и питание", f5d: "Смотрите тип упаковки, сахар, соль и насыщенные жиры с понятными цветовыми подсказками.",
+        f6t: "И косметика", f6d: "Работает и с косметикой: парабены, аллергены отдушек и другие вещества под контролем.",
+        stepsTitle: "В 3 шага",
+        s1t: "Сканируйте", s1d: "Штрихкод или список ингредиентов.",
+        s2t: "Понимайте", s2d: "Оценка, добавки и чёткие предупреждения.",
+        s3t: "Выбирайте", s3d: "Сравните и возьмите вариант получше.",
+        note: "ℹ️ Zelynta носит информационный и образовательный характер. Не заменяет совет врача или диетолога. Данные взяты из открытых баз (Open Food Facts, Open Beauty Facts) и могут быть неполными.",
+        footer1: "Сделано с 🍅 для лучшего выбора",
+      },
+      pl: {
+        tagline: "Zeskanuj produkt i w kilka sekund dowiedz się, jak jest zdrowy: ocena, dodatki, opakowanie i lepsze alternatywy.",
+        btn: "Pobierz na Androida", btnSub: "Plik APK · bezpośrednia instalacja · bez konta", free: "100% ZA DARMO",
+        qr: "Zeskanuj telefonem, aby otworzyć stronę",
+        featuresTitle: "Co robi Zelynta",
+        f1t: "Skanuj kod kreskowy", f1d: "Skieruj aparat na produkt i natychmiast otrzymaj ocenę zdrowotną z międzynarodowych baz danych.",
+        f2t: "Czytaj skład", f2d: "Sfotografuj listę składników, a aplikacja znajdzie dodatki — przydatne dla produktów bez kodu kreskowego.",
+        f3t: "Dodatki wyjaśnione", f3d: "Każdy numer E z poziomem ryzyka i jasnym wyjaśnieniem: co to jest, gdzie występuje i co mówią przepisy UE.",
+        f4t: "Lepsze alternatywy", f4d: "Proponuje podobne produkty z wyższą oceną, by od razu wybrać zdrowiej.",
+        f5t: "Opakowanie i wartości", f5d: "Zobacz rodzaj opakowania, cukier, sól i tłuszcze nasycone z czytelnymi oznaczeniami kolorów.",
+        f6t: "Także kosmetyki", f6d: "Działa też dla kosmetyków: parabeny, alergeny zapachowe i inne substancje do obserwacji.",
+        stepsTitle: "W 3 krokach",
+        s1t: "Skanuj", s1d: "Kod kreskowy lub lista składników.",
+        s2t: "Zrozum", s2d: "Ocena, dodatki i jasne ostrzeżenia.",
+        s3t: "Wybierz", s3d: "Porównaj i wybierz lepszą opcję.",
+        note: "ℹ️ Zelynta ma charakter informacyjny i edukacyjny. Nie zastępuje porady lekarza ani dietetyka. Dane pochodzą z otwartych baz (Open Food Facts, Open Beauty Facts) i mogą być niekompletne.",
+        footer1: "Zrobione z 🍅 dla lepszych wyborów",
+      },
+      nl: {
+        tagline: "Scan een product en ontdek in seconden hoe gezond het is: score, additieven, verpakking en betere alternatieven.",
+        btn: "Download voor Android", btnSub: "APK-bestand · directe installatie · zonder account", free: "100% GRATIS",
+        qr: "Scan met je telefoon om de pagina te openen",
+        featuresTitle: "Wat Zelynta doet",
+        f1t: "Scan de barcode", f1d: "Richt de camera op het product en krijg meteen de gezondheidsscore uit internationale databases.",
+        f2t: "Lees de ingrediënten", f2d: "Fotografeer de ingrediëntenlijst en de app vindt de additieven — handig voor producten zonder barcode.",
+        f3t: "Additieven uitgelegd", f3d: "Elk E-nummer met een risiconiveau en een duidelijke uitleg: wat het is, waar het voorkomt en wat de EU-regels zeggen.",
+        f4t: "Betere alternatieven", f4d: "Stelt vergelijkbare producten met een hogere score voor, zodat je meteen gezonder kiest.",
+        f5t: "Verpakking & voeding", f5d: "Bekijk het verpakkingstype, suiker, zout en verzadigd vet met makkelijke kleurhints.",
+        f6t: "Ook cosmetica", f6d: "Werkt ook voor cosmetica: parabenen, geurallergenen en andere stoffen om in de gaten te houden.",
+        stepsTitle: "In 3 stappen",
+        s1t: "Scan", s1d: "Een barcode of de ingrediëntenlijst.",
+        s2t: "Begrijp", s2d: "Score, additieven en duidelijke waarschuwingen.",
+        s3t: "Kies", s3d: "Vergelijk en kies een betere optie.",
+        note: "ℹ️ Zelynta is bedoeld ter informatie en educatie. Het vervangt geen advies van een arts of voedingsdeskundige. Gegevens komen uit open databases (Open Food Facts, Open Beauty Facts) en kunnen onvolledig zijn.",
+        footer1: "Gemaakt met 🍅 voor betere keuzes",
+      },
+    };
+
+    const dropdown = document.getElementById("langDropdown");
+    const current = document.getElementById("langCurrent");
+    const menu = document.getElementById("langMenu");
+
+    function flagImg(cc, label) {
+      return '<img src="https://flagcdn.com/w80/' + cc + '.png" alt="' + label + '" />';
+    }
+
+    function closeMenu() {
+      dropdown.classList.remove("open");
+      current.setAttribute("aria-expanded", "false");
+    }
+
+    function applyLang(code) {
+      const l = LANGS.find((x) => x.code === code) || LANGS[0];
+      const dict = I18N[code] || I18N.ro;
+      document.documentElement.lang = code;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+      // butonul-casuta arata limba curenta
+      current.innerHTML = flagImg(l.cc, l.label) + "<span>" + l.label + "</span><span class='chev'>▾</span>";
+      // marcheaza optiunea activa in meniu
+      menu.querySelectorAll(".lang-option").forEach((o) => {
+        const on = o.dataset.code === code;
+        o.classList.toggle("active", on);
+        o.querySelector(".check").textContent = on ? "✓" : "";
+      });
+      try { localStorage.setItem("zelynta_lang", code); } catch (e) {}
+    }
+
+    // Construieste optiunile din meniu
+    LANGS.forEach((l) => {
+      const o = document.createElement("button");
+      o.type = "button";
+      o.className = "lang-option";
+      o.dataset.code = l.code;
+      o.setAttribute("role", "menuitem");
+      o.innerHTML = flagImg(l.cc, l.label) + "<span>" + l.label + "</span><span class='check'></span>";
+      o.addEventListener("click", () => { applyLang(l.code); closeMenu(); });
+      menu.appendChild(o);
+    });
+
+    // Deschide / inchide casuta
+    current.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const open = dropdown.classList.toggle("open");
+      current.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    document.addEventListener("click", (e) => {
+      if (!dropdown.contains(e.target)) closeMenu();
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+
+    // Limba initiala: salvata > limba browserului > romana
+    let saved = null;
+    try { saved = localStorage.getItem("zelynta_lang"); } catch (e) {}
+    const browser = (navigator.language || "ro").slice(0, 2);
+    const initial = saved || (I18N[browser] ? browser : "ro");
+    applyLang(initial);
+  </script>
+</body>
+</html>

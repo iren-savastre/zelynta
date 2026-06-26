@@ -26,6 +26,10 @@ function StackNav() {
           name="compare"
           options={{ animation: "slide_from_bottom", animationDuration: 320 }}
         />
+        <Stack.Screen
+          name="advice"
+          options={{ animation: "slide_from_right", animationDuration: 320 }}
+        />
       </Stack>
       <BasketBar />
     </>

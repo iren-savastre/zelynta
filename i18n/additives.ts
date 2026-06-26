@@ -1,3 +1,5 @@
+import { additivesExtra } from "./additives.extra";
+
 export const additivesInfo = {
   e100: {
     level: "safe",
@@ -996,3 +998,13 @@ export const additivesInfo = {
     },
   },
 };
+
+// Imbina traducerile DE/RU/PL/NL (din additives.extra.ts) peste limbile de baza.
+for (const code in additivesExtra) {
+  const base = (additivesInfo as any)[code];
+  const extra = additivesExtra[code];
+  if (!base) continue;
+  Object.assign(base.name, extra.name);
+  Object.assign(base.use, extra.use);
+  Object.assign(base.desc, extra.desc);
+}

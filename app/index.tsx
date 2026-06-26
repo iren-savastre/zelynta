@@ -1,34 +1,37 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Animated,
-  Easing,
-  Image,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
+    ActivityIndicator,
+    Animated,
+    Easing,
+    Image,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    useWindowDimensions,
+    View,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { saveToHistory } from "../utils/history";
-import { analyzeProduct, productDisplay } from "../utils/score";
-import { isFavorite, toggleFavorite } from "../utils/favorites";
-import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
-import { useTheme, type ThemeColors } from "../utils/theme";
-import { useBasket } from "../utils/basket";
-import { ocrImage, extractAdditiveTags } from "../utils/ocr";
 import JuicyButton from "../components/JuicyButton";
+import { getProductAdvice } from "../utils/advice";
+import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
+import { useBasket } from "../utils/basket";
+import { isFavorite, toggleFavorite } from "../utils/favorites";
+import { saveToHistory } from "../utils/history";
+import { getPalmNote, hasPalmOil } from "../utils/palm";
+import { translateText } from "../utils/translate";
+import { extractAdditiveTags, ocrImage } from "../utils/ocr";
+import { analyzeProduct, productDisplay } from "../utils/score";
+import { useTheme, type ThemeColors } from "../utils/theme";
 
 const languages = [
   { code: "ro", label: "Română", flag: "🇷🇴", cc: "ro" },
@@ -46,6 +49,12 @@ const languages = [
 function flagUrl(cc: string, w: number) {
   return `https://flagcdn.com/w${w}/${cc}.png`;
 }
+
+// Etichete pentru traducerea automata a ingredientelor (in toate cele 9 limbi)
+const autoLabels = {
+  translating: { ro: "Se traduce…", en: "Translating…", fr: "Traduction…", it: "Traduzione…", es: "Traduciendo…", de: "Wird übersetzt…", ru: "Перевод…", pl: "Tłumaczenie…", nl: "Vertalen…" } as Record<string, string>,
+  auto: { ro: "tradus automat", en: "auto-translated", fr: "traduit automatiquement", it: "tradotto automaticamente", es: "traducido automáticamente", de: "automatisch übersetzt", ru: "автоперевод", pl: "przetłumaczone automatycznie", nl: "automatisch vertaald" } as Record<string, string>,
+};
 
 const levelColors: Record<string, string> = {
   safe: "#038141",
@@ -205,6 +214,9 @@ export default function Index() {
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [alternatives, setAlternatives] = useState<Alternative[]>([]);
   const [altLoading, setAltLoading] = useState(false);
+  const [ingredientsText, setIngredientsText] = useState("");
+  const [ingredientsAuto, setIngredientsAuto] = useState(false);
+  const [ingredientsTranslating, setIngredientsTranslating] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
 
   const currentLang =
@@ -313,7 +325,7 @@ export default function Index() {
       setError("");
       setProduct(null);
       setLoading(true);
-      const text = await ocrImage(photo?.base64 ?? "");
+      const text = await ocrImage(photo?.uri, photo?.base64);
       if (!text || text.trim().length < 3) {
         setError(t("ocrNoText"));
         setLoading(false);
@@ -357,6 +369,55 @@ export default function Index() {
   const display = product
     ? productDisplay(product)
     : { title: "", subtitle: "" };
+  const advice = product ? getProductAdvice(product, lang) : null;
+  const palm = product && hasPalmOil(product) ? getPalmNote(lang) : null;
+
+  // Ingrediente: foloseste limba aleasa daca exista; altfel traduce automat online.
+  useEffect(() => {
+    if (!product) {
+      setIngredientsText("");
+      setIngredientsAuto(false);
+      setIngredientsTranslating(false);
+      return;
+    }
+    const native = (product[`ingredients_text_${lang}`] || "").trim();
+    if (native) {
+      setIngredientsText(native);
+      setIngredientsAuto(false);
+      setIngredientsTranslating(false);
+      return;
+    }
+    const enText = (product.ingredients_text_en || "").trim();
+    const origText = (product.ingredients_text || "").trim();
+    if (lang === "en") {
+      setIngredientsText(enText || origText);
+      setIngredientsAuto(false);
+      return;
+    }
+    const source = enText || origText;
+    const sourceLang = enText ? "en" : product.lang || "en";
+    if (!source) {
+      setIngredientsText("");
+      setIngredientsAuto(false);
+      return;
+    }
+    let cancelled = false;
+    setIngredientsText(source); // arata originalul cat se traduce
+    setIngredientsAuto(false);
+    setIngredientsTranslating(true);
+    translateText(source, sourceLang, lang)
+      .then((tx) => {
+        if (cancelled) return;
+        setIngredientsText(tx);
+        setIngredientsAuto(tx.trim() !== source.trim());
+      })
+      .finally(() => {
+        if (!cancelled) setIngredientsTranslating(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [product, lang]);
 
   function levelText(level: string | null) {
     if (level === "safe") return t("levelSafe");
@@ -527,7 +588,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       {scannerOpen && (
         <Modal visible transparent={false} animationType="slide">
           <View style={styles.scannerScreen}>
-            <CameraView
+              <CameraView
               ref={cameraRef}
               style={styles.camera}
               facing="back"
@@ -536,6 +597,11 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
               }}
               onBarcodeScanned={ocrLoading ? undefined : handleBarcodeScanned}
+              onMountError={(e: any) => {
+                console.warn("Camera mount error:", e?.message ?? e);
+                setError(t("cameraBlockedHelp"));
+                setScannerOpen(false);
+              }}
             />
             {permission && !permission.granted && (
               <View style={styles.permDenied}>
@@ -636,23 +702,31 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             style={styles.modalOverlay}
             onPress={() => setLangMenuOpen(false)}
           >
-            <View style={[styles.langMenu, isWeb && glass]}>
-              {languages.map((lang) => (
-                <TouchableOpacity
-                  key={lang.code}
-                  style={[
-                    styles.langItem,
-                    i18n.language === lang.code && styles.langItemActive,
-                  ]}
-                  onPress={() => selectLanguage(lang.code)}
-                >
-                  <Image
-                    source={{ uri: flagUrl(lang.cc, 80) }}
-                    style={styles.langFlagImg}
-                    resizeMode="cover"
-                  />
-                </TouchableOpacity>
-              ))}
+            <View style={[styles.langMenu, isWeb && glassStrong]}>
+              {languages.map((lang) => {
+                const active = i18n.language === lang.code;
+                return (
+                  <TouchableOpacity
+                    key={lang.code}
+                    style={[styles.langItem, active && styles.langItemActive]}
+                    onPress={() => selectLanguage(lang.code)}
+                    accessibilityRole="button"
+                    accessibilityLabel={lang.label}
+                  >
+                    <Image
+                      source={{ uri: flagUrl(lang.cc, 80) }}
+                      style={styles.langFlagImg}
+                      resizeMode="cover"
+                    />
+                    <Text
+                      style={[styles.langLabel, active && styles.langLabelActive]}
+                    >
+                      {lang.label}
+                    </Text>
+                    {active && <Text style={styles.langCheck}>✓</Text>}
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </Pressable>
         </Modal>
@@ -977,11 +1051,25 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             )}
             <Text style={styles.scoreLabel}>{t("ingredientsLabel")}</Text>
             <Text style={styles.ingredients}>
-              {product[`ingredients_text_${i18n.language}`] ||
-                product.ingredients_text_en ||
-                product.ingredients_text ||
-                t("noIngredients")}
+              {ingredientsText || t("noIngredients")}
             </Text>
+            {ingredientsTranslating && (
+              <Text style={styles.ingredientsAuto}>
+                ⏳ {autoLabels.translating[lang] ?? autoLabels.translating.en}
+              </Text>
+            )}
+            {ingredientsAuto && !ingredientsTranslating && (
+              <Text style={styles.ingredientsAuto}>
+                🌐 {autoLabels.auto[lang] ?? autoLabels.auto.en}
+              </Text>
+            )}
+
+            {palm && (
+              <View style={styles.palmBox}>
+                <Text style={styles.palmTitle}>🌴 {palm.label}</Text>
+                <Text style={styles.palmText}>{palm.text}</Text>
+              </View>
+            )}
 
             <Text style={styles.scoreLabel}>{t("additivesLabel")}</Text>
             {additives.length === 0 ? (
@@ -1043,6 +1131,33 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                   </TouchableOpacity>
                 ))}
               </>
+            )}
+
+            {/* Buton catre pagina de recomandari */}
+            {advice && (
+              <TouchableOpacity
+                style={styles.adviceButton}
+                onPress={() =>
+                  router.push({
+                    pathname: "/advice",
+                    params: {
+                      category: advice.category,
+                      name: display.title || t("unknownName"),
+                    },
+                  })
+                }
+                accessibilityRole="button"
+                accessibilityLabel={advice.labels.title}
+              >
+                <Text style={styles.adviceButtonIcon}>{advice.icon}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.adviceButtonTitle}>{advice.labels.title}</Text>
+                  <Text style={styles.adviceButtonSub} numberOfLines={1}>
+                    {advice.benefits}
+                  </Text>
+                </View>
+                <Text style={styles.adviceButtonArrow}>›</Text>
+              </TouchableOpacity>
             )}
 
             {/* Alternative mai bune */}
@@ -1428,35 +1543,31 @@ const makeStyles = (c: ThemeColors) =>
   langMenu: {
     backgroundColor: c.surface,
     borderRadius: 16,
-    padding: 10,
-    width: 200,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 6,
+    padding: 8,
+    width: 232,
+    gap: 2,
     shadowColor: "#000",
     shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowRadius: 14,
+    elevation: 6,
   },
   langItem: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "transparent",
+    gap: 12,
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+    borderRadius: 10,
   },
   langItemActive: {
     backgroundColor: c.isDark ? "rgba(91,189,98,0.18)" : "#EAF5EA",
-    borderColor: c.primary,
   },
   langFlag: { fontSize: 30 },
-  langFlagImg: { width: 40, height: 28, borderRadius: 4 },
+  langFlagImg: { width: 30, height: 21, borderRadius: 3 },
   flagImg: { width: 30, height: 21, borderRadius: 3 },
-  langLabel: { fontSize: 16, color: c.text },
+  langLabel: { fontSize: 15, color: c.text, flex: 1 },
   langLabelActive: { color: c.primary, fontWeight: "700" },
+  langCheck: { fontSize: 15, color: c.primary, fontWeight: "800" },
   container: {
     flexGrow: 1,
     justifyContent: "center",
@@ -1550,6 +1661,7 @@ const makeStyles = (c: ThemeColors) =>
   },
   scoreUnknown: { fontSize: 14, color: c.textFaint, fontStyle: "italic" },
   ingredients: { fontSize: 14, color: c.textMuted, marginTop: 4 },
+  ingredientsAuto: { fontSize: 12, color: c.textFaint, fontStyle: "italic", marginTop: 4 },
   additiveRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1628,9 +1740,38 @@ const makeStyles = (c: ThemeColors) =>
     marginTop: 8,
     fontStyle: "italic",
   },
+  // Avertisment ulei de palmier
+  palmBox: {
+    backgroundColor: c.isDark ? "rgba(238,129,0,0.14)" : "#FFF4E5",
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 20,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: c.isDark ? "rgba(238,129,0,0.35)" : "#FCD9A8",
+  },
+  palmTitle: { fontSize: 15, fontWeight: "800", color: "#C2410C" },
+  palmText: { fontSize: 14, color: c.textMuted, lineHeight: 20 },
+  // Buton catre recomandari
+  adviceButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: c.surfaceAlt,
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: c.isDark ? "rgba(91,189,98,0.25)" : "#CDE8CD",
+  },
+  adviceButtonIcon: { fontSize: 28 },
+  adviceButtonTitle: { fontSize: 15, fontWeight: "800", color: c.text },
+  adviceButtonSub: { fontSize: 13, color: c.textFaint, marginTop: 2 },
+  adviceButtonArrow: { fontSize: 24, color: c.textFaint, fontWeight: "bold" },
   logo: {
     width: 140,
     height: 140,
+    marginTop: 34, // spatiu pentru saltul rosiei, ca sa nu intre in navbar
     marginBottom: 8,
   },
   // Favorite

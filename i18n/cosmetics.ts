@@ -1,6 +1,8 @@
 // Substanțe cosmetice de evitat / de urmărit (nomenclatură INCI)
 // Niveluri: risk = interzis/foarte îngrijorător, caution = restricționat/alergen,
 //           moderate = permis cu discuții, safe = fără probleme cunoscute
+import { cosmeticsExtra } from "./cosmetics.extra";
+
 export const cosmeticsInfo = {
   "methylparaben": {
     level: "caution",
@@ -363,3 +365,13 @@ export const cosmeticsInfo = {
     },
   },
 };
+
+// Imbina traducerile DE/RU/PL/NL (din cosmetics.extra.ts) peste limbile de baza.
+for (const code in cosmeticsExtra) {
+  const base = (cosmeticsInfo as any)[code];
+  const extra = cosmeticsExtra[code];
+  if (!base) continue;
+  Object.assign(base.name, extra.name);
+  Object.assign(base.use, extra.use);
+  Object.assign(base.desc, extra.desc);
+}
