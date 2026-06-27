@@ -28,6 +28,7 @@ versionare [SemVer](https://semver.org/).
 - Confirmări la acțiunile de moderare distructive în admin.
 
 ### Securitate
+- Reparat scurgere de date: politica RLS `settings` permitea citirea publică a TUTUROR setărilor (adresă, CUI/TVA, e-mailuri). Acum publicul citește doar cheile sociale + limba implicită; restul doar staff autentificat.
 - Cheia OCR citită din mediu (`EXPO_PUBLIC_OCR_KEY`), cu avertisment în dev pentru cheia demo.
 - Eliminat e-mailul personal din User-Agent-ul cererilor către API-uri externe.
 - Politici DELETE (RLS) pentru admin/super_admin, necesare execuției ștergerii GDPR.

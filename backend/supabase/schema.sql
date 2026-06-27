@@ -350,7 +350,13 @@ create policy analytics_read on public.analytics_events for select using (public
 create policy audit_read on public.audit_logs for select using (public.has_role(array['admin','super_admin']::app_role[]));
 
 -- SETTINGS: public poate citi cheile publice; doar admin scrie
-create policy settings_read on public.settings for select using (true);
+-- Public (anon) poate citi DOAR cheile publice (social + limba implicită).
+-- Cheile interne (adresă, CUI/TVA, e-mailuri, companie) NU sunt expuse public.
+create policy settings_read_public on public.settings for select
+  using (key in ('social_facebook','social_tiktok','social_instagram','default_locale'));
+-- Staff autentificat (orice rol) poate citi toate setările.
+create policy settings_read_staff on public.settings for select
+  using (public.current_role() is not null);
 create policy settings_write on public.settings for all using (public.has_role(array['admin','super_admin']::app_role[]));
 
 -- LANDING CONTENT: public citește published; content_manager+ editează

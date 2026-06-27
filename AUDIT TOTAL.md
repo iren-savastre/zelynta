@@ -31,7 +31,7 @@ Zelynta este o platformă reală, bine construită:
 | Design / UX | **9.0** | = | 15 teme, dark satinat, animații, relief, consecvent pe platformă |
 | Performance / LCP | **8.0** | ↑ 7.0 | + build optimizat automat (WebP logo −81%, minify HTML/CSS/JS) via `npm run optimize` în CI; App optimizat |
 | SEO | **9.2** | ↑ 8.5 | + FAQ JSON-LD + meta dinamice per-limbă; sitemap, robots, hreflang×9, WebApplication schema, preload |
-| Securitate | **7.9** | ↑ 7.5 | + sanitizare CMS + anti-spam; RBAC client cosmetic, fără rate-limit server |
+| Securitate | **8.1** | ↑ 7.5 | + sanitizare CMS + anti-spam + reparat scurgere settings (doar cheile sociale publice); RBAC client cosmetic, fără rate-limit server |
 | GDPR / legal | **8.8** | ↑ 8.5 | + execuție ștergere GDPR + buton „șterge toate datele"; IP-detect pre-consimțământ (gri) rămâne |
 | i18n | **9.2** | ↑ 8.5 | + 24 chei reparate în 7 limbi + tipsEyebrow/paletteTitle; admin RO-only rămâne |
 | Teste | **7.0** | ↑ 4.5 | **38 unit (5 suite) + 25 e2e** în CI; lipsesc integration end-to-end |
@@ -65,6 +65,8 @@ Componente reutilizabile, design system (Context, 15 palete), responsive, memoiz
 **Reparate (selecție):** obiect `{label,text}` randat ca React child · dark mode neutru/tematic · scroll dublu (ThemeFx overflow) · footer full-width + fără gol · **24 chei i18n lipsă în 7 limbi** · texte provizorii/placeholder eliminate (GDPR) · `ctErr` 9 limbi · status HTTP + timeout pe toate fetch-urile · email personal scos din User-Agent · cache traducere plafonat · key-uri React stabile · favicon legal = logo · brand animat · scrollbar brandat · card CTA solid + buton roșu · **error-state comparație** · **confirmări moderare admin** · **linkuri sociale moarte → ascunse** · **TipsSection/PaletteButton** hardcodate → i18n 9 limbi.
 
 **Optimizări:** `apiClient.ts` (dedup fetch) · sanitizare CMS · **10 indexuri DB** · **retenție DB** · `boxShadow` web · preload LCP + lazy steaguri · reduced-motion complet · FAQ JSON-LD · SEO meta per-limbă.
+
+**Reparat (CMS/social):** scurgere de date prin `settings_read using(true)` (setări interne expuse public) → restricționat la whitelist; iconițe sociale gestionate din admin (Setări) și afișate pe landing doar când au URL.
 
 **Confirmat că auditorii greșiseră:** `JSON.parse` deja în `try/catch`; reduce-motion acoperit; FlatList keys corecte; `track("landing_view")` consent-gated deja prezent; skeleton principal + indicator alternative deja existau; 0 coloane DB lipsă.
 
@@ -235,8 +237,9 @@ Zelynta este, după Fazele 1–5 și re-auditul 2, **un produs solid, premium ș
 ## Q. Audit detaliat — SEO — **9.2/10**
 Prezente & corecte: title, meta description, canonical, **hreflang ×9 + x-default**, OG complet (+9 alternate), Twitter card, **JSON-LD WebApplication + FAQPage**, sitemap.xml (13 URL), robots.txt, manifest.json, preload LCP, heading-uri semantice, **meta dinamice per limbă**. Minus minor: <html lang> static RO pe paginile legale (conținutul comută prin JS).
 
-## R. Audit detaliat — Securitate — **7.9/10**
+## R. Audit detaliat — Securitate — **8.1/10**
 **Bun:** fără secrete în repo, auth/RBAC prin **RLS server-side**, **sanitizare CMS** la scriere, **anti-spam**, esc() pe output admin, cheie OCR din mediu.
+**Reparat (re-audit CMS social):** `settings_read using(true)` expunea public TOATE setările (adresă, CUI/TVA, e-mailuri) → acum publicul citește doar `social_*` + `default_locale`; restul doar staff. Iconițele sociale de pe landing funcționează corect din whitelist.
 **Riscuri rămase:** RBAC client cosmetic (real doar cu RLS) · fără rate-limit server pe insert-uri anonime · PII (email/nume) vizibil în tabele admin · fără CSP/headers expliciți (depind de host) · dependența de API gratuite terțe.
 
 ## S. Audit detaliat — GDPR / legal / cookie — **8.8/10**
