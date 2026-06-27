@@ -45,4 +45,36 @@ body {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
 }
+/* ===== bară de scroll personalizată (web) — urmează tema ===== */
+:root {
+  --zscroll-1: #85BB2F;
+  --zscroll-2: #2E7D32;
+  --zscroll-track: rgba(120,120,130,0.08);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--zscroll-2) transparent;
+}
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track {
+  background: var(--zscroll-track);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--zscroll-1), var(--zscroll-2));
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  transition: background .2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  border-width: 2px;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
 `;

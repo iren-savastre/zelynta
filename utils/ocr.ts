@@ -1,9 +1,19 @@
 import TextRecognition from "@react-native-ml-kit/text-recognition";
 import { additivesInfo } from "../i18n/additives";
+import { fetchWithTimeout } from "./net";
 
-// Cheie API OCR.space — "helloworld" e cheia demo gratuită (limitată).
-// Pentru producție, ia o cheie gratuită de pe https://ocr.space/ocrapi
-const OCR_API_KEY = "helloworld";
+// Cheie API OCR.space — citită din mediu (EXPO_PUBLIC_OCR_KEY); "helloworld" e
+// cheia demo gratuită (limitată) folosită doar ca fallback în dezvoltare.
+// Pentru producție, setează o cheie proprie de pe https://ocr.space/ocrapi
+const OCR_API_KEY =
+  (typeof process !== "undefined" && process.env?.EXPO_PUBLIC_OCR_KEY) || "helloworld";
+
+if (OCR_API_KEY === "helloworld" && typeof __DEV__ !== "undefined" && __DEV__) {
+  // Avertisment doar în dezvoltare: cheia demo e puternic limitată în producție.
+  console.warn(
+    "[Zelynta] OCR folosește cheia demo 'helloworld' (rate-limited). Setează EXPO_PUBLIC_OCR_KEY în .env pentru producție."
+  );
+}
 
 // Trimite imaginea (base64) la OCR.space și întoarce textul recunoscut
 export async function ocrImage(uri?: string, base64?: string): Promise<string> {
@@ -12,7 +22,7 @@ export async function ocrImage(uri?: string, base64?: string): Promise<string> {
 
   try {
     const result = await TextRecognition.recognize(source);
-    return result.text.replace(/\r/g, " ").replace(/\s+/g, " ").trim();
+    return (result?.text ?? "").replace(/\r/g, " ").replace(/\s+/g, " ").trim();
   } catch (error) {
     const form = new FormData();
     if (base64) {
@@ -25,10 +35,12 @@ export async function ocrImage(uri?: string, base64?: string): Promise<string> {
     form.append("scale", "true");
     form.append("apikey", OCR_API_KEY);
 
-    const res = await fetch("https://api.ocr.space/parse/image", {
-      method: "POST",
-      body: form,
-    });
+    const res = await fetchWithTimeout(
+      "https://api.ocr.space/parse/image",
+      { method: "POST", body: form },
+      20000
+    );
+    if (!res.ok) throw new Error(`OCR HTTP ${res.status}`);
     const data = await res.json();
     if (data?.IsErroredOnProcessing) {
       throw new Error(

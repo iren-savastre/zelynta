@@ -21,9 +21,18 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import JuicyButton from "../components/JuicyButton";
+import AppFooter from "../components/AppFooter";
+import NavMarquee from "../components/NavMarquee";
+import PaletteButton from "../components/PaletteButton";
+import ThemeFx from "../components/ThemeFx";
+import TipsSection from "../components/TipsSection";
+import WaveText from "../components/WaveText";
 import { getProductAdvice } from "../utils/advice";
 import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
+import { persistAppLanguage } from "../i18n/i18n";
+import { fetchProductByBarcode } from "../utils/apiClient";
 import { useBasket } from "../utils/basket";
 import { isFavorite, toggleFavorite } from "../utils/favorites";
 import { saveToHistory } from "../utils/history";
@@ -31,7 +40,7 @@ import { getPalmNote, hasPalmOil } from "../utils/palm";
 import { translateText } from "../utils/translate";
 import { extractAdditiveTags, ocrImage } from "../utils/ocr";
 import { analyzeProduct, productDisplay } from "../utils/score";
-import { useTheme, type ThemeColors } from "../utils/theme";
+import { mixHex, PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
 const languages = [
   { code: "ro", label: "Română", flag: "🇷🇴", cc: "ro" },
@@ -84,31 +93,30 @@ function makeGlass(c: ThemeColors): any {
 function makeGlassStrong(c: ThemeColors): any {
   return isWeb
     ? {
-        backgroundColor: c.isDark ? "rgba(26,33,28,0.78)" : "rgba(255,255,255,0.72)",
+        backgroundColor: c.isDark ? "rgba(26,33,28,0.82)" : "rgba(255,255,255,0.78)",
         backdropFilter: "blur(28px)",
         WebkitBackdropFilter: "blur(28px)",
         borderWidth: 1,
         borderColor: c.glassBorder,
         boxShadow: c.isDark
-          ? "0 12px 48px rgba(0,0,0,0.45)"
-          : "0 12px 48px rgba(31,55,38,0.16)",
+          ? "0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -6px 14px rgba(0,0,0,0.2)"
+          : "0 24px 60px rgba(31,55,38,0.2), inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -6px 14px rgba(31,55,38,0.05)",
       }
     : {};
 }
 
 function desktopBg(c: ThemeColors): any {
   if (!isWeb) return {};
-  return c.isDark
-    ? {
-        backgroundColor: "#0F1511",
-        backgroundImage:
-          "radial-gradient(900px 600px at 12% 8%, rgba(46,125,50,0.22), transparent 60%), radial-gradient(800px 700px at 90% 100%, rgba(91,189,98,0.14), transparent 55%), linear-gradient(135deg,#10160F 0%,#131A14 45%,#0F1511 100%)",
-      }
-    : {
-        backgroundColor: "#e6efe6",
-        backgroundImage:
-          "radial-gradient(900px 600px at 12% 8%, rgba(46,125,50,0.18), transparent 60%), radial-gradient(800px 700px at 90% 100%, rgba(133,187,47,0.16), transparent 55%), linear-gradient(135deg,#dfeada 0%,#eef3ec 45%,#e3ede6 100%)",
-      };
+  const a = c.primary; // accentul paletei curente
+  const g1 = c.isDark ? "33" : "2B"; // intensitate glow
+  const g2 = c.isDark ? "22" : "20";
+  return {
+    backgroundColor: c.bg,
+    backgroundImage:
+      `radial-gradient(900px 600px at 12% 8%, ${a}${g1}, transparent 60%), ` +
+      `radial-gradient(800px 700px at 90% 100%, ${a}${g2}, transparent 55%), ` +
+      `linear-gradient(135deg, ${c.bg} 0%, ${c.surfaceAlt} 45%, ${c.bg} 100%)`,
+  };
 }
 
 function scoreColor(score: number) {
@@ -126,13 +134,35 @@ function nutrientColor(value: number, midThreshold: number, highThreshold: numbe
 export default function Index() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const { colors, toggle } = useTheme();
+  const { colors, toggle, palette } = useTheme();
+  const pal = PALETTES.find((p) => p.id === palette) || PALETTES[0];
+  const paletteEmoji = pal.emoji;
+  // butoanele (scanare/căutare) urmează tema
+  const scanTop = pal.primaryDark;
+  const scanBottom = pal.primary;
+  const searchTop = pal.primary;
+  const searchBottom = mixHex(pal.primary, 0.62, "#000000");
+
+  // drapel animat (sway) — ca pe landing page
+  const flagWave = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(flagWave, { toValue: 1, duration: 1500, useNativeDriver: true }),
+        Animated.timing(flagWave, { toValue: -1, duration: 1500, useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [flagWave]);
+  const flagRotate = flagWave.interpolate({ inputRange: [-1, 1], outputRange: ["-4deg", "4deg"] });
   const basket = useBasket();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const glass = useMemo(() => makeGlass(colors), [colors]);
   const glassStrong = useMemo(() => makeGlassStrong(colors), [colors]);
   const { width } = useWindowDimensions();
   const isDesktop = isWeb && width >= 900;
+  const isWide = isWeb && width >= 600; // tabletă+: aliniat sus (fără gol jos)
   const isNarrow = width < 480; // telefon: navbar compact, fără text la Istoric
   const params = useLocalSearchParams<{ barcode?: string }>();
 
@@ -224,6 +254,7 @@ export default function Index() {
 
   function selectLanguage(code: string) {
     i18n.changeLanguage(code);
+    persistAppLanguage(code);
     setLangMenuOpen(false);
   }
 
@@ -235,33 +266,13 @@ export default function Index() {
     setScannerOpen(false);
     setLangMenuOpen(false);
 
-    // Caută pe rând în 3 baze: alimente, cosmetice, produse generale
-    const databases = [
-      "https://world.openfoodfacts.org",
-      "https://world.openbeautyfacts.org",
-      "https://world.openproductsfacts.org",
-    ];
-
     try {
-      for (const base of databases) {
-        try {
-          const response = await fetch(
-            `${base}/api/v2/product/${code}.json`,
-            {
-              headers: {
-                "User-Agent": "Zelynta/1.0 (iren.savastre@example.com)",
-              },
-            }
-          );
-          const data = await response.json();
-          if (data.status === 1) {
-            setProduct(data.product);
-            setLoading(false);
-            return; // produs găsit, ne oprim
-          }
-        } catch (e) {
-          // dacă o bază eșuează, continuăm cu următoarea
-        }
+      // Caută pe rând în 3 baze: alimente, cosmetice, produse generale
+      const found = await fetchProductByBarcode(code);
+      if (found) {
+        setProduct(found);
+        setLoading(false);
+        return; // produs găsit, ne oprim
       }
       // dacă am terminat toate bazele fără rezultat
       setError(t("errorNotFound"));
@@ -333,7 +344,7 @@ export default function Index() {
       }
       const tags = extractAdditiveTags(text);
       setProduct({
-        code: `ocr-${Date.now()}`,
+        code: `ocr-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
         product_name: t("ocrTitle"),
         brands: "",
         image_url: photo?.uri ?? "",
@@ -584,6 +595,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <StatusBar style="dark" />
+      <ThemeFx emoji={paletteEmoji} />
       {/* Scanner camera */}
       {scannerOpen && (
         <Modal visible transparent={false} animationType="slide">
@@ -673,16 +685,89 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
         <Modal visible transparent animationType="none" onRequestClose={closeZoom}>
           <Animated.View style={[styles.zoomOverlay, { opacity: zoom }]}>
             <Pressable style={styles.zoomBackdrop} onPress={closeZoom} />
-            <Animated.Image
-              source={{ uri: zoomImage }}
-              style={[
-                styles.zoomImage,
-                {
-                  transform: [{ scale: zoomScale }, { rotate: zoomRotate }],
-                },
-              ]}
-              resizeMode="contain"
-            />
+            <View style={[styles.zoomCard, isDesktop && styles.zoomCardDesktop]} accessibilityViewIsModal>
+              <Animated.View
+                style={[
+                  styles.zoomCircle,
+                  isDesktop && styles.zoomCircleDesktop,
+                  { transform: [{ scale: zoomScale }, { rotate: zoomRotate }] },
+                ]}
+              >
+                <Image source={{ uri: zoomImage }} style={styles.zoomCircleImg} resizeMode="contain" />
+              </Animated.View>
+
+              <View style={[styles.zoomDetails, isDesktop && styles.zoomDetailsDesktop]}>
+                <ScrollView
+                  style={isDesktop ? styles.zoomScroll : undefined}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={[styles.zoomScrollInner, isDesktop && { alignItems: "flex-start" }]}
+                >
+                  <Text style={styles.zoomName} numberOfLines={isDesktop ? 3 : 2}>
+                    {display.title || t("unknownName")}
+                  </Text>
+                  {display.subtitle !== "" && <Text style={styles.zoomBrand}>{display.subtitle}</Text>}
+
+                  <View style={styles.zoomScoreRow}>
+                    <View style={[styles.zoomScoreBadge, { backgroundColor: scoreColor(score) }]}>
+                      <Text style={styles.zoomScoreNum}>{score}</Text>
+                    </View>
+                    <View>
+                      <Text style={[styles.zoomVerdict, { color: scoreColor(score) }]}>
+                        {scoreVerdict(score)}
+                      </Text>
+                      <Text style={styles.zoomScoreCap}>{t("mockScoreCap") || "scor / 100"}</Text>
+                    </View>
+                  </View>
+
+                  {nutrientBadges.length > 0 && (
+                    <View style={styles.zoomSection}>
+                      <Text style={styles.zoomSecTitle}>{t("nutritionLabel")}</Text>
+                      <View style={styles.zoomNutriWrap}>
+                        {nutrientBadges.map((nb) => (
+                          <View key={nb.label} style={styles.zoomNutri}>
+                            <View style={[styles.zoomNutriDot, { backgroundColor: nb.color }]} />
+                            <Text style={styles.zoomNutriLabel}>{nb.label}</Text>
+                            <Text style={styles.zoomNutriVal}>
+                              {nb.value}
+                              {nb.unit}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+
+                  {additives.length > 0 && (
+                    <View style={styles.zoomSection}>
+                      <Text style={styles.zoomSecTitle}>{t("additivesLabel")}</Text>
+                      <View style={styles.zoomChips}>
+                        {additives.map((a: any, i: number) => {
+                          const col = a.level ? levelColors[a.level] : "#9aa";
+                          return (
+                            <View
+                              key={a.code ?? i}
+                              style={[styles.zoomChip, { backgroundColor: col + "33", borderColor: col }]}
+                            >
+                              <Text style={styles.zoomChipText} numberOfLines={1}>
+                                {a.name}
+                              </Text>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    </View>
+                  )}
+
+                  {palm && (
+                    <View style={styles.zoomWarn}>
+                      <Text style={styles.zoomWarnTitle}>🌴 {palm.label}</Text>
+                      <Text style={styles.zoomWarnText}>{palm.text}</Text>
+                    </View>
+                  )}
+                </ScrollView>
+              </View>
+            </View>
+
             <TouchableOpacity
               style={styles.zoomClose}
               onPress={closeZoom}
@@ -697,7 +782,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
       {/* Meniu limbi */}
       {langMenuOpen && (
-        <Modal visible transparent animationType="fade">
+        <Modal visible transparent animationType="fade" onRequestClose={() => setLangMenuOpen(false)}>
           <Pressable
             style={styles.modalOverlay}
             onPress={() => setLangMenuOpen(false)}
@@ -734,12 +819,12 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
       {/* Detalii aditiv */}
       {selectedAdditive && (
-        <Modal visible transparent animationType="fade">
+        <Modal visible transparent animationType="fade" onRequestClose={() => setSelectedAdditive(null)}>
           <Pressable
             style={styles.additiveModalOverlay}
             onPress={() => setSelectedAdditive(null)}
           >
-            <Pressable style={styles.additiveModal} onPress={() => {}}>
+            <Pressable style={styles.additiveModal} onPress={() => {}} accessibilityViewIsModal accessibilityRole="none">
               <View style={styles.additiveModalHeader}>
                 <View
                   style={[
@@ -780,21 +865,32 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
      <View style={[styles.navbar, isWeb && glass, isDesktop && styles.topBar]}>
         <View style={styles.brandRow}>
-          <Image
+          <Animated.Image
             source={require("../assets/images/icon.png")}
-            style={styles.brandLogo}
+            style={[
+              styles.brandLogo,
+              { transform: [{ translateY: hopTranslate }, { scale: hopScale }] },
+            ]}
             resizeMode="contain"
           />
-          <Text style={styles.brandName}>Zelynta</Text>
+          <WaveText text="Zelynta" style={styles.brandName} />
         </View>
+        {isDesktop &&
+          (() => {
+            const m = t("navMottos", { returnObjects: true });
+            return Array.isArray(m) ? (
+              <NavMarquee phrases={m as string[]} color={colors.textMuted} accent={colors.primary} />
+            ) : null;
+          })()}
         <View style={styles.topBarActions}>
+          <PaletteButton glass={isWeb ? glass : undefined} />
           <TouchableOpacity
             style={[styles.iconButton, isWeb && glass]}
             onPress={toggle}
             accessibilityRole="button"
             accessibilityLabel={t("theme")}
           >
-            <Text style={styles.iconButtonText}>{colors.isDark ? "☀️" : "🌙"}</Text>
+            <Text style={styles.navEmoji}>{colors.isDark ? "☀️" : "🌙"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -805,7 +901,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             accessibilityRole="button"
             accessibilityLabel={t("historyTitle")}
           >
-            <Text style={styles.iconButtonText}>📜</Text>
+            <Text style={styles.navEmoji}>📜</Text>
             {!isNarrow && (
               <Text style={styles.historyButtonText}>{t("historyTitle")}</Text>
             )}
@@ -816,9 +912,9 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             accessibilityRole="button"
             accessibilityLabel={currentLang.label}
           >
-            <Image
+            <Animated.Image
               source={{ uri: flagUrl(currentLang.cc, 40) }}
-              style={styles.flagImg}
+              style={[styles.flagImg, { transform: [{ rotate: flagRotate }] }]}
               resizeMode="cover"
             />
           </TouchableOpacity>
@@ -826,7 +922,11 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.container, isDesktop && styles.containerDesktop]}
+        contentContainerStyle={[
+          styles.container,
+          isWide && styles.containerWide,
+          isDesktop && styles.containerDesktop,
+        ]}
         keyboardShouldPersistTaps="handled"
       >
        <View style={[styles.workspace, isDesktop && styles.workspaceDesktop]}>
@@ -848,8 +948,8 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           emoji="🍅"
           label={t("scanButton")}
           onPress={openScanner}
-          colorTop="#FF6B5A"
-          colorBottom="#C42E1C"
+          colorTop={scanTop}
+          colorBottom={scanBottom}
         />
 
         <TextInput
@@ -868,8 +968,8 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           label={t("searchButton")}
           onPress={fetchProduct}
           disabled={!barcode || loading}
-          colorTop="#7BC950"
-          colorBottom="#3E8E2E"
+          colorTop={searchTop}
+          colorBottom={searchBottom}
         />
         </View>
 
@@ -1003,8 +1103,11 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
             {showBreakdown && scoreData.reasons.length > 0 && (
               <View style={styles.breakdown}>
-                {scoreData.reasons.map((r, idx) => (
-                  <View key={idx} style={styles.breakdownRow}>
+                {scoreData.reasons.map((r: any, idx) => (
+                  <View
+                    key={r.kind === "nutrient" ? `n_${r.key}` : `i_${r.name ?? idx}`}
+                    style={styles.breakdownRow}
+                  >
                     <Text style={styles.breakdownLabel} numberOfLines={1}>
                       {reasonLabel(r)}
                     </Text>
@@ -1013,8 +1116,8 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 ))}
               </View>
             )}
-{nutrientBadges.map((row, idx) => (
-              <View key={idx} style={styles.nutrientBlock}>
+{nutrientBadges.map((row) => (
+              <View key={row.label} style={styles.nutrientBlock}>
                 <View style={styles.nutrientRow}>
                   <View style={[styles.nutrientDot, { backgroundColor: row.color }]} />
                   <Text style={styles.nutrientLabel}>{row.label}</Text>
@@ -1077,7 +1180,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             ) : (
               additives.map((add, idx) => (
                 <TouchableOpacity
-                  key={idx}
+                  key={add.code ?? idx}
                   style={styles.additiveRow}
                   onPress={() => setSelectedAdditive(add)}
                 >
@@ -1108,7 +1211,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 <Text style={styles.scoreLabel}>{t("cosmeticsLabel")}</Text>
                 {cosmetics.map((c, idx) => (
                   <TouchableOpacity
-                    key={idx}
+                    key={c.code ?? idx}
                     style={styles.additiveRow}
                     onPress={() => setSelectedAdditive(c)}
                   >
@@ -1165,7 +1268,21 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               <>
                 <Text style={styles.scoreLabel}>{t("alternativesLabel")}</Text>
                 {altLoading && alternatives.length === 0 && (
-                  <Text style={styles.altLoading}>{t("alternativesLoading")}</Text>
+                  <View>
+                    <View style={styles.altLoadingRow}>
+                      <ActivityIndicator size="small" color={colors.primary} />
+                      <Text style={styles.altLoading}>{t("alternativesLoading")}</Text>
+                    </View>
+                    {[0, 1].map((i) => (
+                      <View key={i} style={[styles.altCard, styles.altSkeleton]}>
+                        <View style={[styles.altThumb, styles.skeleton]} />
+                        <View style={styles.altInfo}>
+                          <View style={[styles.skeleton, styles.skelLine, { width: "68%" }]} />
+                          <View style={[styles.skeleton, styles.skelLine, { width: "38%", marginTop: 7 }]} />
+                        </View>
+                      </View>
+                    ))}
+                  </View>
                 )}
                 {alternatives.map((alt) => (
                   <TouchableOpacity
@@ -1232,6 +1349,29 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
         )}
         </View>
        </View>
+
+       {(() => {
+         const tp = t("tips", { returnObjects: true });
+         return Array.isArray(tp) ? (
+           <TipsSection
+             title={t("tipsTitle")}
+             eyebrow={t("tipsEyebrow")}
+             tips={tp as string[]}
+             colors={colors}
+             isDesktop={isDesktop}
+           />
+         ) : null;
+       })()}
+
+       <View
+         style={{
+           alignSelf: "stretch",
+           marginHorizontal: isDesktop ? -32 : -24,
+           marginTop: "auto", // împinge footer-ul la baza paginii când conținutul e scurt
+         }}
+       >
+         <AppFooter isDesktop={isDesktop} />
+       </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -1245,21 +1385,25 @@ const makeStyles = (c: ThemeColors) =>
   workspaceDesktop: {
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     gap: 28,
+    width: "100%",
     maxWidth: 1180,
     alignSelf: "center",
+    paddingHorizontal: 20,
   },
   leftPanel: { width: "100%", maxWidth: 400, alignItems: "center" },
   leftPanelDesktop: {
-    width: 420,
-    maxWidth: 420,
+    flex: 1,
+    width: "auto",
+    maxWidth: 720,
     borderRadius: 28,
-    padding: 32,
+    padding: 34,
+    alignSelf: "stretch",
     ...(isWeb ? { position: "sticky" as any, top: 110 } : {}),
   },
   rightCol: { width: "100%", maxWidth: 400, alignItems: "center" },
-  rightColDesktop: { flex: 1, maxWidth: 560, alignItems: "stretch" },
+  rightColDesktop: { flex: 1, alignSelf: "stretch", alignItems: "stretch" },
   emptyState: {
     borderRadius: 28,
     paddingVertical: 80,
@@ -1386,7 +1530,7 @@ const makeStyles = (c: ThemeColors) =>
     maxWidth: 360,
   },
   permButton: {
-    backgroundColor: "#2E7D32",
+    backgroundColor: c.primary,
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 32,
@@ -1430,7 +1574,7 @@ const makeStyles = (c: ThemeColors) =>
   errorIcon: { fontSize: 44 },
   errorTitle: { fontSize: 16, color: c.textMuted, textAlign: "center", fontWeight: "600" },
   retryButton: {
-    backgroundColor: "#2E7D32",
+    backgroundColor: c.primary,
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 28,
@@ -1501,11 +1645,12 @@ const makeStyles = (c: ThemeColors) =>
     alignItems: "center",
     gap: 6,
     backgroundColor: c.surface,
-    borderRadius: 20,
+    borderRadius: 14,
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: c.border,
+    ...(isWeb ? { boxShadow: "0 6px 14px rgba(20,48,31,0.12)" } : { elevation: 3 }),
   },
   historyButtonText: {
     fontSize: 14,
@@ -1514,24 +1659,27 @@ const makeStyles = (c: ThemeColors) =>
   },
   flagButton: {
     backgroundColor: c.surface,
-    borderRadius: 20,
+    borderRadius: 14,
     paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: c.border,
+    ...(isWeb ? { boxShadow: "0 6px 14px rgba(20,48,31,0.12)" } : { elevation: 3 }),
   },
   flagButtonText: { fontSize: 24 },
   iconButton: {
     backgroundColor: c.surface,
-    borderRadius: 20,
-    width: 40,
-    height: 40,
+    borderRadius: 14,
+    width: 42,
+    height: 42,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
     borderColor: c.border,
+    ...(isWeb ? { boxShadow: "0 6px 14px rgba(20,48,31,0.12)" } : { elevation: 3 }),
   },
   iconButtonText: { fontSize: 18 },
+  navEmoji: { fontSize: 20, lineHeight: 24 },
   modalOverlay: {
     flex: 1,
     backgroundColor: c.overlay,
@@ -1546,10 +1694,7 @@ const makeStyles = (c: ThemeColors) =>
     padding: 8,
     width: 232,
     gap: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 14,
-    elevation: 6,
+    ...(isWeb ? ({ boxShadow: "0 12px 28px rgba(0,0,0,0.15)" } as any) : { elevation: 6 }),
   },
   langItem: {
     flexDirection: "row",
@@ -1573,7 +1718,11 @@ const makeStyles = (c: ThemeColors) =>
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingBottom: 40,
+    paddingBottom: 0,
+  },
+  containerWide: {
+    justifyContent: "flex-start",
+    paddingTop: 24,
   },
   containerDesktop: {
     justifyContent: "flex-start",
@@ -1791,8 +1940,84 @@ const makeStyles = (c: ThemeColors) =>
     alignItems: "center",
     justifyContent: "center",
   },
-  zoomBackdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
-  zoomImage: { width: "88%", height: "70%" },
+  zoomBackdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+    ...(isWeb ? ({ backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" } as any) : {}) },
+  zoomCard: { alignItems: "center", justifyContent: "center", gap: 22, paddingHorizontal: 24, width: "100%" },
+  zoomCardDesktop: {
+    flexDirection: "row",
+    gap: 56,
+    maxWidth: 1080,
+    paddingHorizontal: 40,
+    justifyContent: "center",
+  },
+  zoomCircle: {
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    borderWidth: 5,
+    borderColor: "rgba(255,255,255,0.85)",
+    ...(isWeb ? ({ boxShadow: "0 30px 70px rgba(0,0,0,0.5)" } as any) : { elevation: 10 }),
+  },
+  zoomCircleDesktop: { width: 420, height: 420, borderRadius: 210, borderWidth: 7 },
+  zoomCircleImg: { width: "82%", height: "82%" },
+  zoomDetails: { alignItems: "center", maxWidth: 420 },
+  zoomDetailsDesktop: { alignItems: "flex-start", flex: 1, maxWidth: 520 },
+  zoomName: { color: "#fff", fontSize: 24, fontWeight: "900", textAlign: "center", letterSpacing: 0.2 },
+  zoomBrand: { color: "rgba(255,255,255,0.7)", fontSize: 16, marginTop: 6, fontWeight: "600" },
+  zoomScoreRow: { flexDirection: "row", alignItems: "center", gap: 16, marginTop: 22 },
+  zoomScoreBadge: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    ...(isWeb ? ({ boxShadow: "0 14px 30px rgba(0,0,0,0.35)" } as any) : { elevation: 6 }),
+  },
+  zoomScoreNum: { color: "#fff", fontSize: 30, fontWeight: "900" },
+  zoomVerdict: { fontSize: 20, fontWeight: "900" },
+  zoomScoreCap: { color: "rgba(255,255,255,0.6)", fontSize: 13, marginTop: 2 },
+  zoomScroll: { maxHeight: "82%" as any, alignSelf: "stretch" },
+  zoomScrollInner: { alignItems: "center", paddingBottom: 8 },
+  zoomSection: { marginTop: 22, alignSelf: "stretch" },
+  zoomSecTitle: {
+    color: "rgba(255,255,255,0.6)",
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 10,
+  },
+  zoomNutriWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  zoomNutri: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 999,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+  },
+  zoomNutriDot: { width: 9, height: 9, borderRadius: 5 },
+  zoomNutriLabel: { color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: "600" },
+  zoomNutriVal: { color: "#fff", fontSize: 13, fontWeight: "800" },
+  zoomChips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  zoomChip: { borderRadius: 10, borderWidth: 1, paddingVertical: 6, paddingHorizontal: 11, maxWidth: 220 },
+  zoomChipText: { color: "#fff", fontSize: 13, fontWeight: "700" },
+  zoomWarn: {
+    marginTop: 20,
+    alignSelf: "stretch",
+    backgroundColor: "rgba(234,88,12,0.18)",
+    borderWidth: 1,
+    borderColor: "rgba(251,146,60,0.5)",
+    borderRadius: 14,
+    padding: 14,
+  },
+  zoomWarnTitle: { color: "#fdba74", fontSize: 14, fontWeight: "800", marginBottom: 4 },
+  zoomWarnText: { color: "#fed7aa", fontSize: 13.5, lineHeight: 19 },
   zoomClose: {
     position: "absolute",
     top: 50,
@@ -1830,5 +2055,8 @@ const makeStyles = (c: ThemeColors) =>
   altName: { fontSize: 14, fontWeight: "600", color: c.text },
   altBrand: { fontSize: 12, color: c.textFaint },
   altScore: { fontSize: 16, fontWeight: "800" },
-  altLoading: { fontSize: 13, color: c.textFaint, fontStyle: "italic", marginTop: 6 },
+  altLoading: { fontSize: 13, color: c.textFaint, fontStyle: "italic" },
+  altLoadingRow: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 8, marginBottom: 2 },
+  altSkeleton: { opacity: 0.7 },
+  skelLine: { height: 10, borderRadius: 6 },
 });

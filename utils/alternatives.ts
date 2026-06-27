@@ -1,3 +1,4 @@
+import { fetchWithTimeout } from "./net";
 import { analyzeProduct, productDisplay } from "./score";
 
 export type Alternative = {
@@ -26,9 +27,10 @@ export async function getBetterAlternatives(
       `&fields=code,product_name,brands,image_url,additives_tags,nutriments,categories,ingredients_text,ingredients_text_${lang},ingredients_text_en` +
       `&page_size=40&sort_by=unique_scans_n`;
 
-    const res = await fetch(url, {
-      headers: { "User-Agent": "Zelynta/1.0 (iren.savastre@example.com)" },
+    const res = await fetchWithTimeout(url, {
+      headers: { "User-Agent": "Zelynta/1.0 (https://iren-savastre.github.io/zelynta/)" },
     });
+    if (!res.ok) throw new Error(`alternatives HTTP ${res.status}`);
     const data = await res.json();
     const products: any[] = data?.products ?? [];
 

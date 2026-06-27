@@ -35,13 +35,15 @@ export function BasketProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<BasketItem[]>([]);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then((raw) => {
-      if (raw) {
-        try {
-          setItems(JSON.parse(raw));
-        } catch {}
-      }
-    });
+    AsyncStorage.getItem(KEY)
+      .then((raw) => {
+        if (raw) {
+          try {
+            setItems(JSON.parse(raw));
+          } catch {}
+        }
+      })
+      .catch(() => {});
   }, []);
 
   function persist(next: BasketItem[]) {

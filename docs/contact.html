@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contact — Zelynta</title>
+<meta name="description" content="Contactează echipa Zelynta pentru întrebări generale și sugestii." />
+<link rel="canonical" href="https://iren-savastre.github.io/zelynta/contact.html" />
+<meta name="robots" content="index,follow" />
+<meta name="theme-color" content="#2E7D32" />
+<link rel="icon" type="image/png" href="icon.png" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="stylesheet" href="assets/legal.css" />
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="lhero"><div class="wrap">
+  <p class="crumbs" data-i18n-html="con_crumbs"><a href="index.html">Acasă</a> / Contact</p>
+  <span class="eyebrow" data-i18n="con_eyebrow">Contact</span>
+  <h1 data-i18n="con_h1">Ia legătura cu noi</h1>
+  <p data-i18n="con_lead">Întrebări generale sau sugestii? Scrie-ne. Trimiterea deschide aplicația ta de e-mail; nu folosim trackere.</p>
+</div></section>
+
+<div class="wrap split2" style="padding:40px 24px 10px">
+  <div>
+    <h2 style="color:var(--green-dark)" data-i18n="con_info_h2">Date de contact</h2>
+    <p data-i18n="con_info_email">E-mail: suport@zelynta.com</p>
+    <p data-i18n="con_info_support">Suport: suport@zelynta.com</p>
+    <p data-i18n="con_info_company">Developer Irèn Savastre</p>
+    <div class="callout" style="margin-top:14px" data-i18n-html="con_info_callout">Pentru cereri privind datele personale, folosește pagina <a href="privacy-contact.html">Contact confidențialitate</a>.</div>
+  </div>
+  <form class="lz-form" data-subject="Contact">
+    <div class="field"><label for="n" data-i18n="con_form_name">Nume</label><input id="n" data-label="Nume" data-required type="text" autocomplete="name" /><div class="msg" data-i18n="con_form_name_err">Completează numele.</div></div>
+    <div class="field"><label for="e" data-i18n="con_form_email">E-mail</label><input id="e" data-label="E-mail" data-required type="email" autocomplete="email" /><div class="msg" data-i18n="con_form_email_err">Introdu un e-mail valid.</div></div>
+    <div class="field"><label for="s" data-i18n="con_form_subject">Subiect</label><input id="s" data-label="Subiect" type="text" /></div>
+    <div class="field"><label for="m" data-i18n="con_form_message">Mesaj</label><textarea id="m" data-label="Mesaj" data-required></textarea><div class="msg" data-i18n="con_form_message_err">Scrie un mesaj.</div></div>
+    <label class="consent"><input type="checkbox" data-privacy data-label="Acord confidențialitate" /><span data-i18n-html="con_form_privacy">Sunt de acord cu <a href="legal/privacy.html">Politica de confidențialitate</a>. (obligatoriu)</span></label>
+    <label class="consent"><input type="checkbox" data-label="Acord marketing" /><span data-i18n="con_form_marketing">Vreau să primesc, opțional, noutăți. (separat, nebifat implicit)</span></label>
+    <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="con_form_submit">Trimite mesajul</button>
+    <div class="form-status" role="status" aria-live="polite"></div>
+  </form>
+</div>
+
+<div id="site-footer"></div>
+<script src="assets/legal-i18n.js"></script>
+<script src="assets/legal.js"></script>
+</body>
+</html>

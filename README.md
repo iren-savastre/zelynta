@@ -1,50 +1,35 @@
-# Welcome to your Expo app 👋
+# Zelynta
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**RO** · Zelynta scanează produse (cod de bare sau lista de ingrediente) și îți arată un scor de sănătate, aditivii explicați, avertismente și alternative mai bune — într-o interfață clară, modernă și ușor de folosit. Date din baze deschise, fără cont.
 
-## Get started
+**EN** · Zelynta scans products (barcode or ingredient list) and shows a health score, explained additives, warnings and better alternatives — in a clear, modern and easy-to-use interface. Open data, no account required.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Structură / Structure
 
-2. Start the app
+- `app/` — aplicația mobilă & web (Expo Router, React Native / react-native-web)
+- `components/`, `utils/`, `i18n/` — componente, logică și traduceri (9 limbi)
+- `docs/` — landing page și paginile legale (RO)
+- `admin/` — panou de administrare (dashboard)
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Rulare / Run
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Din output poți deschide aplicația pe Android, iOS sau în browser (web).
 
-## Learn more
+## Tehnologii / Tech
 
-To learn more about developing your project with Expo, look at the following resources:
+Expo SDK 54 · React Native · expo-router · i18next (9 limbi) · date din Open Food Facts / Open Beauty Facts / Open Products Facts.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Variabile de mediu / Environment
 
-## Join the community
+- `EXPO_PUBLIC_OCR_KEY` — cheie OCR.space pentru recunoașterea textului din imagini (opțional; fără ea se folosește OCR-ul on-device).
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+© 2026 Irèn Savastre — toate drepturile rezervate. · © 2026 Irèn Savastre — all rights reserved.

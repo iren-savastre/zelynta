@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Raportează o problemă — Zelynta</title>
+<meta name="description" content="Raportează o problemă tehnică, de scanare, de date despre produs sau de confidențialitate." />
+<link rel="canonical" href="https://iren-savastre.github.io/zelynta/report-problem.html" />
+<meta name="robots" content="index,follow" />
+<meta name="theme-color" content="#2E7D32" />
+<link rel="icon" type="image/png" href="icon.png" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="stylesheet" href="assets/legal.css" />
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="lhero"><div class="wrap">
+  <p class="crumbs" data-i18n-html="rep_crumbs"><a href="index.html">Acasă</a> / Raportează o problemă</p>
+  <span class="eyebrow" data-i18n="rep_eyebrow">Raportare</span>
+  <h1 data-i18n="rep_h1">Raportează o problemă</h1>
+  <p data-i18n="rep_lead">Spune-ne ce nu funcționează. Cerem doar datele necesare. Nu promitem rezolvare instant, dar analizăm fiecare raport.</p>
+</div></section>
+
+<div class="wrap split2" style="padding:40px 24px 10px">
+  <div>
+    <h2 style="color:var(--green-dark)" data-i18n="rep_types_h2">Tipuri de probleme</h2>
+    <ul style="color:var(--muted);margin-left:18px">
+      <li data-i18n="rep_type_tech">Problemă tehnică</li>
+      <li data-i18n="rep_type_scan">Problemă la scanare</li>
+      <li data-i18n="rep_type_data">Problemă cu datele despre produs</li>
+      <li data-i18n="rep_type_priv">Problemă de confidențialitate</li>
+      <li data-i18n="rep_type_abuse">Abuz sau utilizare necorespunzătoare</li>
+      <li data-i18n="rep_type_other">Altă problemă</li>
+    </ul>
+    <div class="callout" style="margin-top:14px" data-i18n-html="rep_callout">Pentru cereri privind datele personale, folosește <a href="privacy-contact.html">Contact confidențialitate</a>. Raportare la suport@zelynta.com.</div>
+  </div>
+  <form class="lz-form" data-subject="Raport problemă">
+    <div class="field"><label for="n" data-i18n="rep_lbl_name">Nume (opțional)</label><input id="n" data-label="Nume" type="text" autocomplete="name" /></div>
+    <div class="field"><label for="e" data-i18n="rep_lbl_email">E-mail</label><input id="e" data-label="E-mail" data-required type="email" autocomplete="email" /><div class="msg" data-i18n="rep_err_email">Introdu un e-mail valid.</div></div>
+    <div class="field"><label for="c" data-i18n="rep_lbl_cat">Categorie</label><select id="c" data-label="Categorie">
+      <option data-i18n="rep_opt_tech">Problemă tehnică</option><option data-i18n="rep_opt_scan">Problemă la scanare</option><option data-i18n="rep_opt_data">Date despre produs</option>
+      <option data-i18n="rep_opt_priv">Confidențialitate</option><option data-i18n="rep_opt_abuse">Abuz / utilizare necorespunzătoare</option><option data-i18n="rep_opt_other">Altă problemă</option>
+    </select></div>
+    <div class="field"><label for="m" data-i18n="rep_lbl_desc">Descrierea problemei</label><textarea id="m" data-label="Descriere" data-required></textarea><div class="msg" data-i18n="rep_err_desc">Descrie problema.</div></div>
+    <div class="field"><label for="r" data-i18n="rep_lbl_steps">Pași de reproducere (dacă e tehnică)</label><textarea id="r" data-label="Pași de reproducere" style="min-height:80px"></textarea></div>
+    <label class="consent"><input type="checkbox" data-privacy data-label="Acord confidențialitate" /><span data-i18n-html="rep_consent">Sunt de acord cu <a href="legal/privacy.html">Politica de confidențialitate</a>. (obligatoriu)</span></label>
+    <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="rep_submit">Trimite raportul</button>
+    <div class="form-status" role="status" aria-live="polite"></div>
+  </form>
+</div>
+
+<div id="site-footer"></div>
+<script src="assets/legal-i18n.js"></script>
+<script src="assets/legal.js"></script>
+</body>
+</html>

@@ -1,10 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchWithTimeout } from "./net";
 
 // Traducere automata gratuita prin MyMemory (fara cont, fara cheie).
 // Folosita pentru ingrediente cand limba aleasa nu exista in baza de date.
 // MyMemory limiteaza fiecare cerere la ~500 caractere, deci taiem textul in bucati.
 
 const memoryCache = new Map<string, string>();
+const CACHE_MAX = 500;
+function cacheSet(key: string, val: string) {
+  if (memoryCache.size >= CACHE_MAX) {
+    const oldest = memoryCache.keys().next().value;
+    if (oldest !== undefined) memoryCache.delete(oldest);
+  }
+  memoryCache.set(key, val);
+}
 
 function cacheKey(from: string, to: string, text: string) {
   return `xlate:${from}:${to}:${text}`;
@@ -37,7 +46,8 @@ async function translateChunk(chunk: string, from: string, to: string): Promise<
     "https://api.mymemory.translated.net/get?q=" +
     encodeURIComponent(chunk) +
     `&langpair=${from}|${to}`;
-  const res = await fetch(url);
+  const res = await fetchWithTimeout(url, {}, 10000);
+  if (!res.ok) throw new Error(`translate HTTP ${res.status}`);
   const data = await res.json();
   const out = data?.responseData?.translatedText;
   if (typeof out === "string" && out.trim() && data?.responseStatus === 200) {
@@ -62,7 +72,7 @@ export async function translateText(
   try {
     const stored = await AsyncStorage.getItem(key);
     if (stored) {
-      memoryCache.set(key, stored);
+      cacheSet(key, stored);
       return stored;
     }
   } catch {}
@@ -73,7 +83,7 @@ export async function translateText(
       chunks.map((c) => translateChunk(c, from, to))
     );
     const result = translated.join("");
-    memoryCache.set(key, result);
+    cacheSet(key, result);
     AsyncStorage.setItem(key, result).catch(() => {});
     return result;
   } catch {

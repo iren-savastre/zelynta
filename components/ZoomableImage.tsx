@@ -74,11 +74,9 @@ export default function ZoomableImage({
         <Modal visible transparent animationType="none" onRequestClose={closeZoom}>
           <Animated.View style={[styles.overlay, { opacity: zoom }]}>
             <Pressable style={styles.backdrop} onPress={closeZoom} />
-            <Animated.Image
-              source={{ uri }}
-              style={[styles.image, { transform: [{ scale }, { rotate }] }]}
-              resizeMode="contain"
-            />
+            <Animated.View style={[styles.circle, { transform: [{ scale }, { rotate }] }]}>
+              <Image source={{ uri }} style={styles.circleImg} resizeMode="contain" />
+            </Animated.View>
             <TouchableOpacity style={styles.close} onPress={closeZoom}>
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>
@@ -99,7 +97,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
-  image: { width: "88%", height: "70%" },
+  circle: {
+    width: 320,
+    height: 320,
+    maxWidth: "86%",
+    borderRadius: 200,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    borderWidth: 5,
+    borderColor: "rgba(255,255,255,0.85)",
+  },
+  circleImg: { width: "82%", height: "82%" },
   close: {
     position: "absolute",
     top: 50,

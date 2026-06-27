@@ -42,3 +42,10 @@ app-example
 /ios
 /android
 .idea/
+
+# tests/build
+node_modules/
+test-results/
+playwright-report/
+.playwright/
+build/

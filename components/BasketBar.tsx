@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -115,11 +116,15 @@ const makeStyles = (c: ThemeColors) =>
       backgroundColor: c.primary,
       alignItems: "center",
       justifyContent: "center",
-      shadowColor: "#000",
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 4 },
-      elevation: 8,
+      ...(Platform.OS === "web"
+        ? ({ boxShadow: "0 6px 16px rgba(0,0,0,0.3)" } as any)
+        : {
+            shadowColor: "#000",
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 8,
+          }),
     },
     fabIcon: { fontSize: 26 },
     badge: {

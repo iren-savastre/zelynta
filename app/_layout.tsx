@@ -3,6 +3,7 @@ import "../i18n/i18n";
 import { ThemeProvider, useTheme } from "../utils/theme";
 import { BasketProvider } from "../utils/basket";
 import BasketBar from "../components/BasketBar";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 function StackNav() {
   const { colors } = useTheme();
@@ -38,10 +39,12 @@ function StackNav() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <BasketProvider>
-        <StackNav />
-      </BasketProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <BasketProvider>
+          <StackNav />
+        </BasketProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

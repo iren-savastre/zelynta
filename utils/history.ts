@@ -47,3 +47,20 @@ export async function clearHistory(): Promise<void> {
     await AsyncStorage.removeItem(KEY);
   } catch {}
 }
+
+// GDPR / control utilizator: șterge toate datele de conținut de pe dispozitiv
+// (istoric, favorite, coș, cache traduceri). Preferințele UI (temă, limbă, paletă)
+// rămân, pentru a nu reseta experiența.
+export async function clearAllData(): Promise<void> {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const toRemove = keys.filter(
+      (k) =>
+        k === "zelynta_history" ||
+        k === "zelynta_favorites" ||
+        k === "zelynta_basket" ||
+        k.startsWith("xlate:")
+    );
+    if (toRemove.length) await AsyncStorage.multiRemove(toRemove);
+  } catch {}
+}
