@@ -61,7 +61,7 @@ function flagUrl(cc: string, w: number) {
   return `https://flagcdn.com/w${w}/${cc}.png`;
 }
 
-// Etichete pentru traducerea automata a ingredientelor (in toate cele 9 limbi)
+// Etichete pentru traducerea automata a ingredientelor (in toate cele 11 limbi)
 const autoLabels = {
   translating: { ro: "Se traduce…", en: "Translating…", fr: "Traduction…", it: "Traduzione…", es: "Traduciendo…", de: "Wird übersetzt…", ru: "Перевод…", pl: "Tłumaczenie…", nl: "Vertalen…" } as Record<string, string>,
   auto: { ro: "tradus automat", en: "auto-translated", fr: "traduit automatiquement", it: "tradotto automaticamente", es: "traducido automáticamente", de: "automatisch übersetzt", ru: "автоперевод", pl: "przetłumaczone automatycznie", nl: "automatisch vertaald" } as Record<string, string>,

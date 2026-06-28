@@ -237,7 +237,53 @@
 
 ---
 
-## 14. 📐 SPECIFICAȚII DE PRODUCȚIE (design, aspect, rezoluție)
+## 14. 💬 COPY AUTENTIC EXTRAS DIN APLICAȚIE & LANDING (reflectă realitatea)
+
+> Texte care **există deja** în aplicație și pe landing page (`docs/index.html`) — verificate în cod, în 11 limbi. Folosește-le ca atare; sunt deja „vocea" brandului.
+
+### 🎯 Slogane rotative (din app — „prompter", lângă logo)
+Acestea derulează deja în aplicație și sunt slogane gata făcute:
+1. **Scanezi. Înțelegi. Alegi mai sănătos.** *(Scan. Understand. Choose healthier.)*
+2. **Codurile E, traduse pe înțelesul tău.** *(E-numbers, translated into plain words.)*
+3. **Ulei de palmier și aditivi de risc — semnalate instant.** *(Palm oil and risky additives — flagged instantly.)*
+4. **Fără cont. Datele rămân pe telefonul tău.** *(No account. Your data stays on your phone.)*
+5. **Un scor clar, în câteva secunde la raft.** *(A clear score, in seconds at the shelf.)*
+
+### 🏷️ Titlu & subtitlu principal (din landing/hero)
+- **Titlu:** „Scanează produse. Înțelege etichetele. Alege mai sănătos."
+- **Subtitlu:** „Scanezi codul de bare sau fotografiezi lista de ingrediente, iar aplicația îți arată un scor de sănătate, aditivii explicați, avertismente și alternative mai bune — pe baza unor baze de date deschise."
+- **Notă (sub buton):** „Gratuit · fără cont · datele rămân pe dispozitivul tău · disponibilă în **11 limbi**."
+
+### 😣 Problema (din landing — perfectă pentru reclamă „problemă → soluție")
+- **Intro:** „Listele de ingrediente sunt lungi, codurile E par un cifru, iar informația e împrăștiată. E greu să știi rapid dacă un produs e o alegere bună — mai ales pentru copii."
+- **Coduri E de neînțeles** — „«E150d», «E471» — fără context, nu spun nimic despre risc sau utilizare."
+- **Informație fragmentată** — „Scor, aditivi, nutriție, ambalaj — de obicei le cauți în locuri diferite."
+- **Decizii la raft, pe grabă** — „Ai câteva secunde să decizi, fără timp de citit etichete cu litere mici."
+
+### ✅ Soluția Zelynta (din landing — bullets gata de pliant)
+- **Scor de sănătate clar, de la 0 la 100**
+- **Fiecare aditiv cu nivel de risc și explicație**
+- **Avertismente pentru ulei de palmier și ambalaj**
+- **Alternative mai bune și recomandări pe categorie**
+
+### 🛡️ Insigne de încredere (din landing — perfecte ca pictograme pe pliant)
+`Scanare rapidă` · `Fără cont` · `Date pe dispozitiv` · `11 limbi` · `Surse deschise` · `GDPR-ready`
+
+### 🔢 Cum funcționează (din landing — cei 5 pași, gata pentru infografic)
+1. **Scanează** — „Îndreaptă camera spre codul de bare sau fotografiază lista de ingrediente."
+2. **Caută în baze** — „Aplicația caută produsul în bazele deschise Open Food / Beauty / Products Facts."
+3. **Vezi rezultatul** — „Scor, aditivi, nutriție și avertismente, într-un card clar."
+4. **Primești sfaturi** — „Recomandări pe categorie și alternative mai bune."
+5. **Salvează** — „Adaugă la istoric sau favorite și compară produse."
+
+### 🍅 Vocea mascotei (ton de brand — prietenos, cald)
+- „Salut! Hai să-mi scrii câteva rânduri 👋"
+- „Super! Acum apasă Trimite 🎉"
+> Folosește acest ton (cald, jucăuș, încurajator) în toate textele de marketing.
+
+---
+
+## 15. 📐 SPECIFICAȚII DE PRODUCȚIE (design, aspect, rezoluție)
 
 > Specs actualizate (2026). Regula de aur: **PRINT = 300 DPI + CMYK**; **ECRAN = 72 PPI + RGB**. Nu mări o imagine mică — pornește mereu de la rezoluția finală.
 
