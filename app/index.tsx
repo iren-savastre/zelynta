@@ -39,7 +39,7 @@ import { saveToHistory } from "../utils/history";
 import { getPalmNote, hasPalmOil } from "../utils/palm";
 import { translateText } from "../utils/translate";
 import { extractAdditiveTags, ocrImage } from "../utils/ocr";
-import { analyzeProduct, productDisplay } from "../utils/score";
+import { analyzeProduct, annotateIngredients, productDisplay } from "../utils/score";
 import { mixHex, PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
 const languages = [
@@ -366,6 +366,11 @@ export default function Index() {
 
   const n = product?.nutriments ?? {};
   const lang = i18n.language;
+  // Text de ingrediente cu codul E adăugat lângă denumirea aditivului (ex. "acid fosforic (E338)")
+  const ingredientsDisplay = useMemo(
+    () => annotateIngredients(ingredientsText, lang),
+    [ingredientsText, lang]
+  );
 
   // Analiza completă (scor + motive + aditivi + cosmetice) — partajată cu comparația/alternativele
   const analysis = useMemo(
@@ -1156,7 +1161,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             )}
             <Text style={styles.scoreLabel}>{t("ingredientsLabel")}</Text>
             <Text style={styles.ingredients}>
-              {ingredientsText || t("noIngredients")}
+              {ingredientsDisplay || t("noIngredients")}
             </Text>
             {ingredientsTranslating && (
               <Text style={styles.ingredientsAuto}>

@@ -24,6 +24,58 @@ function pickField(field: any, lang: string) {
   return field ? field[lang] ?? field.en ?? field.ro ?? "" : "";
 }
 
+// ---- Adnotare ingrediente: adaugă codul E lângă denumirea aditivului ----
+// Ex: "acidifiant: acid fosforic" -> "acidifiant: acid fosforic (E338)".
+type AnnIndex = { re: RegExp; byName: Map<string, string> };
+const annCache: Record<string, AnnIndex> = {};
+
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function buildAnnIndex(lang: string): AnnIndex {
+  if (annCache[lang]) return annCache[lang];
+  const byName = new Map<string, string>(); // nume(lowercase) -> cod E
+  for (const code in additivesInfo) {
+    const info: any = (additivesInfo as any)[code];
+    const ecode = code.toUpperCase(); // ex. "E338"
+    const names = new Set<string>();
+    const nl = pickField(info?.name, lang);
+    const ne = info?.name?.en;
+    if (nl) names.add(String(nl).trim());
+    if (ne) names.add(String(ne).trim());
+    for (const nm of names) {
+      // doar nume specifice (evită cuvinte scurte comune); primul cod câștigă
+      if (nm.length >= 6 && !byName.has(nm.toLowerCase())) byName.set(nm.toLowerCase(), ecode);
+    }
+  }
+  // o singură trecere, cu alternativă; cele mai lungi denumiri primele (câștigă)
+  const names = [...byName.keys()].sort((a, b) => b.length - a.length).map(escapeRe);
+  const re = new RegExp(
+    "(^|[\\s,;:.()\\-/])(" + names.join("|") + ")(?![A-Za-zÀ-ÿ0-9])",
+    "gi"
+  );
+  const idx = { re, byName };
+  annCache[lang] = idx;
+  return idx;
+}
+
+// Adaugă codul E după denumirea aditivului, dacă acesta nu apare deja în text.
+export function annotateIngredients(text: string, lang: string): string {
+  if (!text || text.length > 4000) return text;
+  const { re, byName } = buildAnnIndex(lang);
+  const upper = text.toUpperCase();
+  const used = new Set<string>();
+  re.lastIndex = 0;
+  return text.replace(re, (m, pre, nm) => {
+    const code = byName.get(String(nm).toLowerCase());
+    if (!code) return m;
+    if (used.has(code) || upper.includes(code)) return m; // o dată / deja scris de producător
+    used.add(code);
+    return pre + nm + " (" + code + ")";
+  });
+}
+
 export function getAdditives(product: any, lang: string): AnalyzedAdditive[] {
   const tags: string[] = product?.additives_tags ?? [];
   const seen = new Set<string>();
