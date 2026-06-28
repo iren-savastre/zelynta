@@ -4329,7 +4329,9 @@
       var name=document.getElementById("cName"), email=document.getElementById("cEmail"), msg=document.getElementById("cMsg");
       if(!name||!email||!msg) return;
       function dictNow(){ var l=document.documentElement.lang||"ro"; return I18N[l]||I18N.ro; }
-      function setState(cls,key){ m.classList.remove("m-idle","m-think","m-happy","m-sad"); m.classList.add(cls); var d=dictNow(); bt.textContent=d[key]||""; bubble.classList.remove("pop"); void bubble.offsetWidth; bubble.classList.add("pop"); }
+      function setState(cls,key){ m.classList.remove("m-idle","m-think","m-happy","m-sad"); m.classList.add(cls); m.setAttribute("data-masckey",key); var d=dictNow(); bt.textContent=d[key]||""; bubble.classList.remove("pop"); void bubble.offsetWidth; bubble.classList.add("pop"); }
+      // re-traduce bula mascotei la schimbarea limbii (păstrează starea curentă)
+      window.__refreshMascot=function(){ var k=m.getAttribute("data-masckey")||"mascHi"; bt.textContent=dictNow()[k]||""; };
       function allGood(){ return name.value.trim() && /\S+@\S+\.\S+/.test(email.value) && msg.value.trim(); }
       setState("m-idle","mascHi");
       [name,email,msg].forEach(function(f){
@@ -4414,6 +4416,7 @@
         o.querySelector(".ck").textContent = on ? "✓" : "";
       });
       try{ localStorage.setItem("zelynta_lang", code); }catch(e){}
+      if(window.__refreshMascot) window.__refreshMascot();
     }
     LANGS.forEach(l=>{
       const o=document.createElement("button"); o.type="button"; o.className="lang-opt"; o.dataset.code=l.code; o.setAttribute("role","menuitem");
