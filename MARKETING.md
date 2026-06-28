@@ -237,6 +237,106 @@
 
 ---
 
+## 14. 📐 SPECIFICAȚII DE PRODUCȚIE (design, aspect, rezoluție)
+
+> Specs actualizate (2026). Regula de aur: **PRINT = 300 DPI + CMYK**; **ECRAN = 72 PPI + RGB**. Nu mări o imagine mică — pornește mereu de la rezoluția finală.
+
+### 🖨️ A. Pliante / flyere (print)
+| Format | Tăiat (mm) | Cu bleed +3mm (mm) | Pixeli @300 DPI | Folosire |
+|---|---|---|---|---|
+| **A6** | 105 × 148 | 111 × 154 | 1240 × 1748 | fluturaș mic, mână |
+| **A5** ⭐ | 148 × 210 | 154 × 216 | 1748 × 2480 | pliantul standard (recomandat) |
+| **A4** | 210 × 297 | 216 × 303 | 2480 × 3508 | afiș/poster mic |
+| **DL** | 99 × 210 | 105 × 216 | 1169 × 2480 | flyer îngust, plic |
+
+- **Bleed:** 3 mm pe fiecare latură (fundalul/culoarea trebuie să iasă până în bleed).
+- **Safe margin:** ține text și logo **la min. 5 mm** de margine.
+- **Culoare:** **CMYK** (nu RGB — la print, RGB-ul șterge portocaliul/violetul).
+- **Format fișier:** PDF/X-1a (print), fonturi **convertite în contur** (outline).
+- **Rezoluție imagini incluse:** min. 300 DPI la dimensiunea finală.
+
+### 🎪 B. Roll-up / banner vertical (stand expo)
+- **Dimensiune:** **85 × 200 cm** (standard) — vizibilă 850 × 2000 mm.
+- **Rezoluție:** **150 DPI** la mărime reală (suficient de la 1–3 m) → ~5020 × 11810 px. (Min. 100 DPI; pentru detalii fine 150–300.)
+- **Zonă sigură jos:** ultimii **10–20 cm** intră în baza standului → **fără text/logo** acolo.
+- **Bleed:** 3–5 mm; safe margin 5–10 mm.
+- **Regula 1/3 sus:** logo + slogan în treimea de sus (se văd peste capetele oamenilor).
+
+### 📱 C. Social media (imagini)
+| Rețea / format | Pixeli | Raport | Note |
+|---|---|---|---|
+| **Feed vertical** ⭐ (IG/FB/LinkedIn) | **1080 × 1350** | 4:5 | formatul preferat 2026, ocupă cel mai mult ecran |
+| Feed pătrat | 1080 × 1080 | 1:1 | universal |
+| **Story / Reel cover** | **1080 × 1920** | 9:16 | full-screen |
+| **TikTok** (tot) | 1080 × 1920 | 9:16 | doar vertical |
+| **Open Graph** (preview link FB/site) | 1200 × 630 | 1.91:1 | imaginea când distribui un link |
+| Banner profil FB (cover) | 1640 × 856 | — | poză de copertă |
+
+- **Format:** JPG sau PNG, **RGB**, sub ~8 MB.
+
+### 🎬 D. Reels / TikTok / Shorts (video)
+- **Rezoluție:** **1080 × 1920** (9:16), vertical.
+- **Codec:** MP4 (H.264), **30 fps**, audio AAC.
+- **Durată:** 15–30 sec ideal pentru reclamă (hook în primele 3 sec).
+- **Zone sigure (foarte important — UI-ul acoperă marginile):**
+  - **Sus:** evită primii **~200 px** (nume cont).
+  - **Jos:** evită ultimii **~400 px** (caption + butoane like/share).
+  - **Dreapta:** evită ~90–120 px (coloana de butoane).
+  - **Zonă sigură de conținut:** centrul, ~**1080 × 1320 px**.
+  - **Textul-cârlig (hook):** centrat, la **200–600 px de sus** (sigur pe toate telefoanele).
+
+### 🤖 E. Google Play (assets obligatorii din magazin)
+| Asset | Spec exact | Note |
+|---|---|---|
+| **Iconiță** | **512 × 512 px**, PNG 32-bit, < 1 MB | din **martie 2026** colțurile se rotunjesc automat (30%) → ține elementele cheie în **15–18% padding interior** |
+| **Feature graphic** | **1024 × 500 px**, JPEG sau PNG 24-bit **fără alpha** | **obligatoriu** (nu poți publica fără el); focalizează central |
+| **Screenshot-uri telefon** | min. 320 / max. 3840 px pe latură, raport între **9:16 și 9:21** | minim **2**, până la **8**; recomand 1080 × 1920 |
+| Screenshot-uri tabletă | aceleași reguli | opțional, dar bun pentru calitate |
+
+### 🌐 F. Bannere web / display (opțional, pentru reclame online)
+| Tip | Pixeli |
+|---|---|
+| Leaderboard | 728 × 90 |
+| Medium rectangle | 300 × 250 |
+| Large mobile | 320 × 100 |
+| Half page | 300 × 600 |
+| Social ad (universal) | 1080 × 1080 |
+
+- Format: PNG/JPG static sau HTML5; sub 150 KB pentru display ads.
+
+### 🎨 G. Culorile brandului în CMYK (pentru print — aproximativ, confirmă la tipografie)
+| Culoare | HEX (ecran) | CMYK aprox. (print) |
+|---|---|---|
+| Verde Zelynta | `#2E7D32` | C63 M0 Y60 K49 |
+| Accent verde deschis | `#5BBD62` | C52 M0 Y60 K26 |
+| Scor 🟢 sănătos | `#038141` | C98 M0 Y50 K49 |
+| Scor 🟠 moderat | `#EE8100` | C0 M46 Y100 K7 |
+| Scor 🔴 nesănătos | `#E63E11` | C0 M73 Y93 K10 |
+| Fundal crem | `#F7F7F2` | C0 M0 Y2 K3 |
+
+### ✅ H. Reguli rapide pentru orice material
+1. **Print → 300 DPI + CMYK + bleed 3 mm.** Ecran → RGB.
+2. **Spațiu liber în jurul logo-ului** = înălțimea literei „Z" pe toate laturile.
+3. **Contrast mare** text/fundal (lizibil de la distanță).
+4. **Un singur mesaj** per material (un titlu, un CTA).
+5. **CTA + QR** mereu prezente (descărcare).
+6. Exportă **la dimensiunea finală**, nu redimensiona în sus.
+7. Testează pliantul pe hârtie reală și reel-ul pe telefon înainte de tipar/postare.
+
+### 📦 Lista de livrabile (cu dimensiuni, gata de brief către designer)
+- [ ] Iconiță **512×512** (PNG, safe zone 15%)
+- [ ] Feature graphic **1024×500** (logo + slogan, central)
+- [ ] 5 screenshot-uri **1080×1920** (scanare, scor, aditivi, comparație, alternative)
+- [ ] Pliant **A5** față-verso **1748×2480** @300 DPI, CMYK, +bleed
+- [ ] Roll-up **85×200 cm** @150 DPI (logo+slogan sus, jos liber)
+- [ ] 3 postări feed **1080×1350** + 2 story **1080×1920**
+- [ ] 1 reel **1080×1920**, 30 fps, hook în 3 sec, text în zona sigură
+- [ ] Open Graph **1200×630** pentru site
+
+**Surse specs:** [Buffer — Social Media Image Sizes 2026](https://buffer.com/resources/social-media-image-sizes/) · [Hootsuite](https://blog.hootsuite.com/social-media-image-sizes-guide/) · [Figma — Flyer Sizes](https://www.figma.com/resource-library/flyer-sizes/) · [Pixexact — Flyer Size Guide 2026](https://www.pixexact.com/blog/flyer-size-guide) · [Android Developers — Icon Specs](https://developer.android.com/distribute/google-play/resources/icon-design-specifications) · [Play Console Help — Preview assets](https://support.google.com/googleplay/android-developer/answer/9866151) · [Instagram Reels Safe Zones 2026](https://campaignswift.com/blog/instagram-safe-zone-sizes) · [Roll-up banner specs](https://www.dtfeasyprint.com/roll-up-banner-file-specs-color-modes-and-print-resolution/)
+
+---
+
 *Toate afirmațiile din acest kit reflectă funcțiile reale ale aplicației Zelynta. Pentru descrierea oficială din magazin și formularul Data Safety, vezi `STORE_LISTING.md`. Pentru deploy, vezi `GHID_PLAY_STORE.md`.*
 
 © 2026 Irèn Savastre — toate drepturile rezervate.
