@@ -93,7 +93,7 @@ export default function LegalPage() {
           })
         )}
         <Text style={styles.foot}>
-          © 2026 Irèn Savastre — {t("footerRights") || "toate drepturile rezervate."}
+          © 2026 {t("footerRights") || "Irèn Savastre — toate drepturile rezervate."}
         </Text>
       </ScrollView>
     </View>
