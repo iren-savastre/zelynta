@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -60,35 +61,36 @@ const SOCIAL: { ic: any; url: string }[] = [
   { ic: "logo-instagram", url: SITE },
 ];
 
-type Item = { label: string; url: string; ic: any };
 // head/label sunt CHEI i18n (traduse cu t() la randare).
+// route = navigare în app (fără 404). Conținutul Legal/Suport e importat din paginile site-ului.
+type Item = { label: string; route: string; ic: any };
 const COLS: { head: string; headIc: any; items: Item[] }[] = [
   {
     head: "footerColProduct",
     headIc: "grid",
     items: [
-      { label: "footerFeatures", url: SITE + "#features", ic: "sparkles-outline" },
-      { label: "footerHow", url: SITE + "#how", ic: "list-outline" },
-      { label: "footerFaq", url: SITE + "#faq", ic: "help-circle-outline" },
+      { label: "footerFeatures", route: "/", ic: "sparkles-outline" },
+      { label: "footerHow", route: "/advice", ic: "list-outline" },
+      { label: "footerFaq", route: "/legal/support", ic: "help-circle-outline" },
     ],
   },
   {
     head: "footerColLegal",
     headIc: "document-text",
     items: [
-      { label: "footerPrivacy", url: SITE + "legal/privacy.html", ic: "shield-checkmark-outline" },
-      { label: "footerTerms", url: SITE + "legal/terms.html", ic: "document-text-outline" },
-      { label: "footerCookies", url: SITE + "legal/cookies.html", ic: "browsers-outline" },
-      { label: "footerGdpr", url: SITE + "legal/gdpr-rights.html", ic: "key-outline" },
+      { label: "footerPrivacy", route: "/legal/privacy", ic: "shield-checkmark-outline" },
+      { label: "footerTerms", route: "/legal/terms", ic: "document-text-outline" },
+      { label: "footerCookies", route: "/legal/cookies", ic: "browsers-outline" },
+      { label: "footerGdpr", route: "/legal/gdpr", ic: "key-outline" },
     ],
   },
   {
     head: "footerColSupport",
     headIc: "help-buoy",
     items: [
-      { label: "footerContact", url: SITE + "contact.html", ic: "mail-outline" },
-      { label: "footerSupport", url: SITE + "support.html", ic: "help-buoy-outline" },
-      { label: "footerReport", url: SITE + "report-problem.html", ic: "warning-outline" },
+      { label: "footerContact", route: "/legal/contact", ic: "mail-outline" },
+      { label: "footerSupport", route: "/legal/support", ic: "help-buoy-outline" },
+      { label: "footerReport", route: "/legal/report", ic: "warning-outline" },
     ],
   },
 ];
@@ -101,6 +103,7 @@ export default function AppFooter({
 }) {
   const year = new Date().getFullYear();
   const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <View style={styles.outer}>
@@ -146,7 +149,7 @@ export default function AppFooter({
                   <Text style={styles.colHead}>{t(c.head)}</Text>
                 </View>
                 {c.items.map((it, i) => (
-                  <TouchableOpacity key={i} style={styles.linkRow} onPress={() => open(it.url)}>
+                  <TouchableOpacity key={i} style={styles.linkRow} onPress={() => router.push(it.route as any)}>
                     <Ionicons name={it.ic} size={15} color="#7fbf95" />
                     <Text style={styles.link}>{t(it.label)}</Text>
                   </TouchableOpacity>
