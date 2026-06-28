@@ -61,6 +61,13 @@ const SOCIAL: { ic: any; url: string }[] = [
   { ic: "logo-instagram", url: SITE },
 ];
 
+// Butoane de store (sub social). URL-urile pot fi schimbate aici sau din CMS (landing).
+const STORE_URL = "https://github.com/iren-savastre/zelynta/releases/latest";
+const STORES: { img: any; url: string; label: string }[] = [
+  { img: require("../assets/images/google-play.png"), url: STORE_URL, label: "Google Play" },
+  { img: require("../assets/images/app-store.png"), url: STORE_URL, label: "App Store" },
+];
+
 // head/label sunt CHEI i18n (traduse cu t() la randare).
 // route = navigare în app (fără 404). Conținutul Legal/Suport e importat din paginile site-ului.
 type Item = { label: string; route: string; ic: any };
@@ -138,6 +145,19 @@ export default function AppFooter({
                   </TouchableOpacity>
                 ))}
               </View>
+              <View style={styles.stores}>
+                {STORES.map((s, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    onPress={() => open(s.url)}
+                    accessibilityRole="button"
+                    accessibilityLabel={s.label}
+                    style={styles.storeBtn}
+                  >
+                    <Image source={s.img} style={styles.storeImg} resizeMode="contain" />
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
 
             {COLS.map((c, ci) => (
@@ -189,6 +209,9 @@ const styles = StyleSheet.create({
   brand: { color: "#fff", fontSize: 22, fontWeight: "800", letterSpacing: 0.5 },
   desc: { color: "#9fb3a6", fontSize: 13.5, lineHeight: 20 },
   social: { flexDirection: "row", gap: 10, marginTop: 2 },
+  stores: { flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 14 },
+  storeBtn: { borderRadius: 9, overflow: "hidden" },
+  storeImg: { height: 44, width: 150 },
   soc: {
     width: 40,
     height: 40,

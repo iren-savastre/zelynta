@@ -101,6 +101,7 @@
     {id:"appdata", label:"App / Scan Data", ic:"scan", color:"#22d3ee", roles:ADM, group:"Conținut", desc:"Date despre aplicația de scanare (offline-first)."},
     {id:"images", label:"Optimizare imagini", ic:"image", color:"#f97316", roles:CM, group:"Conținut", desc:"Scanează și convertește imagini în WebP — totul la apăsare de buton."},
     {id:"users", label:"Utilizatori (staff)", ic:"users", color:"#a78bfa", roles:ADM, group:"Sistem", desc:"Echipa și rolurile (RBAC)."},
+    {id:"appstores", label:"Butoane store", ic:"dl", color:"#34d399", roles:ADM, group:"Conținut", desc:"Butoanele de descărcare din footer (Google Play / App Store) — editează, ascunde, șterge."},
     {id:"settings", label:"Setări", ic:"cog", color:"#9ca3af", roles:ADM, group:"Sistem", desc:"Setări platformă, temă și date companie."},
     {id:"audit", label:"Audit log", ic:"log", color:"#84cc16", roles:ADM, group:"Sistem", desc:"Jurnal de audit pentru acțiunile de moderare."}
   ];
@@ -239,7 +240,7 @@
     var c=document.getElementById("content");
     c.innerHTML=pageHeader(s)+'<div id="pbody"><div class="panel"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div></div>';
     var body=document.getElementById("pbody");
-    ({overview:secOverview,landing:secLanding,reviews:secReviews,comments:secComments,support:secSupport,reports:secReports,privacy:secPrivacy,legal:secLegal,cookies:secCookies,appdata:secAppData,images:secImages,analytics:secAnalytics,audit:secAudit,settings:secSettings,users:secUsers,inbox:secInbox}[id]||secOverview)(body);
+    ({overview:secOverview,landing:secLanding,reviews:secReviews,comments:secComments,support:secSupport,reports:secReports,privacy:secPrivacy,legal:secLegal,cookies:secCookies,appdata:secAppData,images:secImages,analytics:secAnalytics,audit:secAudit,settings:secSettings,appstores:secAppStores,users:secUsers,inbox:secInbox}[id]||secOverview)(body);
   }
 
   // ---- counts pentru badge-uri ----
@@ -579,6 +580,43 @@
         });
       });
       c.querySelectorAll(".t-card").forEach(function(b){ b.addEventListener("click",function(){ applyTheme(b.getAttribute("data-theme")); navigate("settings"); }); });
+    });
+  }
+
+  // ====== BUTOANE STORE (footer site + aplicație) ======
+  function secAppStores(c){
+    var DEF="https://github.com/iren-savastre/zelynta/releases/latest";
+    sb.from("settings").select("*").then(function(r){
+      var map={}; (r.data||[]).forEach(function(s){ map[s.key]=typeof s.value==="string"?s.value:JSON.stringify(s.value); });
+      function chk(k){ return (map[k]==="0"||map[k]==="false") ? "" : "checked"; }
+      c.innerHTML='<div class="note">Butoanele de descărcare din footer (site + aplicație). Lasă URL gol și debifează „Afișat" ca să ascunzi un buton. „Șterge" golește URL-ul și ascunde.</div>'+
+        '<div class="panel"><div class="panel-head"><h2>Butoane store</h2><div class="spacer"></div><span class="muted">Google Play · App Store</span></div><div style="padding:18px;max-width:580px">'+
+        '<div class="field"><label for="st-android">Google Play — URL</label><input id="st-android" placeholder="'+DEF+'" value="'+esc(map["store_android_url"]||"")+'"></div>'+
+        '<label style="display:flex;gap:8px;align-items:center;margin:-4px 0 16px;color:var(--text)"><input type="checkbox" id="st-android-show" '+chk("store_android_show")+'> Afișat</label>'+
+        '<div class="field"><label for="st-ios">App Store — URL</label><input id="st-ios" placeholder="'+DEF+'" value="'+esc(map["store_ios_url"]||"")+'"></div>'+
+        '<label style="display:flex;gap:8px;align-items:center;margin:-4px 0 16px;color:var(--text)"><input type="checkbox" id="st-ios-show" '+chk("store_ios_show")+'> Afișat</label>'+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap">'+
+          '<button class="btn btn-primary" id="stSave">'+ic("save")+'Salvează</button>'+
+          '<button class="btn" id="stClearA" type="button">Șterge Google Play</button>'+
+          '<button class="btn" id="stClearI" type="button">Șterge App Store</button>'+
+        '</div><div class="msg" id="stMsg"></div></div></div>';
+      function save(rows,okText,reload){
+        sb.from("settings").upsert(rows,{onConflict:"key"}).then(function(rr){
+          var m=document.getElementById("stMsg");
+          if(rr.error){ m.className="msg bad"; m.textContent="Eroare: "+rr.error.message; }
+          else { m.className="msg ok"; m.textContent=okText; if(reload) setTimeout(function(){ navigate("appstores"); },500); }
+        });
+      }
+      document.getElementById("stSave").addEventListener("click",function(){
+        save([
+          {key:"store_android_url",value:document.getElementById("st-android").value.trim()},
+          {key:"store_ios_url",value:document.getElementById("st-ios").value.trim()},
+          {key:"store_android_show",value:document.getElementById("st-android-show").checked?"1":"0"},
+          {key:"store_ios_show",value:document.getElementById("st-ios-show").checked?"1":"0"}
+        ],"Salvat. Butoanele se actualizează pe site și în aplicație.",false);
+      });
+      document.getElementById("stClearA").addEventListener("click",function(){ save([{key:"store_android_url",value:""},{key:"store_android_show",value:"0"}],"Google Play șters și ascuns.",true); });
+      document.getElementById("stClearI").addEventListener("click",function(){ save([{key:"store_ios_url",value:""},{key:"store_ios_show",value:"0"}],"App Store șters și ascuns.",true); });
     });
   }
 

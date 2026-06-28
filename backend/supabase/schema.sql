@@ -353,7 +353,8 @@ create policy audit_read on public.audit_logs for select using (public.has_role(
 -- Public (anon) poate citi DOAR cheile publice (social + limba implicită).
 -- Cheile interne (adresă, CUI/TVA, e-mailuri, companie) NU sunt expuse public.
 create policy settings_read_public on public.settings for select
-  using (key in ('social_facebook','social_tiktok','social_instagram','default_locale'));
+  using (key in ('social_facebook','social_tiktok','social_instagram','default_locale',
+                 'store_android_url','store_ios_url','store_android_show','store_ios_show'));
 -- Staff autentificat (orice rol) poate citi toate setările.
 create policy settings_read_staff on public.settings for select
   using (public.current_role() is not null);
