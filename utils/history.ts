@@ -59,6 +59,7 @@ export async function clearAllData(): Promise<void> {
         k === "zelynta_history" ||
         k === "zelynta_favorites" ||
         k === "zelynta_basket" ||
+        k === "zelynta_cookie_consent" ||
         k.startsWith("xlate:")
     );
     if (toRemove.length) await AsyncStorage.multiRemove(toRemove);
