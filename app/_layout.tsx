@@ -3,6 +3,7 @@ import "../i18n/i18n";
 import { ThemeProvider, useTheme } from "../utils/theme";
 import { BasketProvider } from "../utils/basket";
 import BasketBar from "../components/BasketBar";
+import CookieBanner from "../components/CookieBanner";
 import ErrorBoundary from "../components/ErrorBoundary";
 
 function StackNav() {
@@ -33,6 +34,7 @@ function StackNav() {
         />
       </Stack>
       <BasketBar />
+      <CookieBanner />
     </>
   );
 }
