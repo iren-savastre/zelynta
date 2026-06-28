@@ -4656,5 +4656,50 @@
       els.forEach(el=>io.observe(el));
     }
   </script>
+
+  <!-- Butoane derulare: autoscroll + sus (urmează paleta) -->
+  <style>
+    .scroll-fab{position:fixed;right:18px;bottom:22px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:60;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .25s ease,transform .25s ease}
+    .scroll-fab.show{opacity:1;transform:none;pointer-events:auto}
+    .sfab{border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;box-shadow:0 10px 24px rgba(20,48,31,.24);transition:transform .15s ease,box-shadow .2s ease;line-height:1}
+    .sfab:hover{transform:scale(1.09)}
+    .sfab:active{transform:scale(.96)}
+    .sfab-main{width:54px;height:54px;background:linear-gradient(180deg,var(--green-2,#3E9E3A),var(--green,#2E7D32));color:#fff}
+    .sfab-main svg{width:24px;height:24px;fill:#fff}
+    .sfab-top{width:44px;height:44px;background:var(--surface,#fff);color:var(--ink,#14211a);border:1px solid var(--line,rgba(20,48,31,.12))}
+    .sfab-top svg{width:20px;height:20px;stroke:var(--ink,#14211a);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+    @media (prefers-reduced-motion:reduce){.scroll-fab,.sfab{transition:none}}
+  </style>
+  <div id="scrollFab" class="scroll-fab" aria-hidden="true">
+    <button id="toTopBtn" class="sfab sfab-top" type="button" aria-label="Sus" title="Sus">
+      <svg viewBox="0 0 24 24"><path d="M6 14l6-6 6 6"/></svg>
+    </button>
+    <button id="autoScrollBtn" class="sfab sfab-main" type="button" aria-label="Derulare automată" title="Derulare automată">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+  </div>
+  <script>
+    (function(){
+      var fab=document.getElementById("scrollFab");
+      var auto=document.getElementById("autoScrollBtn");
+      var toTop=document.getElementById("toTopBtn");
+      if(!fab||!auto||!toTop) return;
+      var ICON_PLAY='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      var ICON_PAUSE='<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+      var running=false, raf=null;
+      function atBottom(){ return window.innerHeight+window.scrollY >= document.documentElement.scrollHeight-2; }
+      function tick(){ if(!running) return; window.scrollBy(0,2); if(atBottom()){ stop(); return; } raf=requestAnimationFrame(tick); }
+      function start(){ if(atBottom()) return; running=true; auto.innerHTML=ICON_PAUSE; auto.setAttribute("aria-label","Oprește derularea"); tick(); }
+      function stop(){ running=false; if(raf) cancelAnimationFrame(raf); auto.innerHTML=ICON_PLAY; auto.setAttribute("aria-label","Derulare automată"); }
+      auto.addEventListener("click",function(){ running?stop():start(); });
+      toTop.addEventListener("click",function(){ stop(); window.scrollTo({top:0,behavior:"smooth"}); });
+      // oprește autoscroll-ul dacă utilizatorul derulează manual
+      window.addEventListener("wheel",function(){ if(running) stop(); },{passive:true});
+      window.addEventListener("touchmove",function(){ if(running) stop(); },{passive:true});
+      window.addEventListener("scroll",function(){
+        if(window.scrollY>320) fab.classList.add("show"); else { fab.classList.remove("show"); if(running) stop(); }
+      },{passive:true});
+    })();
+  </script>
 </body>
 </html>

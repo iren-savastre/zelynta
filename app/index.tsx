@@ -241,24 +241,6 @@ export default function Index() {
   const [torchOn, setTorchOn] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const cameraRef = useRef<CameraView>(null);
-  // ---- Autoscroll (derulare automată hands-free) ----
-  const scrollRef = useRef<ScrollView>(null);
-  const scrollY = useRef(0);
-  const contentH = useRef(0);
-  const layoutH = useRef(0);
-  const [autoScroll, setAutoScroll] = useState(false);
-  const [showScrollFab, setShowScrollFab] = useState(false);
-  useEffect(() => {
-    if (!autoScroll) return;
-    const id = setInterval(() => {
-      const max = Math.max(0, contentH.current - layoutH.current);
-      const next = Math.min(scrollY.current + 2.5, max);
-      scrollRef.current?.scrollTo({ y: next, animated: false });
-      scrollY.current = next;
-      if (next >= max - 1) setAutoScroll(false); // a ajuns jos
-    }, 16);
-    return () => clearInterval(id);
-  }, [autoScroll]);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [favorite, setFavorite] = useState(false);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
@@ -947,19 +929,6 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       </View>
 
       <ScrollView
-        ref={scrollRef}
-        scrollEventThrottle={16}
-        onScroll={(e) => {
-          scrollY.current = e.nativeEvent.contentOffset.y;
-          const show = scrollY.current > 280;
-          if (show !== showScrollFab) setShowScrollFab(show);
-        }}
-        onLayout={(e) => {
-          layoutH.current = e.nativeEvent.layout.height;
-        }}
-        onContentSizeChange={(_w, h) => {
-          contentH.current = h;
-        }}
         contentContainerStyle={[
           styles.container,
           isWide && styles.containerWide,
@@ -1411,31 +1380,6 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
          <AppFooter isDesktop={isDesktop} />
        </View>
       </ScrollView>
-
-      {showScrollFab && (
-        <View style={styles.fabCol} pointerEvents="box-none">
-          <TouchableOpacity
-            style={[styles.fab, styles.fabSmall]}
-            onPress={() => {
-              setAutoScroll(false);
-              scrollY.current = 0;
-              scrollRef.current?.scrollTo({ y: 0, animated: true });
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={t("scrollTop") || "Sus"}
-          >
-            <Ionicons name="chevron-up" size={20} color={colors.text} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.fab}
-            onPress={() => setAutoScroll((v) => !v)}
-            accessibilityRole="button"
-            accessibilityLabel={t("autoScroll") || "Derulare automată"}
-          >
-            <Ionicons name={autoScroll ? "pause" : "play"} size={22} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      )}
     </KeyboardAvoidingView>
   );
 }
@@ -1444,35 +1388,6 @@ const makeStyles = (c: ThemeColors) =>
   StyleSheet.create({
   screen: { flex: 1, backgroundColor: c.bg },
   screenWeb: desktopBg(c),
-  fabCol: {
-    position: "absolute",
-    right: 16,
-    bottom: 96,
-    alignItems: "center",
-    gap: 10,
-    zIndex: 50,
-  },
-  fab: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: c.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 8,
-  },
-  fabSmall: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: c.surfaceAlt,
-    borderWidth: 1,
-    borderColor: c.border,
-  },
   workspace: { width: "100%", alignItems: "center" },
   workspaceDesktop: {
     flexDirection: "row",
