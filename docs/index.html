@@ -4310,16 +4310,19 @@
       var KEYS=["pr1","pr2","pr3","pr4","pr5"];
       function dictNow(){ var l=document.documentElement.lang||"ro"; return I18N[l]||I18N.ro; }
       function txt(k){ return dictNow()[k]||""; }
-      var idx=0, cur=0;
-      lines[0].textContent=txt(KEYS[0]); lines[0].classList.add("in"); idx=1;
+      var idx=0, cur=0, shown=0;
+      lines[0].textContent=txt(KEYS[0]); lines[0].classList.add("in"); idx=1; shown=0;
       setInterval(function(){
         var nextEl=lines[1-cur], curEl=lines[cur];
-        nextEl.textContent=txt(KEYS[idx%KEYS.length]);
+        shown=idx%KEYS.length;
+        nextEl.textContent=txt(KEYS[shown]);
         nextEl.classList.remove("out"); void nextEl.offsetWidth;
         nextEl.classList.add("in");
         curEl.classList.remove("in"); curEl.classList.add("out");
         cur=1-cur; idx++;
       }, 3400);
+      // re-traduce instant mesajul afișat la schimbarea limbii
+      window.__refreshPrompter=function(){ lines[cur].textContent=txt(KEYS[shown]); };
     })();
 
     /* ---------- mascotă contact (reacționează la căsuțe) ---------- */
@@ -4418,6 +4421,7 @@
       try{ localStorage.setItem("zelynta_lang", code); }catch(e){}
       if(window.__refreshMascot) window.__refreshMascot();
       if(window.__refreshReview) window.__refreshReview();
+      if(window.__refreshPrompter) window.__refreshPrompter();
     }
     LANGS.forEach(l=>{
       const o=document.createElement("button"); o.type="button"; o.className="lang-opt"; o.dataset.code=l.code; o.setAttribute("role","menuitem");
