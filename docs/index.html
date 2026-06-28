@@ -4361,19 +4361,23 @@
       hf.addEventListener("click",function(){ hf.classList.toggle("flipped"); hf.setAttribute("aria-label", hf.classList.contains("flipped")?"Zelynta":"Apasă pe inimă"); });
     })();
 
-    /* ---------- motto animat în tab (typewriter) ---------- */
+    /* ---------- motto animat în tab (typewriter) — urmează limba aleasă ---------- */
     (function(){
-      var phrases=["Zelynta — știi ce mănânci 🌿","Scanează. Înțelege. Alege sănătos.","Eticheta, pe înțelesul tău"];
-      var p=0,c=0,del=false;
+      function dictNow(){ var l=document.documentElement.lang||"ro"; return I18N[l]||I18N.ro; }
+      var KEYS=["pr1","pr2","pr3"];
+      function phrases(){ var d=dictNow(); var a=KEYS.map(function(k){return d[k]||"";}).filter(Boolean); return a.length?a:["Zelynta"]; }
+      var p=0,c=0,del=false,list=phrases();
       function tick(){
-        var arr=Array.from(phrases[p]);
+        var arr=Array.from(list[p%list.length]||"");
         document.title=arr.slice(0,c).join("")+(c<arr.length?" ▌":"");
         var t=del?45:95;
         if(!del){ c++; if(c>arr.length){ del=true; t=1600; } }
-        else { c--; if(c<0){ c=0; del=false; p=(p+1)%phrases.length; t=350; } }
+        else { c--; if(c<0){ c=0; del=false; p=(p+1)%list.length; list=phrases(); t=350; } }
         setTimeout(tick,t);
       }
       tick();
+      // la schimbarea limbii: reia animația cu textul în noua limbă
+      window.__refreshTabTitle=function(){ list=phrases(); p=p%list.length; c=0; del=false; };
     })();
 
     const dd = document.getElementById("langDropdown");
@@ -4422,6 +4426,7 @@
       if(window.__refreshMascot) window.__refreshMascot();
       if(window.__refreshReview) window.__refreshReview();
       if(window.__refreshPrompter) window.__refreshPrompter();
+      if(window.__refreshTabTitle) window.__refreshTabTitle();
     }
     LANGS.forEach(l=>{
       const o=document.createElement("button"); o.type="button"; o.className="lang-opt"; o.dataset.code=l.code; o.setAttribute("role","menuitem");
