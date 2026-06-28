@@ -15,13 +15,32 @@ export default function Root({ children }: PropsWithChildren) {
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
         <meta name="theme-color" content="#2E7D32" />
+        {/* PWA: instalabilă + funcțională offline */}
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="icon" type="image/png" href="/icon-192.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Zelynta" />
+        <meta name="application-name" content="Zelynta" />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: globalCss }} />
+        <script dangerouslySetInnerHTML={{ __html: swRegister }} />
       </head>
       <body>{children}</body>
     </html>
   );
 }
+
+// Înregistrează service worker-ul (PWA offline). Rulează doar în browser, pe context sigur.
+const swRegister = `
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/sw.js').catch(function () {});
+  });
+}
+`;
 
 const globalCss = `
 html, body, #root {
