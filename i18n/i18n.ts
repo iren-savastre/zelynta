@@ -6,7 +6,7 @@ import { translations } from "./translations";
 
 // Cheia de limbă — aceeași ca pe web (landing + pagini legale), pentru consecvență.
 const LANG_KEY = "zelynta_lang";
-const supportedLanguages = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl"];
+const supportedLanguages = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el"];
 
 // Limba telefonului (ex: "fr", "ro"...) — semnal secundar.
 const deviceLanguage = getLocales()[0]?.languageCode ?? "en";
@@ -23,6 +23,8 @@ const CC2LANG: Record<string, string> = {
   RU: "ru", BY: "ru", KZ: "ru", KG: "ru", AM: "ru",
   PL: "pl",
   NL: "nl", SR: "nl", AW: "nl",
+  BG: "bg",
+  EL: "el", GR: "el", CY: "el",
 };
 
 // Detectează limba după IP-ul dispozitivului (geojs.io, fără cheie). Fallback: null.

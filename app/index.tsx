@@ -52,6 +52,8 @@ const languages = [
   { code: "ru", label: "Русский", flag: "🇷🇺", cc: "ru" },
   { code: "pl", label: "Polski", flag: "🇵🇱", cc: "pl" },
   { code: "nl", label: "Nederlands", flag: "🇳🇱", cc: "nl" },
+  { code: "bg", label: "Български", flag: "🇧🇬", cc: "bg" },
+  { code: "el", label: "Ελληνικά", flag: "🇬🇷", cc: "gr" },
 ];
 
 // Pe Windows/web emoji-urile de drapel nu se randează → folosim imagini reale

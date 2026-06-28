@@ -8,9 +8,9 @@
   /* ---------- i18n ---------- */
   var DICT = window.ZLEGAL_CHROME || { ro:{}, en:{} };
   var PAGES = window.ZLEGAL_PAGES || {}; // dicționare de conținut per pagină (opțional)
-  var LANGS = [["ro","ro"],["en","gb"],["fr","fr"],["it","it"],["es","es"],["de","de"],["ru","ru"],["pl","pl"],["nl","nl"]];
-  var LNAME = { ro:"Română", en:"English", fr:"Français", it:"Italiano", es:"Español", de:"Deutsch", ru:"Русский", pl:"Polski", nl:"Nederlands" };
-  var RIGHTS = { ro:"toate drepturile rezervate.", en:"all rights reserved.", fr:"tous droits réservés.", it:"tutti i diritti riservati.", es:"todos los derechos reservados.", de:"alle Rechte vorbehalten.", ru:"все права защищены.", pl:"wszelkie prawa zastrzeżone.", nl:"alle rechten voorbehouden." };
+  var LANGS = [["ro","ro"],["en","gb"],["fr","fr"],["it","it"],["es","es"],["de","de"],["ru","ru"],["pl","pl"],["nl","nl"],["bg","bg"],["el","gr"]];
+  var LNAME = { ro:"Română", en:"English", fr:"Français", it:"Italiano", es:"Español", de:"Deutsch", ru:"Русский", pl:"Polski", nl:"Nederlands", bg:"Български", el:"Ελληνικά" };
+  var RIGHTS = { ro:"toate drepturile rezervate.", en:"all rights reserved.", fr:"tous droits réservés.", it:"tutti i diritti riservati.", es:"todos los derechos reservados.", de:"alle Rechte vorbehalten.", ru:"все права защищены.", pl:"wszelkie prawa zastrzeżone.", nl:"alle rechten voorbehouden.", bg:"всички права запазени.", el:"με επιφύλαξη παντός δικαιώματος." };
   var TOOFAST = { ro:"Așteaptă câteva secunde înainte de a trimite din nou.", en:"Please wait a few seconds before sending again.", fr:"Veuillez patienter quelques secondes avant de renvoyer.", it:"Attendi qualche secondo prima di inviare di nuovo.", es:"Espera unos segundos antes de volver a enviar.", de:"Bitte warte ein paar Sekunden, bevor du erneut sendest.", ru:"Подождите несколько секунд перед повторной отправкой.", pl:"Odczekaj kilka sekund przed ponownym wysłaniem.", nl:"Wacht een paar seconden voordat je opnieuw verzendt." };
   // țară (ISO-3166-1 alpha-2) -> limbă disponibilă; restul -> engleză
   var CC2LANG = {
@@ -22,7 +22,9 @@
     DE:"de", AT:"de", LI:"de",
     RU:"ru", BY:"ru", KZ:"ru", KG:"ru", AM:"ru",
     PL:"pl",
-    NL:"nl", SR:"nl", AW:"nl"
+    NL:"nl", SR:"nl", AW:"nl",
+    BG:"bg",
+    EL:"el", GR:"el", CY:"el"
   };
   // detectează limba după IP-ul dispozitivului (geojs.io, fără cheie). Fallback: null
   function detectByIp(){
