@@ -61,33 +61,34 @@ const SOCIAL: { ic: any; url: string }[] = [
 ];
 
 type Item = { label: string; url: string; ic: any };
+// head/label sunt CHEI i18n (traduse cu t() la randare).
 const COLS: { head: string; headIc: any; items: Item[] }[] = [
   {
-    head: "Produs",
+    head: "footerColProduct",
     headIc: "grid",
     items: [
-      { label: "Funcționalități", url: SITE + "#features", ic: "sparkles-outline" },
-      { label: "Cum funcționează", url: SITE + "#how", ic: "list-outline" },
-      { label: "Întrebări", url: SITE + "#faq", ic: "help-circle-outline" },
+      { label: "footerFeatures", url: SITE + "#features", ic: "sparkles-outline" },
+      { label: "footerHow", url: SITE + "#how", ic: "list-outline" },
+      { label: "footerFaq", url: SITE + "#faq", ic: "help-circle-outline" },
     ],
   },
   {
-    head: "Legal",
+    head: "footerColLegal",
     headIc: "document-text",
     items: [
-      { label: "Confidențialitate", url: SITE + "legal/privacy.html", ic: "shield-checkmark-outline" },
-      { label: "Termeni", url: SITE + "legal/terms.html", ic: "document-text-outline" },
-      { label: "Cookie-uri", url: SITE + "legal/cookies.html", ic: "browsers-outline" },
-      { label: "Drepturi GDPR", url: SITE + "legal/gdpr-rights.html", ic: "key-outline" },
+      { label: "footerPrivacy", url: SITE + "legal/privacy.html", ic: "shield-checkmark-outline" },
+      { label: "footerTerms", url: SITE + "legal/terms.html", ic: "document-text-outline" },
+      { label: "footerCookies", url: SITE + "legal/cookies.html", ic: "browsers-outline" },
+      { label: "footerGdpr", url: SITE + "legal/gdpr-rights.html", ic: "key-outline" },
     ],
   },
   {
-    head: "Suport",
+    head: "footerColSupport",
     headIc: "help-buoy",
     items: [
-      { label: "Contact", url: SITE + "contact.html", ic: "mail-outline" },
-      { label: "Suport", url: SITE + "support.html", ic: "help-buoy-outline" },
-      { label: "Raportează o problemă", url: SITE + "report-problem.html", ic: "warning-outline" },
+      { label: "footerContact", url: SITE + "contact.html", ic: "mail-outline" },
+      { label: "footerSupport", url: SITE + "support.html", ic: "help-buoy-outline" },
+      { label: "footerReport", url: SITE + "report-problem.html", ic: "warning-outline" },
     ],
   },
 ];
@@ -121,10 +122,7 @@ export default function AppFooter({
                 />
                 <WaveText text="Zelynta" style={styles.brand} />
               </View>
-              <Text style={styles.desc}>
-                Scanezi produse și înțelegi etichetele: scor, aditivi, avertismente și alternative.
-                Date din baze deschise.
-              </Text>
+              <Text style={styles.desc}>{t("footerDesc")}</Text>
               <View style={styles.social}>
                 {SOCIAL.map((s, i) => (
                   <TouchableOpacity
@@ -145,12 +143,12 @@ export default function AppFooter({
                   <View style={styles.headTile}>
                     <Ionicons name={c.headIc} size={15} color="#0e2a1c" />
                   </View>
-                  <Text style={styles.colHead}>{c.head}</Text>
+                  <Text style={styles.colHead}>{t(c.head)}</Text>
                 </View>
                 {c.items.map((it, i) => (
                   <TouchableOpacity key={i} style={styles.linkRow} onPress={() => open(it.url)}>
                     <Ionicons name={it.ic} size={15} color="#7fbf95" />
-                    <Text style={styles.link}>{it.label}</Text>
+                    <Text style={styles.link}>{t(it.label)}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
