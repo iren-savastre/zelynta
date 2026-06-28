@@ -4417,6 +4417,7 @@
       });
       try{ localStorage.setItem("zelynta_lang", code); }catch(e){}
       if(window.__refreshMascot) window.__refreshMascot();
+      if(window.__refreshReview) window.__refreshReview();
     }
     LANGS.forEach(l=>{
       const o=document.createElement("button"); o.type="button"; o.className="lang-opt"; o.dataset.code=l.code; o.setAttribute("role","menuitem");
@@ -4574,6 +4575,8 @@
         setAv(pAv,dn);
       }
       function upCount(){ counter.textContent=text.value.length+" / 600"; }
+      // re-traduce previzualizarea recenziei + eticheta de rating la schimbarea limbii
+      window.__refreshReview=function(){ try{ sync(); if(rating()>0) live.textContent=(D().rvSelected||"{n}/5").replace("{n}",rating()); }catch(e){} };
       [name,nick,titleI].forEach(function(el){ el.addEventListener("input",sync); });
       name.addEventListener("input",function(){ if(!avatarData) avBig.textContent=initials(name.value); });
       text.addEventListener("input",function(){ upCount(); sync(); });
