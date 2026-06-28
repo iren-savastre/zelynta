@@ -56,6 +56,8 @@ i18n.use(initReactI18next).init({
     ru: { translation: translations.ru },
     pl: { translation: translations.pl },
     nl: { translation: translations.nl },
+    bg: { translation: translations.bg },
+    el: { translation: translations.el },
   },
   lng: deviceFallback, // provizoriu — se rezolvă mai jos (instant, fără ecran gol)
   fallbackLng: "en",
