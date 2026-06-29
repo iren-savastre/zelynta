@@ -549,8 +549,7 @@
         var sw=stage.clientWidth, sh=stage.clientHeight;
         if(!natW||!natH||!sw||!sh) return;
         minScale=Math.min(sw/natW, sh/natH);
-        // nu lăsa zoom-ul să treacă mult peste rezoluția nativă (altfel devine neclar)
-        maxScale=Math.max(minScale*1.2, Math.min(minScale*9, 2.2));
+        maxScale=minScale*9; // zoom amplu, ca înainte (imaginile sunt deja de rezoluție mare)
         scale=minScale;
         tx=(sw-natW*scale)/2; ty=(sh-natH*scale)/2; apply();
       }
