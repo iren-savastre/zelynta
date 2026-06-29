@@ -44,6 +44,11 @@
   /* Imaginea hartă */
   .map-frame{margin:34px auto 8px;max-width:var(--maxw);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 30px 70px rgba(20,48,31,.16);position:relative}
   .map-frame img{width:100%;border-radius:14px;cursor:zoom-in}
+  /* descărcare PDF */
+  .dl-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:center;margin-top:6px}
+  .dl-btn{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(180deg,var(--green-2),var(--green));color:#fff;font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px;text-decoration:none;box-shadow:0 12px 26px rgba(46,125,50,.32);transition:transform .15s ease,filter .2s ease}
+  .dl-btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
+  .dl-note{font-size:13px;color:var(--muted)}
   .map-cap{font-size:13px;color:var(--muted);text-align:center;margin-top:12px}
   .map-cap b{color:var(--ink)}
 
@@ -112,9 +117,22 @@
   </div></header>
 
   <div class="wrap">
+    <div class="dl-row">
+      <a class="dl-btn" href="healing-web.pdf" download>
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+        Descarcă PDF (înaltă rezoluție)
+      </a>
+      <span class="dl-note">2 pagini · ~16 MB · ideal pentru tipărit</span>
+    </div>
+
     <figure class="map-frame">
-      <img id="mapImg" src="healing-web.jpg" alt="The Healing Web — hartă a îngrijirii holistice și alopate, în stil de metrou" loading="lazy" />
-      <figcaption class="map-cap"><b>Apasă pe imagine</b> pentru a o mări și a citi fiecare „stație".</figcaption>
+      <img class="zoom" src="healing-web.jpg" alt="The Healing Web — harta rețelei holistice și alopate, în stil de metrou" loading="lazy" />
+      <figcaption class="map-cap"><b>Harta 1 — Rețeaua.</b> Apasă pentru a o mări și a citi fiecare „stație".</figcaption>
+    </figure>
+
+    <figure class="map-frame">
+      <img class="zoom" src="healing-web-2.jpg" alt="The Healing Web — pagina index: arborele vieții, statistici și indexul de afecțiuni și remedii" loading="lazy" />
+      <figcaption class="map-cap"><b>Harta 2 — Ghid &amp; index.</b> Arborele vieții, statistici de sănătate, diagrama corp–minte și indexul de afecțiuni și remedii.</figcaption>
     </figure>
   </div>
 
@@ -192,11 +210,12 @@
 
   <script>
     (function(){
-      var img=document.getElementById("mapImg"), lb=document.getElementById("lightbox"), x=document.getElementById("lbClose");
-      if(!img||!lb) return;
-      function open(){ lb.classList.add("open"); document.body.style.overflow="hidden"; }
+      var lb=document.getElementById("lightbox"), x=document.getElementById("lbClose");
+      var lbImg=lb&&lb.querySelector("img"), imgs=document.querySelectorAll(".zoom");
+      if(!lb||!lbImg) return;
+      function open(src){ lbImg.src=src; lb.classList.add("open"); document.body.style.overflow="hidden"; }
       function close(){ lb.classList.remove("open"); document.body.style.overflow=""; }
-      img.addEventListener("click",open);
+      imgs.forEach(function(im){ im.addEventListener("click",function(){ open(im.getAttribute("src")); }); });
       x.addEventListener("click",close);
       lb.addEventListener("click",function(e){ if(e.target===lb) close(); });
       document.addEventListener("keydown",function(e){ if(e.key==="Escape") close(); });
