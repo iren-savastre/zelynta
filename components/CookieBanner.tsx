@@ -71,6 +71,15 @@ export default function CookieBanner() {
       ]}
     >
       <View style={styles.card}>
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={() => dismiss(false)}
+          accessibilityRole="button"
+          accessibilityLabel={t("cookieReject") || "Închide"}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="close" size={18} color={colors.textMuted} />
+        </TouchableOpacity>
         <View style={styles.headRow}>
           <View style={styles.iconCircle}>
             <Ionicons name="shield-checkmark" size={20} color="#fff" />
@@ -143,7 +152,18 @@ function makeStyles(c: ThemeColors, accent: string) {
       shadowOffset: { width: 0, height: 14 },
       elevation: 16,
     },
-    headRow: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
+    closeBtn: {
+      position: "absolute",
+      top: 8,
+      right: 8,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 2,
+    },
+    headRow: { flexDirection: "row", gap: 12, alignItems: "flex-start", paddingRight: 22 },
     iconCircle: {
       width: 40,
       height: 40,
