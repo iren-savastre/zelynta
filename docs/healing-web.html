@@ -93,11 +93,16 @@
   footer a{color:#eaf5ee;text-decoration:none;font-weight:600}
   footer .copy{font-size:13px;color:#9db5a6;width:100%;margin-top:8px}
 
-  /* Lightbox */
-  .lb{position:fixed;inset:0;background:rgba(8,16,11,.92);display:none;align-items:center;justify-content:center;z-index:90;padding:18px;cursor:zoom-out}
-  .lb.open{display:flex}
-  .lb img{max-width:100%;max-height:92vh;border-radius:10px;cursor:default}
-  .lb-x{position:absolute;top:16px;right:18px;width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:20px;cursor:pointer}
+  /* Vizualizator cu zoom & pan */
+  .lb{position:fixed;inset:0;background:rgba(8,16,11,.95);display:none;z-index:90;overflow:hidden}
+  .lb.open{display:block}
+  .lb-stage{position:absolute;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+  .lb-stage.grabbing{cursor:grabbing}
+  .lb-stage img{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;user-select:none;-webkit-user-drag:none;border-radius:4px}
+  .lb-bar{position:absolute;top:14px;right:14px;z-index:2;display:flex;gap:8px;align-items:center}
+  .lb-bar button{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;backdrop-filter:blur(4px)}
+  .lb-bar button:hover{background:rgba(255,255,255,.30)}
+  .lb-hint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;font-size:13px;color:#d7e6dc;background:rgba(8,16,11,.6);border:1px solid rgba(255,255,255,.14);padding:8px 16px;border-radius:999px;pointer-events:none;transition:opacity .4s}
 
   @media (max-width:640px){.two{grid-template-columns:1fr}.hero{padding-top:42px}}
 </style>
@@ -118,11 +123,12 @@
 
   <div class="wrap">
     <div class="dl-row">
-      <a class="dl-btn" href="healing-web.pdf" download>
+      <!-- Înlocuiește href cu linkul tău de hosting (GitHub Release / Drive) când îl ai. -->
+      <a class="dl-btn" href="https://github.com/iren-savastre/zelynta/releases/latest" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
         Descarcă PDF (înaltă rezoluție)
       </a>
-      <span class="dl-note">2 pagini · ~16 MB · ideal pentru tipărit</span>
+      <span class="dl-note">2 pagini · ideal pentru tipărit</span>
     </div>
 
     <figure class="map-frame">
@@ -203,22 +209,80 @@
     <span class="copy">© 2026 Irèn Savastre — toate drepturile rezervate. „The Healing Web" este o lucrare educativă/decorativă terță; drepturile asupra ei aparțin autorilor respectivi.</span>
   </div></footer>
 
-  <div class="lb" id="lightbox">
-    <button class="lb-x" id="lbClose" aria-label="Închide">&#10005;</button>
-    <img src="healing-web.jpg" alt="The Healing Web — mărit" />
+  <div class="lb" id="lightbox" role="dialog" aria-label="Hartă — zoom">
+    <div class="lb-bar">
+      <button data-z="out" aria-label="Micșorează">&#8722;</button>
+      <button data-z="reset" aria-label="Resetează">&#8635;</button>
+      <button data-z="in" aria-label="Mărește">&#43;</button>
+      <button id="lbClose" aria-label="Închide">&#10005;</button>
+    </div>
+    <div class="lb-stage" id="lbStage">
+      <img id="lbImg" src="" alt="Hartă mărită" draggable="false" />
+    </div>
+    <div class="lb-hint" id="lbHint">Rotița mouse-ului sau pinch pentru zoom · trage pentru a te deplasa · dublu-click mărește</div>
   </div>
 
   <script>
     (function(){
-      var lb=document.getElementById("lightbox"), x=document.getElementById("lbClose");
-      var lbImg=lb&&lb.querySelector("img"), imgs=document.querySelectorAll(".zoom");
-      if(!lb||!lbImg) return;
-      function open(src){ lbImg.src=src; lb.classList.add("open"); document.body.style.overflow="hidden"; }
-      function close(){ lb.classList.remove("open"); document.body.style.overflow=""; }
-      imgs.forEach(function(im){ im.addEventListener("click",function(){ open(im.getAttribute("src")); }); });
-      x.addEventListener("click",close);
-      lb.addEventListener("click",function(e){ if(e.target===lb) close(); });
-      document.addEventListener("keydown",function(e){ if(e.key==="Escape") close(); });
+      var lb=document.getElementById("lightbox"), stage=document.getElementById("lbStage");
+      var img=document.getElementById("lbImg"), hint=document.getElementById("lbHint");
+      var imgs=document.querySelectorAll(".zoom");
+      if(!lb||!stage||!img) return;
+      var scale=1, minScale=1, maxScale=1, tx=0, ty=0, natW=0, natH=0;
+      function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+      function apply(){ img.style.transform="translate("+tx+"px,"+ty+"px) scale("+scale+")"; }
+      function constrain(){
+        var sw=stage.clientWidth, sh=stage.clientHeight, iw=natW*scale, ih=natH*scale;
+        tx = iw<=sw ? (sw-iw)/2 : clamp(tx, sw-iw, 0);
+        ty = ih<=sh ? (sh-ih)/2 : clamp(ty, sh-ih, 0);
+      }
+      function fit(){
+        var sw=stage.clientWidth, sh=stage.clientHeight;
+        if(!natW||!natH||!sw||!sh) return;
+        minScale=Math.min(sw/natW, sh/natH); maxScale=minScale*9; scale=minScale;
+        tx=(sw-natW*scale)/2; ty=(sh-natH*scale)/2; apply();
+      }
+      function zoomAt(px,py,factor){
+        var ns=clamp(scale*factor, minScale, maxScale); if(ns===scale) return;
+        tx=px-(px-tx)*(ns/scale); ty=py-(py-ty)*(ns/scale); scale=ns; constrain(); apply();
+      }
+      function openLb(src){
+        img.onload=function(){ natW=img.naturalWidth; natH=img.naturalHeight; fit(); };
+        img.src=src;
+        if(img.complete && img.naturalWidth){ natW=img.naturalWidth; natH=img.naturalHeight; fit(); }
+        lb.classList.add("open"); document.body.style.overflow="hidden";
+        if(hint){ hint.style.opacity="1"; clearTimeout(openLb._h); openLb._h=setTimeout(function(){ hint.style.opacity="0"; },2800); }
+      }
+      function closeLb(){ lb.classList.remove("open"); document.body.style.overflow=""; }
+      imgs.forEach(function(im){ im.addEventListener("click",function(){ openLb(im.getAttribute("src")); }); });
+      document.getElementById("lbClose").addEventListener("click",closeLb);
+      document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&lb.classList.contains("open")) closeLb(); });
+      window.addEventListener("resize",function(){ if(lb.classList.contains("open")) fit(); });
+      Array.prototype.forEach.call(lb.querySelectorAll(".lb-bar button[data-z]"),function(b){
+        b.addEventListener("click",function(){
+          var cx=stage.clientWidth/2, cy=stage.clientHeight/2, z=b.getAttribute("data-z");
+          if(z==="in") zoomAt(cx,cy,1.5); else if(z==="out") zoomAt(cx,cy,1/1.5); else fit();
+        });
+      });
+      stage.addEventListener("wheel",function(e){ e.preventDefault(); var r=stage.getBoundingClientRect(); zoomAt(e.clientX-r.left,e.clientY-r.top, e.deltaY<0?1.18:1/1.18); },{passive:false});
+      stage.addEventListener("dblclick",function(e){ var r=stage.getBoundingClientRect(); if(scale>minScale*1.3) fit(); else zoomAt(e.clientX-r.left,e.clientY-r.top,3); });
+      var pts={}, lastDist=0, dragging=false, lastX=0, lastY=0;
+      stage.addEventListener("pointerdown",function(e){
+        stage.setPointerCapture(e.pointerId); pts[e.pointerId]={x:e.clientX,y:e.clientY};
+        var ids=Object.keys(pts);
+        if(ids.length===1){ dragging=true; lastX=e.clientX; lastY=e.clientY; stage.classList.add("grabbing"); }
+        else if(ids.length===2){ dragging=false; var a=pts[ids[0]],b=pts[ids[1]]; lastDist=Math.hypot(a.x-b.x,a.y-b.y); }
+      });
+      stage.addEventListener("pointermove",function(e){
+        if(!pts[e.pointerId]) return; pts[e.pointerId]={x:e.clientX,y:e.clientY};
+        var ids=Object.keys(pts);
+        if(ids.length===2){
+          var a=pts[ids[0]],b=pts[ids[1]], dist=Math.hypot(a.x-b.x,a.y-b.y), r=stage.getBoundingClientRect();
+          if(lastDist) zoomAt((a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top, dist/lastDist); lastDist=dist;
+        } else if(dragging){ tx+=e.clientX-lastX; ty+=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; constrain(); apply(); }
+      });
+      function up(e){ delete pts[e.pointerId]; if(Object.keys(pts).length<2) lastDist=0; if(!Object.keys(pts).length){ dragging=false; stage.classList.remove("grabbing"); } }
+      stage.addEventListener("pointerup",up); stage.addEventListener("pointercancel",up);
     })();
   </script>
 </body>
