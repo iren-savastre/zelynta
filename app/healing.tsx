@@ -23,6 +23,26 @@ const MAP1 = require("../assets/images/healing-web-1.jpg");
 const MAP2 = require("../assets/images/healing-web-2.jpg");
 const RATIO = 3168 / 2448;
 
+const DEATHS: [string, number][] = [
+  ["Boli de inimă", 614348], ["Cancer", 591699], ["Erori medicale", 251454],
+  ["Boli respiratorii", 147101], ["Accidente", 136053], ["AVC", 133103],
+  ["Alzheimer", 93541], ["Diabet", 76488], ["Gripă / pneumonie", 55227],
+  ["Boli renale", 48146], ["Sinucidere", 42773],
+];
+const MAXD = 614348;
+const CHRONIC: [string, number][] = [
+  ["Hipertensiune", 21.9], ["Hiperlipidemie", 18.0], ["Alergii & sinuzite", 13.5],
+  ["Artrită", 13.0], ["Tulb. de dispoziție", 10.6], ["Diabet (1 & 2)", 9.5],
+  ["Anxietate", 6.7], ["Astm", 6.2], ["Boală coronariană", 5.3],
+  ["Tiroidă", 4.0], ["Pulmonar obstructiv", 3.5],
+];
+const CHAKRAS: [string, string, string][] = [
+  ["7", "Coroană", "#8b5cf6"], ["6", "Al treilea ochi", "#4f46e5"],
+  ["5", "Gât", "#3b82f6"], ["4", "Inimă", "#22c55e"],
+  ["3", "Plex solar", "#eab308"], ["2", "Sacral", "#f97316"], ["1", "Rădăcină", "#ef4444"],
+];
+const fmtN = (n: number) => n.toLocaleString("ro-RO");
+
 // Legendă scurtă (ro/en; restul cad pe en). Simbolurile sunt universale.
 const LEG: Record<string, any> = {
   ro: {
@@ -107,6 +127,63 @@ export default function Healing() {
           <Text style={styles.legItem}>{leg.merge}</Text>
           <Text style={styles.legItem}>{leg.sides}</Text>
           <Text style={styles.legItem}>🎨 {leg.colors}</Text>
+        </View>
+
+        {/* Diagrame */}
+        <Text style={styles.secTitle}>Diagrame</Text>
+
+        <View style={styles.dia}>
+          <Text style={styles.diaTitle}>1 · Relaționarea</Text>
+          <View style={[styles.relNode, { backgroundColor: "#fdecec", borderColor: "#f5c6c6" }]}>
+            <Text style={[styles.relB, { color: "#b42318" }]}>Tratează simptomul</Text>
+            <Text style={styles.relS}>Big Pharma · medicina occidentală</Text>
+          </View>
+          <Text style={styles.relArrow}>↑ ↓</Text>
+          <View style={[styles.relNode, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}>
+            <Text style={[styles.relB, { color: colors.text }]}>INDEX</Text>
+            <Text style={styles.relS}>afecțiuni & simptome</Text>
+          </View>
+          <Text style={styles.relArrow}>↑ ↓</Text>
+          <View style={[styles.relNode, { backgroundColor: colors.surfaceAlt, borderColor: "#bfe3c8" }]}>
+            <Text style={[styles.relB, { color: colors.primary }]}>Tratează cauza</Text>
+            <Text style={styles.relS}>Holistic · natural</Text>
+          </View>
+        </View>
+
+        <View style={styles.dia}>
+          <Text style={styles.diaTitle}>2 · Statistici (conform hărții)</Text>
+          <Text style={styles.diaSub}>Cauze de deces în SUA (sec. XXI)</Text>
+          {DEATHS.map(([l, v]) => (
+            <View key={l} style={styles.barRow}>
+              <Text style={styles.barLabel} numberOfLines={1}>{l}</Text>
+              <View style={styles.barTrack}>
+                <View style={[styles.barFill, { width: `${(v / MAXD) * 100}%`, backgroundColor: "#e63e11" }]} />
+              </View>
+              <Text style={styles.barVal}>{fmtN(v)}</Text>
+            </View>
+          ))}
+          <Text style={[styles.diaSub, { marginTop: 14 }]}>Afecțiuni cronice prevalente (% populație)</Text>
+          {CHRONIC.map(([l, v]) => (
+            <View key={l} style={styles.barRow}>
+              <Text style={styles.barLabel} numberOfLines={1}>{l}</Text>
+              <View style={styles.barTrack}>
+                <View style={[styles.barFill, { width: `${(v / 25) * 100}%`, backgroundColor: colors.primary }]} />
+              </View>
+              <Text style={styles.barVal}>{v}%</Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.dia}>
+          <Text style={styles.diaTitle}>3 · Corp & energie — cele 7 chakre</Text>
+          {CHAKRAS.map(([n, t2, col]) => (
+            <View key={n} style={styles.chk}>
+              <View style={[styles.chkDot, { backgroundColor: col }]}>
+                <Text style={styles.chkN}>{n}</Text>
+              </View>
+              <Text style={styles.chkT}>{t2}</Text>
+            </View>
+          ))}
         </View>
 
         {/* Eseuri */}
@@ -206,6 +283,30 @@ function makeStyles(c: ThemeColors) {
     },
     legTitle: { fontSize: 16, fontWeight: "800", color: c.text, marginBottom: 4 },
     legItem: { fontSize: 13.5, lineHeight: 20, color: c.textMuted },
+    secTitle: { fontSize: 22, fontWeight: "900", color: c.text, marginTop: 26, marginBottom: 4 },
+    dia: {
+      backgroundColor: c.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: c.border,
+      padding: 16,
+      marginTop: 14,
+    },
+    diaTitle: { fontSize: 15.5, fontWeight: "800", color: c.text, marginBottom: 10 },
+    diaSub: { fontSize: 12.5, fontWeight: "700", color: c.textMuted, marginBottom: 8 },
+    relNode: { borderRadius: 14, borderWidth: 1, padding: 14, alignItems: "center" },
+    relB: { fontSize: 14, fontWeight: "800", marginBottom: 3 },
+    relS: { fontSize: 12, color: c.textMuted, textAlign: "center" },
+    relArrow: { textAlign: "center", color: c.primary, fontSize: 16, marginVertical: 5 },
+    barRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 7 },
+    barLabel: { width: 110, fontSize: 11.5, color: c.text, textAlign: "right" },
+    barTrack: { flex: 1, height: 16, borderRadius: 999, backgroundColor: c.surfaceAlt, overflow: "hidden" },
+    barFill: { height: "100%", borderRadius: 999 },
+    barVal: { width: 62, fontSize: 11, fontWeight: "700", color: c.textMuted },
+    chk: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 8 },
+    chkDot: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
+    chkN: { color: "#fff", fontWeight: "800", fontSize: 15 },
+    chkT: { fontSize: 14.5, fontWeight: "600", color: c.text },
     essay: {
       backgroundColor: c.surface,
       borderRadius: 18,
