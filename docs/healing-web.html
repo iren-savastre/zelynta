@@ -112,7 +112,13 @@
   <div class="topbar"><div class="wrap">
     <a class="brand" href="index.html"><img src="icon.png" alt="" />Zelynta</a>
     <span class="spacer"></span>
-    <a class="back" href="index.html">← Înapoi la site</a>
+    <div class="hwdd" id="hwdd">
+      <button class="hwdd-cur" id="hwddCur" type="button" aria-haspopup="true" aria-expanded="false">
+        <img id="hwddFlag" src="https://flagcdn.com/w40/ro.png" alt="" /><span id="hwddLabel">Română</span><span class="hwdd-ch">▾</span>
+      </button>
+      <div class="hwdd-menu" id="hwddMenu"></div>
+    </div>
+    <a class="back" href="index.html">← Înapoi</a>
   </div></div>
 
   <header class="hero"><div class="wrap">
@@ -147,6 +153,16 @@
   <style>
     .essays{padding:46px 0}
     .essays .eyebrow{margin-bottom:14px}
+    .hwdd{position:relative}
+    .hwdd-cur{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13px;font-weight:600;padding:7px 11px;border-radius:999px;cursor:pointer}
+    .hwdd-cur img{width:20px;height:14px;border-radius:3px;object-fit:cover}
+    .hwdd-ch{font-size:10px;color:var(--muted)}
+    .hwdd-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px rgba(20,48,31,.18);padding:6px;display:none;max-height:340px;overflow:auto;z-index:30;min-width:184px}
+    .hwdd.open .hwdd-menu{display:block}
+    .hwdd-item{display:flex;align-items:center;gap:9px;width:100%;border:none;background:none;color:var(--ink);font-size:13.5px;padding:8px 10px;border-radius:9px;cursor:pointer;text-align:left}
+    .hwdd-item:hover{background:var(--surface-2)}
+    .hwdd-item.active{background:var(--green);color:#fff}
+    .hwdd-item img{width:20px;height:14px;border-radius:3px;object-fit:cover}
     .hw-langs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 8px}
     .hw-lang{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;cursor:pointer;transition:.15s}
     .hw-lang img{width:20px;height:14px;border-radius:3px;object-fit:cover}
@@ -166,7 +182,6 @@
       <span class="eyebrow" id="hwEyebrow">Textele hărții, traduse</span>
       <h2>Prezentarea hărții</h2>
       <p class="lead" id="hwLead"></p>
-      <div class="hw-langs" id="hwLangs"></div>
       <div class="essay-grid">
         <article class="essay"><h3 id="hwLeftTitle"></h3><div class="essay-body" id="hwLeftBody"></div></article>
         <article class="essay"><h3 id="hwRightTitle"></h3><div class="essay-body" id="hwRightBody"></div></article>
@@ -291,16 +306,22 @@
         document.getElementById("hwLeftBody").innerHTML=paras(d.leftBody);
         document.getElementById("hwRightBody").innerHTML=paras(d.rightBody);
         setTxt("hwDisclaimer",d.disclaimer);
-        Array.prototype.forEach.call(document.querySelectorAll(".hw-lang"),function(b){ b.classList.toggle("active", b.getAttribute("data-l")===cur); });
+        var meta=LANGS.filter(function(x){return x[0]===cur;})[0]||LANGS[0];
+        var cf=document.getElementById("hwddFlag"), cl=document.getElementById("hwddLabel");
+        if(cf) cf.src="https://flagcdn.com/w40/"+meta[2]+".png";
+        if(cl) cl.textContent=meta[1];
+        Array.prototype.forEach.call(document.querySelectorAll(".hwdd-item"),function(b){ b.classList.toggle("active", b.getAttribute("data-l")===cur); });
       }
-      var box=document.getElementById("hwLangs");
+      var dd=document.getElementById("hwdd"), curBtn=document.getElementById("hwddCur"), menu=document.getElementById("hwddMenu");
       LANGS.forEach(function(l){
         if(!ZHEAL[l[0]]) return;
-        var b=document.createElement("button"); b.type="button"; b.className="hw-lang"; b.setAttribute("data-l",l[0]);
+        var b=document.createElement("button"); b.type="button"; b.className="hwdd-item"; b.setAttribute("data-l",l[0]);
         b.innerHTML='<img src="https://flagcdn.com/w40/'+l[2]+'.png" alt="" loading="lazy">'+l[1];
-        b.addEventListener("click",function(){ cur=l[0]; try{ localStorage.setItem("zelynta_lang",cur); }catch(e){} render(); });
-        box.appendChild(b);
+        b.addEventListener("click",function(){ cur=l[0]; try{ localStorage.setItem("zelynta_lang",cur); }catch(e){} dd.classList.remove("open"); curBtn.setAttribute("aria-expanded","false"); render(); });
+        menu.appendChild(b);
       });
+      curBtn.addEventListener("click",function(e){ e.stopPropagation(); var op=dd.classList.toggle("open"); curBtn.setAttribute("aria-expanded",op?"true":"false"); });
+      document.addEventListener("click",function(){ dd.classList.remove("open"); curBtn.setAttribute("aria-expanded","false"); });
       render();
     })();
   </script>
