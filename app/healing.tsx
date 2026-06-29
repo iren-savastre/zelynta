@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Animated,
   Image,
   Modal,
   Platform,
@@ -80,6 +81,14 @@ export default function Healing() {
   const leg = LEG[lang] ?? LEG.en;
   const [zoom, setZoom] = useState<any>(null);
 
+  // animația barelor + bara „secol” (0 -> 1 la intrare)
+  const prog = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(prog, { toValue: 1, duration: 1200, delay: 250, useNativeDriver: false }).start();
+  }, [prog]);
+  const barW = (pct: number) =>
+    prog.interpolate({ inputRange: [0, 1], outputRange: ["0%", `${pct}%`] });
+
   const contentW = Math.min(width, 820) - 36;
   const mapH = contentW / RATIO;
   const paras = (s: string) => String(s).split("\n\n");
@@ -152,12 +161,21 @@ export default function Healing() {
 
         <View style={styles.dia}>
           <Text style={styles.diaTitle}>2 · Statistici (conform hărții)</Text>
-          <Text style={styles.diaSub}>Cauze de deces în SUA (sec. XXI)</Text>
+          <View style={styles.century}>
+            <View style={styles.centuryHead}>
+              <Text style={styles.centuryTitle}>Secolul XXI</Text>
+              <Text style={styles.centuryRange}>2001 — prezent</Text>
+            </View>
+            <View style={styles.centuryTrack}>
+              <Animated.View style={[styles.centuryFill, { width: barW(24) }]} />
+            </View>
+          </View>
+          <Text style={styles.diaSub}>Cauze de deces în SUA</Text>
           {DEATHS.map(([l, v]) => (
             <View key={l} style={styles.barRow}>
               <Text style={styles.barLabel} numberOfLines={1}>{l}</Text>
               <View style={styles.barTrack}>
-                <View style={[styles.barFill, { width: `${(v / MAXD) * 100}%`, backgroundColor: "#e63e11" }]} />
+                <Animated.View style={[styles.barFill, { width: barW((v / MAXD) * 100), backgroundColor: "#e63e11" }]} />
               </View>
               <Text style={styles.barVal}>{fmtN(v)}</Text>
             </View>
@@ -167,7 +185,7 @@ export default function Healing() {
             <View key={l} style={styles.barRow}>
               <Text style={styles.barLabel} numberOfLines={1}>{l}</Text>
               <View style={styles.barTrack}>
-                <View style={[styles.barFill, { width: `${(v / 25) * 100}%`, backgroundColor: colors.primary }]} />
+                <Animated.View style={[styles.barFill, { width: barW((v / 25) * 100), backgroundColor: colors.primary }]} />
               </View>
               <Text style={styles.barVal}>{v}%</Text>
             </View>
@@ -289,11 +307,19 @@ function makeStyles(c: ThemeColors) {
       borderRadius: 16,
       borderWidth: 1,
       borderColor: c.border,
+      borderTopWidth: 3,
+      borderTopColor: c.primary,
       padding: 16,
       marginTop: 14,
     },
     diaTitle: { fontSize: 15.5, fontWeight: "800", color: c.text, marginBottom: 10 },
     diaSub: { fontSize: 12.5, fontWeight: "700", color: c.textMuted, marginBottom: 8 },
+    century: { backgroundColor: "#13301f", borderRadius: 14, padding: 14, marginBottom: 14 },
+    centuryHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline", marginBottom: 10 },
+    centuryTitle: { fontSize: 16, fontWeight: "800", color: "#9be7a6", letterSpacing: 0.5 },
+    centuryRange: { fontSize: 12, color: "#9db5a6" },
+    centuryTrack: { height: 11, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.12)", overflow: "hidden" },
+    centuryFill: { height: "100%", borderRadius: 999, backgroundColor: "#5bbd62" },
     relNode: { borderRadius: 14, borderWidth: 1, padding: 14, alignItems: "center" },
     relB: { fontSize: 14, fontWeight: "800", marginBottom: 3 },
     relS: { fontSize: 12, color: c.textMuted, textAlign: "center" },
