@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>The Healing Web — ghid vizual al îngrijirii holistice și alopate | Zelynta</title>
+<meta name="description" content="The Healing Web: o hartă vizuală, în stil de metrou, care îmbină medicina occidentală (alopată) cu abordările holistice și naturale. Ghid educativ pentru a înțelege traseele de îngrijire a sănătății." />
+<meta name="theme-color" content="#2E7D32" />
+<meta property="og:title" content="The Healing Web — ghid vizual al îngrijirii holistice și alopate" />
+<meta property="og:description" content="O hartă tip metrou care leagă medicina occidentală de cea holistică. Ghid educativ și vizual." />
+<meta property="og:image" content="healing-web.jpg" />
+<meta property="og:type" content="article" />
+<link rel="icon" type="image/png" href="icon.png" />
+<style>
+  :root{
+    --green:#2E7D32; --green-2:#3E9E3A; --green-dark:#14301f;
+    --ink:#16241c; --muted:#5b6b61; --line:rgba(20,48,31,.12);
+    --bg:#f6f8f4; --surface:#ffffff; --surface-2:#eef4ea;
+    --warm:#b3541e; --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+  img{max-width:100%;display:block}
+  a{color:var(--green)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+
+  /* Bara de sus */
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(246,248,244,.86);backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;gap:12px;height:62px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;color:var(--ink);text-decoration:none;font-size:18px}
+  .brand img{width:30px;height:30px;border-radius:50%}
+  .spacer{flex:1}
+  .back{font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;padding:8px 14px;border:1px solid var(--line);border-radius:999px;transition:.2s}
+  .back:hover{background:var(--surface);color:var(--ink)}
+
+  /* Hero */
+  .hero{position:relative;padding:64px 0 30px;text-align:center;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(1100px 380px at 50% -8%,rgba(62,158,58,.16),transparent 70%);pointer-events:none}
+  .eyebrow{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--green);background:var(--surface-2);border:1px solid var(--line);padding:6px 14px;border-radius:999px;margin-bottom:18px}
+  h1{font-size:clamp(34px,6vw,58px);line-height:1.05;margin:0 0 16px;letter-spacing:-.02em}
+  .lead{font-size:clamp(16px,2.2vw,20px);color:var(--muted);max-width:720px;margin:0 auto 8px}
+
+  /* Imaginea hartă */
+  .map-frame{margin:34px auto 8px;max-width:var(--maxw);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 30px 70px rgba(20,48,31,.16);position:relative}
+  .map-frame img{width:100%;border-radius:14px;cursor:zoom-in}
+  .map-cap{font-size:13px;color:var(--muted);text-align:center;margin-top:12px}
+  .map-cap b{color:var(--ink)}
+
+  section{padding:42px 0}
+  section h2{font-size:clamp(24px,3.4vw,34px);margin:0 0 14px;letter-spacing:-.01em}
+  section p{font-size:16.5px;color:#39473f;max-width:760px}
+  .muted{color:var(--muted)}
+
+  /* Doua abordari */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px}
+  .card h3{margin:0 0 8px;font-size:19px}
+  .card .tag{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;display:inline-block;margin-bottom:10px}
+  .tag.west{color:#1d4ed8;background:#e7eeff}
+  .tag.holi{color:var(--green-dark);background:var(--surface-2)}
+  .card p{font-size:15px;color:#48564d;margin:0}
+
+  /* Ramuri */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:24px}
+  .branch{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;transition:transform .15s ease,box-shadow .2s ease}
+  .branch:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(20,48,31,.12)}
+  .branch .dot{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--surface-2);margin-bottom:11px}
+  .branch h4{margin:0 0 5px;font-size:16px}
+  .branch p{margin:0;font-size:13.6px;color:#56655b;line-height:1.5}
+
+  /* Cum se citeste */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:22px}
+  .step{display:flex;gap:13px;align-items:flex-start}
+  .step .n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .step b{display:block;margin-bottom:3px}
+  .step span{font-size:14.5px;color:#56655b}
+
+  /* Disclaimer */
+  .note{background:#fff7ed;border:1px solid #f3d8b8;border-left:4px solid var(--warm);border-radius:14px;padding:20px 22px;margin-top:14px}
+  .note h3{margin:0 0 8px;color:var(--warm);font-size:18px}
+  .note p{font-size:14.5px;color:#6b4a2b;margin:0 0 8px}
+  .note p:last-child{margin:0}
+
+  /* Footer */
+  footer{background:var(--green-dark);color:#cdded3;margin-top:30px;padding:34px 0}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  footer a{color:#eaf5ee;text-decoration:none;font-weight:600}
+  footer .copy{font-size:13px;color:#9db5a6;width:100%;margin-top:8px}
+
+  /* Lightbox */
+  .lb{position:fixed;inset:0;background:rgba(8,16,11,.92);display:none;align-items:center;justify-content:center;z-index:90;padding:18px;cursor:zoom-out}
+  .lb.open{display:flex}
+  .lb img{max-width:100%;max-height:92vh;border-radius:10px;cursor:default}
+  .lb-x{position:absolute;top:16px;right:18px;width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:20px;cursor:pointer}
+
+  @media (max-width:640px){.two{grid-template-columns:1fr}.hero{padding-top:42px}}
+</style>
+</head>
+<body>
+
+  <div class="topbar"><div class="wrap">
+    <a class="brand" href="index.html"><img src="icon.png" alt="" />Zelynta</a>
+    <span class="spacer"></span>
+    <a class="back" href="index.html">← Înapoi la site</a>
+  </div></div>
+
+  <header class="hero"><div class="wrap">
+    <span class="eyebrow">Hartă educativă · sănătate holistică</span>
+    <h1>The Healing Web</h1>
+    <p class="lead">Un ghid vizual, în stil de hartă de metrou, care leagă <strong>medicina occidentală (alopată)</strong> de abordările <strong>holistice și naturale</strong> — toate traseele de îngrijire a sănătății, pe o singură imagine.</p>
+  </div></header>
+
+  <div class="wrap">
+    <figure class="map-frame">
+      <img id="mapImg" src="healing-web.jpg" alt="The Healing Web — hartă a îngrijirii holistice și alopate, în stil de metrou" loading="lazy" />
+      <figcaption class="map-cap"><b>Apasă pe imagine</b> pentru a o mări și a citi fiecare „stație".</figcaption>
+    </figure>
+  </div>
+
+  <main>
+    <section><div class="wrap">
+      <h2>Ce este harta</h2>
+      <p>„The Healing Web" transformă un subiect complex — sistemele de îngrijire a sănătății — într-o hartă lizibilă, ca o rețea de metrou. „Liniile" leagă afecțiuni, simptome și abordări de tratament, iar „stațiile" marchează metode din două mari lumi: medicina convențională și cea holistică. Ideea ei nu este să spună „ce e bun și ce e rău", ci să arate <strong>câte căi există</strong> și cum se intersectează.</p>
+    </div></section>
+
+    <section style="background:var(--surface-2)"><div class="wrap">
+      <h2>Două abordări, o singură hartă</h2>
+      <p class="muted">Harta pune față în față, fără a le opune categoric, două filozofii de îngrijire.</p>
+      <div class="two">
+        <div class="card">
+          <span class="tag west">Medicina occidentală (alopată)</span>
+          <h3>Bazată pe diagnostic și dovezi</h3>
+          <p>Spitale, diagnostic clinic, intervenții, medicamente farmaceutice. Se concentrează pe identificarea și tratarea cauzei și a simptomelor, cu protocoale validate științific.</p>
+        </div>
+        <div class="card">
+          <span class="tag holi">Medicina holistică / naturală</span>
+          <h3>Bazată pe echilibru și prevenție</h3>
+          <p>Privește omul ca întreg — corp, minte, stil de viață. Include nutriția, plantele, mișcarea și terapii complementare, cu accent pe prevenție și pe susținerea capacității naturale de vindecare.</p>
+        </div>
+      </div>
+    </div></section>
+
+    <section><div class="wrap">
+      <h2>Ramurile principale de pe hartă</h2>
+      <p class="muted">Câteva dintre „liniile" pe care le vei recunoaște scanând harta:</p>
+      <div class="grid">
+        <div class="branch"><div class="dot">🌿</div><h4>Fitoterapie</h4><p>Plante medicinale și remedii din natură, folosite tradițional pentru susținerea organismului.</p></div>
+        <div class="branch"><div class="dot">🥗</div><h4>Nutriție</h4><p>Alimentația ca temelie a sănătății — exact zona în care te ajută și Zelynta.</p></div>
+        <div class="branch"><div class="dot">💧</div><h4>Naturopatie</h4><p>Abordare care combină mai multe metode naturale pentru a sprijini echilibrul corpului.</p></div>
+        <div class="branch"><div class="dot">🪡</div><h4>Acupunctură</h4><p>Practică din medicina tradițională chineză, axată pe fluxul de energie prin puncte specifice.</p></div>
+        <div class="branch"><div class="dot">🧘</div><h4>Minte–corp</h4><p>Meditație, respirație, yoga — tehnici pentru reducerea stresului și starea de bine.</p></div>
+        <div class="branch"><div class="dot">🌀</div><h4>Homeopatie</h4><p>Sistem alternativ controversat; harta îl include pentru context, nu ca recomandare.</p></div>
+        <div class="branch"><div class="dot">🖐️</div><h4>Terapii manuale</h4><p>Chiropractică, masaj și tehnici corporale pentru mobilitate și relaxare.</p></div>
+        <div class="branch"><div class="dot">🏥</div><h4>Medicina convențională</h4><p>Diagnostic clinic, farmacologie și proceduri — coloana vertebrală a îngrijirii moderne.</p></div>
+      </div>
+    </div></section>
+
+    <section style="background:var(--surface-2)"><div class="wrap">
+      <h2>Cum să o citești</h2>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><b>Pornește de la o „stație"</b><span>O afecțiune sau o metodă care te interesează.</span></div></div>
+        <div class="step"><div class="n">2</div><div><b>Urmărește „liniile"</b><span>Vezi ce abordări sunt conectate și cum se intersectează.</span></div></div>
+        <div class="step"><div class="n">3</div><div><b>Compară lumile</b><span>Observă alternativele holistice alături de cele convenționale.</span></div></div>
+        <div class="step"><div class="n">4</div><div><b>Discută cu un specialist</b><span>Folosește harta ca punct de pornire pentru o conversație informată.</span></div></div>
+      </div>
+    </div></section>
+
+    <section><div class="wrap">
+      <h2>Unde își găsește locul</h2>
+      <p>Prin designul ei elegant, harta e potrivită pentru un cabinet, un centru de wellness, un birou sau acasă — oriunde poate stârni o discuție atentă despre sănătate și despre opțiunile de îngrijire. E, în egală măsură, un obiect decorativ și un instrument de educație.</p>
+
+      <div class="note">
+        <h3>⚠️ Notă importantă</h3>
+        <p>Această hartă are scop <strong>educativ, informativ și decorativ</strong>. Nu este sfat medical și nu înlocuiește consultul unui medic, farmacist sau nutriționist autorizat.</p>
+        <p>Unele dintre abordările prezentate sunt susținute de dovezi științifice solide, iar altele (precum homeopatia) <strong>nu</strong> au demonstrat eficacitate dincolo de efectul placebo. Tratează harta ca pe o privire de ansamblu asupra opțiunilor existente, nu ca pe o recomandare de tratament. Pentru orice problemă de sănătate, consultă întotdeauna un profesionist.</p>
+      </div>
+    </div></section>
+  </main>
+
+  <footer><div class="wrap">
+    <a href="index.html">← Zelynta</a>
+    <span class="spacer"></span>
+    <a href="legal/privacy.html">Confidențialitate</a>
+    <span class="copy">© 2026 Irèn Savastre — toate drepturile rezervate. „The Healing Web" este o lucrare educativă/decorativă terță; drepturile asupra ei aparțin autorilor respectivi.</span>
+  </div></footer>
+
+  <div class="lb" id="lightbox">
+    <button class="lb-x" id="lbClose" aria-label="Închide">&#10005;</button>
+    <img src="healing-web.jpg" alt="The Healing Web — mărit" />
+  </div>
+
+  <script>
+    (function(){
+      var img=document.getElementById("mapImg"), lb=document.getElementById("lightbox"), x=document.getElementById("lbClose");
+      if(!img||!lb) return;
+      function open(){ lb.classList.add("open"); document.body.style.overflow="hidden"; }
+      function close(){ lb.classList.remove("open"); document.body.style.overflow=""; }
+      img.addEventListener("click",open);
+      x.addEventListener("click",close);
+      lb.addEventListener("click",function(e){ if(e.target===lb) close(); });
+      document.addEventListener("keydown",function(e){ if(e.key==="Escape") close(); });
+    })();
+  </script>
+</body>
+</html>
