@@ -1,0 +1,22 @@
+{
+  "//": "Pagini statice single-file: stilurile inline sunt intentionate. Oprim doar regulile de stil zgomotoase; pastram verificarile reale (taguri neinchise, id duplicat, alt lipsa etc.).",
+
+  "inline-style-disabled": false,
+  "inline-script-disabled": false,
+  "style-disabled": false,
+  "attr-no-duplication": true,
+
+  "tagname-lowercase": true,
+  "attr-lowercase": true,
+  "attr-value-double-quotes": false,
+  "tag-pair": true,
+  "tag-self-close": false,
+  "spec-char-escape": false,
+  "id-unique": true,
+  "src-not-empty": true,
+  "title-require": true,
+  "alt-require": true,
+  "doctype-first": false,
+  "doctype-html5": true,
+  "head-script-disabled": false
+}

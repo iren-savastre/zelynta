@@ -12,10 +12,29 @@ export type HistoryItem = {
   scannedAt: number; // timestamp
 };
 
+// Doua intrari sunt "acelasi produs" daca au acelasi barcode SAU acelasi
+// nume+marca (scanarile din poza primesc coduri interne unice, deci fara
+// compararea numelui s-ar aduna dubluri ale aceluiasi produs).
+const norm = (s: string) => (s ?? "").trim().toLowerCase();
+function sameProduct(a: HistoryItem, b: HistoryItem): boolean {
+  if (a.barcode === b.barcode) return true;
+  return norm(a.name) !== "" && norm(a.name) === norm(b.name) && norm(a.brand) === norm(b.brand);
+}
+
+// Pastreaza doar prima aparitie (lista e ordonata: cele mai noi primele).
+function dedupe(list: HistoryItem[]): HistoryItem[] {
+  const out: HistoryItem[] = [];
+  for (const item of list) {
+    if (!out.some((kept) => sameProduct(kept, item))) out.push(item);
+  }
+  return out;
+}
+
 export async function getHistory(): Promise<HistoryItem[]> {
   try {
     const raw = await AsyncStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : [];
+    // Deduplicam si la citire — curata automat dublurile salvate in trecut.
+    return raw ? dedupe(JSON.parse(raw)) : [];
   } catch {
     return [];
   }
@@ -24,10 +43,10 @@ export async function getHistory(): Promise<HistoryItem[]> {
 export async function saveToHistory(item: HistoryItem): Promise<void> {
   try {
     const history = await getHistory();
-    // Scoate intrarea veche cu același barcode (deduplicare)
-    const filtered = history.filter((h) => h.barcode !== item.barcode);
+    // Scoate orice intrare veche a aceluiasi produs (dupa cod SAU nume+marca)
+    const filtered = history.filter((h) => !sameProduct(h, item));
     // Adaugă noua intrare în față
-    const updated = [item, ...filtered].slice(0, MAX_ITEMS);
+    const updated = dedupe([item, ...filtered]).slice(0, MAX_ITEMS);
     await AsyncStorage.setItem(KEY, JSON.stringify(updated));
   } catch {
     // ignoră erorile de stocare

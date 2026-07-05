@@ -42,7 +42,7 @@
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#2E7D32" />
   <link rel="preload" as="image" href="icon.png" fetchpriority="high" />
-  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="icon.png" />
   <link rel="manifest" href="manifest.json" />
   <script type="application/ld+json">
@@ -54,7 +54,8 @@
     "operatingSystem": "Android, Web",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
     "description": "Aplicație de scanare produse: scor de sănătate, aditivi explicați, avertismente și alternative, din baze de date deschise.",
-    "publisher": { "@type": "Organization", "name": "Zelynta", "email": "suport@zelynta.com" }
+    "publisher": { "@type": "Organization", "name": "Zelynta", "email": "suport@zelynta.com" },
+    "sameAs": ["https://www.facebook.com/profile.php?id=100063203081052"]
   }
   </script>
   <script type="application/ld+json">
@@ -172,7 +173,7 @@
       background:var(--surface); box-shadow:var(--shadow-sm); transition:transform .15s, box-shadow .15s; }
     .ztheme-btn:hover { transform:translateY(-1px); box-shadow:var(--shadow); }
     .ztheme-btn svg { width:22px; height:22px; display:block; }
-    .ztheme-menu { position:absolute; right:0; top:calc(100% + 8px); background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:6px; box-shadow:var(--shadow); min-width:210px; display:none; flex-direction:column; gap:2px; z-index:120; }
+    .ztheme-menu { position:absolute; right:0; top:calc(100% + 8px); background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:6px; box-shadow:var(--shadow); min-width:210px; max-height:min(72vh,540px); overflow-y:auto; display:none; flex-direction:column; gap:2px; z-index:120; }
     .ztheme-menu::-webkit-scrollbar { width:7px; }
     .ztheme-menu::-webkit-scrollbar-thumb { background:rgba(var(--a1),0.25); border-radius:8px; }
     .ztheme-menu::-webkit-scrollbar-track { background:transparent; }
@@ -1660,9 +1661,9 @@
           <div class="ft-brand"><img src="icon.png" alt="" width="30" height="30" loading="lazy" decoding="async" /><span class="wave"><span>Z</span><span>e</span><span>l</span><span>y</span><span>n</span><span>t</span><span>a</span></span></div>
           <p data-i18n="ftDesc">Scanezi produse și înțelegi etichetele: scor, aditivi, avertismente și alternative. Date din baze deschise.</p>
           <div class="ft-social" id="ftSocial">
-            <a class="ft-soc" id="socFacebook" href="#" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/></svg></a>
-            <a class="ft-soc" id="socTiktok" href="#" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3c.3 2.1 1.6 3.6 3.5 3.8v2.4c-1.2 0-2.4-.4-3.5-1v6.1a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v2.5a3.1 3.1 0 1 0 2.2 3V3h2.5Z"/></svg></a>
-            <a class="ft-soc" id="socInstagram" href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.06 1.8.25 2.2.42.6.2 1 .5 1.4 1 .5.4.8.8 1 1.4.17.4.36 1 .42 2.2.07 1.3.07 1.7.07 4.9s0 3.6-.07 4.9c-.06 1.2-.25 1.8-.42 2.2-.2.6-.5 1-1 1.4-.4.5-.8.8-1.4 1-.4.17-1 .36-2.2.42-1.3.07-1.7.07-4.9.07s-3.6 0-4.9-.07c-1.2-.06-1.8-.25-2.2-.42-.6-.2-1-.5-1.4-1-.5-.4-.8-.8-1-1.4-.17-.4-.36-1-.42-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.9c.06-1.2.25-1.8.42-2.2.2-.6.5-1 1-1.4.4-.5.8-.8 1.4-1 .4-.17 1-.36 2.2-.42C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.1 0-3.5 0-4.7.07-1.1.05-1.7.24-2.1.4-.5.2-.9.43-1.3.83-.4.4-.63.8-.83 1.3-.16.4-.35 1-.4 2.1C2.6 8.5 2.6 8.9 2.6 12s0 3.5.07 4.7c.05 1.1.24 1.7.4 2.1.2.5.43.9.83 1.3.4.4.8.63 1.3.83.4.16 1 .35 2.1.4 1.2.07 1.6.07 4.7.07s3.5 0 4.7-.07c1.1-.05 1.7-.24 2.1-.4.5-.2.9-.43 1.3-.83.4-.4.63-.8.83-1.3.16-.4.35-1 .4-2.1.07-1.2.07-1.6.07-4.7s0-3.5-.07-4.7c-.05-1.1-.24-1.7-.4-2.1-.2-.5-.43-.9-.83-1.3-.4-.4-.8-.63-1.3-.83-.4-.16-1-.35-2.1-.4C15.5 4 15.1 4 12 4Zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8Zm0 1.8a3.1 3.1 0 1 0 0 6.2 3.1 3.1 0 0 0 0-6.2Zm5.1-.4a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg></a>
+            <a class="ft-soc" id="socFacebook" href="https://www.facebook.com/profile.php?id=100063203081052" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/></svg></a>
+            <a class="ft-soc" id="socTiktok" href="#" target="_blank" rel="noopener" aria-label="TikTok" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 3c.3 2.1 1.6 3.6 3.5 3.8v2.4c-1.2 0-2.4-.4-3.5-1v6.1a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v2.5a3.1 3.1 0 1 0 2.2 3V3h2.5Z"/></svg></a>
+            <a class="ft-soc" id="socInstagram" href="#" target="_blank" rel="noopener" aria-label="Instagram" style="display:none"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.06 1.8.25 2.2.42.6.2 1 .5 1.4 1 .5.4.8.8 1 1.4.17.4.36 1 .42 2.2.07 1.3.07 1.7.07 4.9s0 3.6-.07 4.9c-.06 1.2-.25 1.8-.42 2.2-.2.6-.5 1-1 1.4-.4.5-.8.8-1.4 1-.4.17-1 .36-2.2.42-1.3.07-1.7.07-4.9.07s-3.6 0-4.9-.07c-1.2-.06-1.8-.25-2.2-.42-.6-.2-1-.5-1.4-1-.5-.4-.8-.8-1-1.4-.17-.4-.36-1-.42-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.9c.06-1.2.25-1.8.42-2.2.2-.6.5-1 1-1.4.4-.5.8-.8 1.4-1 .4-.17 1-.36 2.2-.42C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.1 0-3.5 0-4.7.07-1.1.05-1.7.24-2.1.4-.5.2-.9.43-1.3.83-.4.4-.63.8-.83 1.3-.16.4-.35 1-.4 2.1C2.6 8.5 2.6 8.9 2.6 12s0 3.5.07 4.7c.05 1.1.24 1.7.4 2.1.2.5.43.9.83 1.3.4.4.8.63 1.3.83.4.16 1 .35 2.1.4 1.2.07 1.6.07 4.7.07s3.5 0 4.7-.07c1.1-.05 1.7-.24 2.1-.4.5-.2.9-.43 1.3-.83.4-.4.63-.8.83-1.3.16-.4.35-1 .4-2.1.07-1.2.07-1.6.07-4.7s0-3.5-.07-4.7c-.05-1.1-.24-1.7-.4-2.1-.2-.5-.43-.9-.83-1.3-.4-.4-.8-.63-1.3-.83-.4-.16-1-.35-2.1-.4C15.5 4 15.1 4 12 4Zm0 3.1a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8Zm0 1.8a3.1 3.1 0 1 0 0 6.2 3.1 3.1 0 0 0 0-6.2Zm5.1-.4a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3Z"/></svg></a>
           </div>
           <div class="ft-stores" id="ftStores">
             <a class="ft-store" id="storeAndroid" href="https://github.com/iren-savastre/zelynta/releases/latest" target="_blank" rel="noopener" aria-label="Google Play"><img src="google-play.png" alt="Google Play" loading="lazy" decoding="async" /></a>
@@ -1714,7 +1715,6 @@
     <p data-i18n="ckText">Folosim doar stocare strict necesară (ex. limba aleasă). Nu folosim analytics sau marketing fără acordul tău.</p>
     <div class="row">
       <button class="btn btn-primary" id="ckAccept" data-i18n="ckAccept">Accept toate</button>
-      <button class="btn btn-ghost" id="ckReject" data-i18n="ckReject">Resping neesențiale</button>
       <button class="btn btn-ghost" id="ckManage" data-i18n="ckManage">Gestionează preferințe</button>
     </div>
   </div>
@@ -4286,8 +4286,9 @@
     zMenu.innerHTML='<h5>Temă · fructe & plante</h5>'+ZTHEMES.map(function(t){ return '<button type="button" class="zrow" data-z="'+t.id+'" title="'+t.label+'" aria-label="'+t.label+'" style="--gl:'+t.g+'"><span class="zsw-em">'+zIcon(t.id)+'</span><span>'+t.label+'</span><span class="ck">✓</span></button>'; }).join("");
     var zBack=document.createElement("div"); zBack.className="ztheme-backdrop"; document.body.appendChild(zBack);
     zBtn.setAttribute("aria-expanded","false");
-    function zOpen(){ zMenu.classList.add("show"); zBack.classList.add("show"); zBtn.setAttribute("aria-expanded","true"); }
+    function zOpen(){ if(window.__closeDD) window.__closeDD(); zMenu.classList.add("show"); zBack.classList.add("show"); zBtn.setAttribute("aria-expanded","true"); }
     function zClose(){ zMenu.classList.remove("show"); zBack.classList.remove("show"); zBtn.setAttribute("aria-expanded","false"); }
+    window.__zClose=zClose;
     zBtn.addEventListener("click",function(e){ e.stopPropagation(); zMenu.classList.contains("show")?zClose():zOpen(); });
     zBack.addEventListener("click",zClose);
     zMenu.querySelectorAll(".zrow").forEach(function(s){ s.addEventListener("click",function(){ zApply(s.dataset.z); zClose(); }); });
@@ -4400,7 +4401,9 @@
         .then(function(r){ return r.json(); })
         .then(function(rows){
           var s={}; (rows||[]).forEach(function(row){ s[row.key]=row.value; });
-          (rows||[]).forEach(function(row){ var id=map[row.key]; var a=id&&document.getElementById(id); if(a&&row.value){ a.setAttribute("href",row.value); } });
+          var anySoc=false;
+          (rows||[]).forEach(function(row){ var id=map[row.key]; var a=id&&document.getElementById(id); if(a&&row.value){ a.setAttribute("href",row.value); a.style.display=""; anySoc=true; } });
+          var socBox=document.getElementById("ftSocial"); if(socBox) socBox.style.display=anySoc?"":"none";
           // butoane store: aplică URL + vizibilitate (gol/ascuns => display none)
           function store(id, urlKey, showKey){
             var a=document.getElementById(id); if(!a) return false;
@@ -4448,6 +4451,7 @@
     const menu = document.getElementById("langMenu");
     const flag = (cc,l) => '<img class="flag" src="https://flagcdn.com/w80/'+cc+'.png" alt="'+l+'" width="20" height="14" loading="lazy" decoding="async" />';
     function closeDD(){ dd.classList.remove("open"); cur.setAttribute("aria-expanded","false"); }
+    window.__closeDD=closeDD;
     function applyLang(code){
       const l = LANGS.find(x=>x.code===code) || LANGS[0];
       const dict = I18N[code] || I18N.ro;
@@ -4498,7 +4502,7 @@
       o.addEventListener("click",()=>{ applyLang(l.code); closeDD(); });
       menu.appendChild(o);
     });
-    cur.addEventListener("click",e=>{ e.stopPropagation(); const open=dd.classList.toggle("open"); cur.setAttribute("aria-expanded",open?"true":"false"); });
+    cur.addEventListener("click",e=>{ e.stopPropagation(); if(window.__zClose) window.__zClose(); const open=dd.classList.toggle("open"); cur.setAttribute("aria-expanded",open?"true":"false"); });
     document.addEventListener("click",e=>{ if(!dd.contains(e.target)) closeDD(); });
     document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeDD(); closePrefs(); } });
     let savedLang=null; try{ savedLang=localStorage.getItem("zelynta_lang"); }catch(e){}
@@ -4536,7 +4540,6 @@
     function hideBanner(){ banner.classList.remove("show"); }
     if(!getConsent()) banner.classList.add("show");
     document.getElementById("ckAccept").addEventListener("click",()=>{ setConsent({necessary:true,functional:true,analytics:true,marketing:true}); hideBanner(); });
-    document.getElementById("ckReject").addEventListener("click",()=>{ setConsent({necessary:true,functional:false,analytics:false,marketing:false}); hideBanner(); });
     document.getElementById("ckX").addEventListener("click",()=>{ setConsent({necessary:true,functional:false,analytics:false,marketing:false}); hideBanner(); });
     document.getElementById("ckManage").addEventListener("click",openPrefs);
     document.getElementById("openPrefsFooter").addEventListener("click",openPrefs);

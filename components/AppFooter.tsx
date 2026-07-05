@@ -55,8 +55,10 @@ function FloatLeaf({ left, size, delay, dur }: { left: string; size: number; del
   );
 }
 
+// Pagina oficiala de Facebook; TikTok/Instagram raman pe site pana exista conturi.
+const FACEBOOK = "https://www.facebook.com/profile.php?id=100063203081052";
 const SOCIAL: { ic: any; url: string }[] = [
-  { ic: "logo-facebook", url: SITE },
+  { ic: "logo-facebook", url: FACEBOOK },
   { ic: "logo-tiktok", url: SITE },
   { ic: "logo-instagram", url: SITE },
 ];
@@ -113,6 +115,21 @@ export default function AppFooter({
   const { t } = useTranslation();
   const router = useRouter();
 
+  // Rosia din footer topaie si ea, ca sora ei din navbar (aceleasi timpi).
+  const hop = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(hop, { toValue: 1, duration: 360, useNativeDriver: true }),
+        Animated.timing(hop, { toValue: 0, duration: 600, useNativeDriver: true }),
+        Animated.delay(900),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [hop]);
+  const hopY = hop.interpolate({ inputRange: [0, 1], outputRange: [0, -10] });
+
   return (
     <View style={styles.outer}>
       <View style={styles.accent} />
@@ -126,9 +143,9 @@ export default function AppFooter({
           <View style={styles.top}>
             <View style={styles.brandCol}>
               <View style={styles.brandRow}>
-                <Image
+                <Animated.Image
                   source={require("../assets/images/icon.png")}
-                  style={styles.logo}
+                  style={[styles.logo, { transform: [{ translateY: hopY }] }]}
                   resizeMode="contain"
                 />
                 <WaveText text="Zelynta" style={styles.brand} />

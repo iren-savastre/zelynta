@@ -1,5 +1,6 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -10,6 +11,7 @@ import {
     Easing,
     Image,
     KeyboardAvoidingView,
+    Linking,
     Modal,
     Platform,
     Pressable,
@@ -38,8 +40,10 @@ import { isFavorite, toggleFavorite } from "../utils/favorites";
 import { saveToHistory } from "../utils/history";
 import { getPalmNote, hasPalmOil } from "../utils/palm";
 import { translateText } from "../utils/translate";
-import { extractAdditiveTags, ocrImage } from "../utils/ocr";
-import { analyzeProduct, annotateIngredients, productDisplay } from "../utils/score";
+import { pickM } from "../i18n/methodology";
+import { localizeInci } from "../utils/inci";
+import { extractAdditiveTags, extractIngredientsSegment, ocrImage } from "../utils/ocr";
+import { analyzeProduct, stripAdditives, productDisplay } from "../utils/score";
 import { mixHex, PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
 const languages = [
@@ -168,7 +172,7 @@ export default function Index() {
   const isNarrow = width < 480; // telefon: navbar compact, fără text la Istoric
   const params = useLocalSearchParams<{ barcode?: string }>();
 
-  // Roșia care țopăie 🍅
+  // Roșia care țopăie 🍅 — bucla clasica: saritura + aterizare cu bounce.
   const hop = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -240,6 +244,9 @@ export default function Index() {
   const [selectedAdditive, setSelectedAdditive] = useState<any>(null);
   const [torchOn, setTorchOn] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
+  // Mod dedicat de fotografiere a ingredientelor: scannerul de coduri e oprit
+  // complet, camera focalizeaza linistita, iar utilizatorul alege momentul pozei.
+  const [ocrMode, setOcrMode] = useState(false);
   const cameraRef = useRef<CameraView>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [favorite, setFavorite] = useState(false);
@@ -261,6 +268,11 @@ export default function Index() {
   }
 
  async function fetchProductByCode(code: string) {
+    // Numar de serie al cererii: scannerul poate declansa acelasi cod de mai
+    // multe ori intr-o fractiune de secunda → doar ULTIMA cerere are voie sa
+    // scrie rezultatul, altfel una lenta/esuata suprascrie produsul deja gasit
+    // cu "negasit".
+    const seq = ++fetchSeqRef.current;
     setLoading(true);
     setError("");
     setProduct(null);
@@ -271,6 +283,7 @@ export default function Index() {
     try {
       // Caută pe rând în 3 baze: alimente, cosmetice, produse generale
       const found = await fetchProductByBarcode(code);
+      if (seq !== fetchSeqRef.current) return; // a pornit alta cautare intre timp
       if (found) {
         setProduct(found);
         setLoading(false);
@@ -279,9 +292,10 @@ export default function Index() {
       // dacă am terminat toate bazele fără rezultat
       setError(t("errorNotFound"));
     } catch (e) {
+      if (seq !== fetchSeqRef.current) return;
       setError(t("errorConnection"));
     } finally {
-      setLoading(false);
+      if (seq === fetchSeqRef.current) setLoading(false);
     }
   }
 
@@ -307,10 +321,20 @@ export default function Index() {
   function closeScanner() {
     setTorchOn(false);
     setScannerOpen(false);
+    setOcrMode(false);
   }
 
   function handleBarcodeScanned({ data }: { data: string }) {
     if (!scannerOpen || ocrLoading) return; // evită declanșarea multiplă
+    // Scannerul emite acelasi cod de mai multe ori pe secunda inainte ca
+    // starea sa apuce sa se schimbe — ignoram repetarile apropiate.
+    const now = Date.now();
+    if (
+      data === lastScanRef.current.code &&
+      now - lastScanRef.current.at < 4000
+    )
+      return;
+    lastScanRef.current = { code: data, at: now };
     // Feedback haptic la scanare reușită
     if (Platform.OS !== "web") {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
@@ -322,53 +346,140 @@ export default function Index() {
     fetchProductByCode(data);
   }
 
-  // Citește lista de ingrediente din poză (OCR) — aceeași cameră
-  async function captureIngredients() {
-    if (!cameraRef.current || ocrLoading) return;
-    setOcrLoading(true);
-    try {
-      const photo = await cameraRef.current.takePictureAsync({
-        base64: true,
-        quality: 0.5,
-      });
-      if (Platform.OS !== "web") {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+  // Nr. de serie al cautarii curente (doar ultima are voie sa scrie starea)
+  // si ultimul cod scanat (anti-dublura la scanari repetate ale camerei).
+  const fetchSeqRef = useRef(0);
+  const lastScanRef = useRef<{ code: string; at: number }>({ code: "", at: 0 });
+
+  // Produsul curent, accesibil din bucla de recunoastere automata fara
+  // problemele de "closure invechit" ale state-ului.
+  const productRef = useRef<any>(null);
+  useEffect(() => {
+    productRef.current = product;
+  }, [product]);
+
+  // Recunoastere AUTOMATA a ingredientelor: cat timp modul foto e activ,
+  // camera incearca singura (poza -> OCR) pana gaseste text — fara buton.
+  useEffect(() => {
+    if (!ocrMode || !scannerOpen) return;
+    let alive = true;
+    (async () => {
+      // Lasam autofocusul sa se aseze dupa comutarea modului.
+      await new Promise((r) => setTimeout(r, 1200));
+      for (let attempt = 0; alive && attempt < 12; attempt++) {
+        try {
+          setOcrLoading(true);
+          const r = await snapAndRead();
+          if (!alive) return;
+          // Sub ~25 de caractere e zgomot (colt de eticheta, blur) — reincercam.
+          if (r && r.text.length >= 25) {
+            applyOcrResult(r.text, r.photoUri);
+            return;
+          }
+        } catch {
+          // eroare trecatoare (retea/captura) — reincercam
+        } finally {
+          if (alive) setOcrLoading(false);
+        }
+        await new Promise((r) => setTimeout(r, 800));
       }
-      closeScanner();
-      setError("");
-      setProduct(null);
-      setLoading(true);
-      const text = await ocrImage(photo?.uri, photo?.base64);
-      if (!text || text.trim().length < 3) {
+      if (alive) {
+        closeScanner();
         setError(t("ocrNoText"));
-        setLoading(false);
-        return;
       }
-      const tags = extractAdditiveTags(text);
+    })();
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ocrMode, scannerOpen]);
+
+  // Face o poza, o micsoreaza si intoarce textul citit (gol daca nu e text).
+  async function snapAndRead(): Promise<{ text: string; photoUri: string } | null> {
+    if (!cameraRef.current) return null;
+    let photo;
+    try {
+      // Intai poza procesata normal (orientare si expunere corecte).
+      photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
+    } catch {
+      await new Promise((r) => setTimeout(r, 400));
+      // Fallback: captura rapida, fara post-procesare.
+      photo = await cameraRef.current.takePictureAsync({
+        quality: 0.7,
+        skipProcessing: true,
+      });
+    }
+    // Micsoram poza inainte de OCR: sub limita de 1MB a OCR.space (gratuit)
+    // si cu orientarea EXIF aplicata corect (pozele mari veneau rotite/goale).
+    const small = photo?.uri
+      ? await manipulateAsync(photo.uri, [{ resize: { width: 1280 } }], {
+          compress: 0.7,
+          format: SaveFormat.JPEG,
+          base64: true,
+        })
+      : null;
+    const text = await ocrImage(small?.uri ?? photo?.uri, small?.base64 ?? undefined);
+    return { text: (text ?? "").trim(), photoUri: photo?.uri ?? "" };
+  }
+
+  // Aplica textul citit: il ataseaza produsului deschis (scanat cu cod de
+  // bare) sau creeaza un produs de sine statator. Poza nu contine codul de
+  // bare, deci legatura o facem prin produsul deschis in acel moment.
+  function applyOcrResult(text: string, photoUri: string) {
+    const prevProduct =
+      productRef.current && !String(productRef.current.code ?? "").startsWith("ocr-")
+        ? productRef.current
+        : null;
+    if (Platform.OS !== "web") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    }
+    closeScanner();
+    setError("");
+    // Aditivii ii cautam in TOT textul (etichetele multilingve repeta lista —
+    // prindem orice cod E indiferent de limba); pentru afisare pastram doar
+    // lista de ingrediente, in limba preferata, si o traducem automat.
+    const tags = extractAdditiveTags(text);
+    const { segment, srcLang } = extractIngredientsSegment(text, i18n.language);
+    if (prevProduct) {
+      // COMPLETAM produsul existent, nu il stricam: textul din baza de date e
+      // scris de oameni (procente corecte), pe cand OCR-ul mai greseste cifre
+      // (ex. "72%" citit "8%"). Textul din poza intra DOAR daca produsul nu
+      // are deloc ingrediente; aditivii din poza se adauga intotdeauna.
+      const merged: any = { ...prevProduct };
+      const hasIngredients = Object.keys(prevProduct).some(
+        (k) =>
+          k.startsWith("ingredients_text") &&
+          String((prevProduct as any)[k] ?? "").trim()
+      );
+      if (!hasIngredients) {
+        merged.ingredients_text = segment;
+        merged.lang = srcLang; // limba-sursa pentru traducerea automata
+      }
+      merged.additives_tags = [
+        ...new Set([...(prevProduct.additives_tags ?? []), ...tags]),
+      ];
+      setProduct(merged);
+    } else {
       setProduct({
         code: `ocr-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
         product_name: t("ocrTitle"),
         brands: "",
-        image_url: photo?.uri ?? "",
-        ingredients_text: text,
+        image_url: photoUri,
+        ingredients_text: segment,
+        lang: srcLang, // limba-sursa pentru traducerea automata
         additives_tags: tags,
         nutriments: {},
         categories_tags: [],
       });
-      setLoading(false);
-    } catch (e) {
-      setError(t("ocrError"));
-      setLoading(false);
-    } finally {
-      setOcrLoading(false);
     }
   }
 
   const n = product?.nutriments ?? {};
   const lang = i18n.language;
-  // Text de ingrediente cu codul E adăugat lângă denumirea aditivului (ex. "acid fosforic (E338)")
+  // Text de ingrediente FĂRĂ aditivi (au secțiunea lor separată în UI) și cu
+  // termenii INCI de pe cosmetice ("aqua") localizați în limba aleasă ("apă").
   const ingredientsDisplay = useMemo(
-    () => annotateIngredients(ingredientsText, lang),
+    () => localizeInci(stripAdditives(ingredientsText, lang), lang),
     [ingredientsText, lang]
   );
 
@@ -452,6 +563,7 @@ export default function Index() {
         energy: t("energy"),
         saturatedFat: t("saturatedFat"),
         salt: t("salt"),
+        noData: t("noNutritionData"),
       };
       return map[r.key] ?? r.key;
     }
@@ -468,6 +580,8 @@ export default function Index() {
   const sugars = n["sugars_100g"] ?? null;
   const satFat = n["saturated-fat_100g"] ?? null;
   const salt = n["salt_100g"] ?? null;
+  const fiber = n["fiber_100g"] ?? null;
+  const proteins = n["proteins_100g"] ?? null;
 useEffect(() => {
     if (!product) return;
     saveToHistory({
@@ -515,6 +629,7 @@ useEffect(() => {
       unit: string;
       color: string;
       percent: number;
+      reverse?: boolean; // nutrienti "buni" (fibre/proteine): mult = verde
     }[] = [];
 
     // Calculează poziția săgeții ASTFEL încât să se alinieze cu culorile:
@@ -556,6 +671,29 @@ useEffect(() => {
         unit: "g",
         color: nutrientColor(salt, 0.3, 1.5),
         percent: pos(salt, 0.3, 1.5),
+      });
+    // Nutrienti "buni" — logica inversa: cu cat mai mult, cu atat mai verde.
+    // Praguri per 100g dupa reglementarea UE: fibre >=3g "sursa", >=6g "bogat";
+    // proteine — semnificativ peste ~8g/100g.
+    const goodColor = (v: number, mid: number, high: number) =>
+      v >= high ? "#038141" : v >= mid ? "#85BB2F" : "#EE8100";
+    if (fiber != null)
+      rows.push({
+        label: t("fiber"),
+        value: Math.round(fiber * 10) / 10,
+        unit: "g",
+        color: goodColor(fiber, 3, 6),
+        percent: pos(fiber, 3, 6),
+        reverse: true,
+      });
+    if (proteins != null)
+      rows.push({
+        label: t("proteins"),
+        value: Math.round(proteins * 10) / 10,
+        unit: "g",
+        color: goodColor(proteins, 4, 8),
+        percent: pos(proteins, 4, 8),
+        reverse: true,
       });
     return rows;
   }
@@ -611,11 +749,16 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               ref={cameraRef}
               style={styles.camera}
               facing="back"
+              autofocus="on"
               enableTorch={torchOn}
-              barcodeScannerSettings={{
-                barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"],
-              }}
-              onBarcodeScanned={ocrLoading ? undefined : handleBarcodeScanned}
+              // In modul foto-ingrediente analizorul de coduri de bare e oprit
+              // complet — altfel pe Android captura esueaza ("Failed to capture").
+              barcodeScannerSettings={
+                ocrMode || ocrLoading
+                  ? undefined
+                  : { barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"] }
+              }
+              onBarcodeScanned={ocrMode || ocrLoading ? undefined : handleBarcodeScanned}
               onMountError={(e: any) => {
                 console.warn("Camera mount error:", e?.message ?? e);
                 setError(t("cameraBlockedHelp"));
@@ -658,25 +801,34 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               <Text style={styles.torchIcon}>{torchOn ? "🔦" : "💡"}</Text>
             </TouchableOpacity>
             <View style={styles.scannerOverlay}>
-              <Text style={styles.scannerText}>{t("scanInstructions")}</Text>
-              <TouchableOpacity
-                style={styles.ingredientsButton}
-                onPress={captureIngredients}
-                disabled={ocrLoading}
-                accessibilityRole="button"
-                accessibilityLabel={t("readIngredients")}
-              >
-                {ocrLoading ? (
+              <Text style={styles.scannerText}>
+                {ocrMode ? t("ocrAim") : t("scanInstructions")}
+              </Text>
+              {ocrMode ? (
+                <View
+                  style={[
+                    styles.ingredientsButton,
+                    { flexDirection: "row", alignItems: "center", gap: 8 },
+                  ]}
+                >
                   <ActivityIndicator color="#222" />
-                ) : (
+                  <Text style={styles.ingredientsButtonText}>{t("ocrSearching")}</Text>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.ingredientsButton}
+                  onPress={() => setOcrMode(true)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("readIngredients")}
+                >
                   <Text style={styles.ingredientsButtonText}>
                     📝 {t("readIngredients")}
                   </Text>
-                )}
-              </TouchableOpacity>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={styles.cancelButton}
-                onPress={closeScanner}
+                onPress={ocrMode ? () => setOcrMode(false) : closeScanner}
                 accessibilityRole="button"
                 accessibilityLabel={t("cancel")}
               >
@@ -692,25 +844,27 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
         <Modal visible transparent animationType="none" onRequestClose={closeZoom}>
           <Animated.View style={[styles.zoomOverlay, { opacity: zoom }]}>
             <Pressable style={styles.zoomBackdrop} onPress={closeZoom} />
-            <View style={[styles.zoomCard, isDesktop && styles.zoomCardDesktop]} accessibilityViewIsModal>
-              <Animated.View
-                style={[
-                  styles.zoomCircle,
-                  isDesktop && styles.zoomCircleDesktop,
-                  { transform: [{ scale: zoomScale }, { rotate: zoomRotate }] },
-                ]}
-              >
-                <Image source={{ uri: zoomImage }} style={styles.zoomCircleImg} resizeMode="contain" />
-              </Animated.View>
-
-              <View style={[styles.zoomDetails, isDesktop && styles.zoomDetailsDesktop]}>
-                <ScrollView
-                  style={isDesktop ? styles.zoomScroll : undefined}
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={[styles.zoomScrollInner, isDesktop && { alignItems: "flex-start" }]}
+            <ScrollView
+              style={styles.zoomScrollOuter}
+              contentContainerStyle={styles.zoomScrollAll}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={[styles.zoomCard, isDesktop && styles.zoomCardDesktop]} accessibilityViewIsModal>
+                <Animated.View
+                  style={[
+                    styles.zoomCircle,
+                    isDesktop && styles.zoomCircleDesktop,
+                    { transform: [{ scale: zoomScale }, { rotate: zoomRotate }] },
+                  ]}
                 >
+                  <Image source={{ uri: zoomImage }} style={styles.zoomCircleImg} resizeMode="contain" />
+                </Animated.View>
+
+                <View style={[styles.zoomDetails, isDesktop && styles.zoomDetailsDesktop]}>
                   <Text style={styles.zoomName} numberOfLines={isDesktop ? 3 : 2}>
-                    {display.title || t("unknownName")}
+                    {display.title && display.title !== "null" && display.title !== "undefined"
+                      ? display.title
+                      : t("unknownName")}
                   </Text>
                   {display.subtitle !== "" && <Text style={styles.zoomBrand}>{display.subtitle}</Text>}
 
@@ -722,7 +876,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                       <Text style={[styles.zoomVerdict, { color: scoreColor(score) }]}>
                         {scoreVerdict(score)}
                       </Text>
-                      <Text style={styles.zoomScoreCap}>{t("mockScoreCap") || "scor / 100"}</Text>
+                      <Text style={styles.zoomScoreCap}>{t("mockScoreCap", { defaultValue: "scor / 100" })}</Text>
                     </View>
                   </View>
 
@@ -771,9 +925,9 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                       <Text style={styles.zoomWarnText}>{palm.text}</Text>
                     </View>
                   )}
-                </ScrollView>
+                </View>
               </View>
-            </View>
+            </ScrollView>
 
             <TouchableOpacity
               style={styles.zoomClose}
@@ -859,6 +1013,34 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 </Text>
               )}
               <Text style={styles.additiveModalDesc}>{additiveDesc}</Text>
+
+              {/* Surse științifice — evaluările publice pe care se bazează nivelurile de risc */}
+              <Text style={styles.additiveSourcesTitle}>{pickM("sciSources", lang)}</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL(
+                    "https://www.efsa.europa.eu/en/topics/topic/food-additives"
+                  ).catch(() => {})
+                }
+                accessibilityRole="link"
+              >
+                <Text style={styles.additiveSourceLink}>
+                  • EFSA — {pickM("efsaDesc", lang)} ↗
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL(
+                    "https://monographs.iarc.who.int/list-of-classifications"
+                  ).catch(() => {})
+                }
+                accessibilityRole="link"
+              >
+                <Text style={styles.additiveSourceLink}>
+                  • IARC — {pickM("iarcDesc", lang)} ↗
+                </Text>
+              </TouchableOpacity>
+
               <TouchableOpacity
                 style={styles.additiveModalClose}
                 onPress={() => setSelectedAdditive(null)}
@@ -900,20 +1082,6 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             <Text style={styles.navEmoji}>{colors.isDark ? "☀️" : "🌙"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              isNarrow ? styles.iconButton : styles.historyButton,
-              isWeb && glass,
-            ]}
-            onPress={() => router.push("/history")}
-            accessibilityRole="button"
-            accessibilityLabel={t("historyTitle")}
-          >
-            <Text style={styles.navEmoji}>📜</Text>
-            {!isNarrow && (
-              <Text style={styles.historyButtonText}>{t("historyTitle")}</Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
             style={[styles.flagButton, isWeb && glass]}
             onPress={() => setLangMenuOpen(true)}
             accessibilityRole="button"
@@ -933,6 +1101,8 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           styles.container,
           isWide && styles.containerWide,
           isDesktop && styles.containerDesktop,
+          // loc pentru bara de jos suprapusa, ca sa nu acopere finalul paginii
+          { paddingBottom: 118 },
         ]}
         keyboardShouldPersistTaps="handled"
       >
@@ -978,6 +1148,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           colorTop={searchTop}
           colorBottom={searchBottom}
         />
+
         </View>
 
         <View style={[styles.rightCol, isDesktop && styles.rightColDesktop]}>
@@ -1044,14 +1215,6 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               </View>
               <View style={{ gap: 8 }}>
                 <TouchableOpacity
-                  style={styles.favButton}
-                  onPress={onToggleFavorite}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("favorite")}
-                >
-                  <Text style={styles.favIcon}>{favorite ? "❤️" : "🤍"}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
                   style={[
                     styles.favButton,
                     basket.has(product.code ?? barcode) && styles.favButtonOn,
@@ -1105,6 +1268,14 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                     </Text>
                   </TouchableOpacity>
                 )}
+                <TouchableOpacity
+                  onPress={() => router.push("/methodology")}
+                  accessibilityRole="link"
+                >
+                  <Text style={styles.methodologyLink}>
+                    ℹ️ {pickM("title", lang)}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -1139,10 +1310,15 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                     </Text>
                   </View>
                   <View style={styles.baremBar}>
-                    <View style={[styles.baremSeg, { backgroundColor: "#038141" }]} />
-                    <View style={[styles.baremSeg, { backgroundColor: "#85BB2F" }]} />
-                    <View style={[styles.baremSeg, { backgroundColor: "#EE8100" }]} />
-                    <View style={[styles.baremSeg, { backgroundColor: "#E63E11" }]} />
+                    {(row.reverse
+                      ? ["#E63E11", "#EE8100", "#85BB2F", "#038141"]
+                      : ["#038141", "#85BB2F", "#EE8100", "#E63E11"]
+                    ).map((segColor, segIdx) => (
+                      <View
+                        key={segIdx}
+                        style={[styles.baremSeg, { backgroundColor: segColor }]}
+                      />
+                    ))}
                   </View>
                 </View>
               </View>
@@ -1173,6 +1349,20 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 🌐 {autoLabels.auto[lang] ?? autoLabels.auto.en}
               </Text>
             )}
+            {/* Completeaza/actualizeaza ingredientele direct de pe eticheta:
+                camera se deschide gata in modul foto, iar rezultatul se
+                toarna in ACEASTA pagina (nume + nutritie pastrate). */}
+            <TouchableOpacity
+              style={styles.ocrFillButton}
+              onPress={() => {
+                setOcrMode(true);
+                openScanner();
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t("readIngredients")}
+            >
+              <Text style={styles.ocrFillButtonText}>📷 {t("readIngredients")}</Text>
+            </TouchableOpacity>
 
             {palm && (
               <View style={styles.palmBox}>
@@ -1253,6 +1443,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                     params: {
                       category: advice.category,
                       name: display.title || t("unknownName"),
+                      score: String(score),
                     },
                   })
                 }
@@ -1269,6 +1460,20 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 <Text style={styles.adviceButtonArrow}>›</Text>
               </TouchableOpacity>
             )}
+
+            {/* Istoric — apare pe pagina produsului (scos din header, era prea plin) */}
+            <TouchableOpacity
+              style={styles.adviceButton}
+              onPress={() => router.push("/history")}
+              accessibilityRole="button"
+              accessibilityLabel={t("historyTitle")}
+            >
+              <Text style={styles.adviceButtonIcon}>📜</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.adviceButtonTitle}>{t("historyTitle")}</Text>
+              </View>
+              <Text style={styles.adviceButtonArrow}>›</Text>
+            </TouchableOpacity>
 
             {/* Alternative mai bune */}
             {(altLoading || alternatives.length > 0) && (
@@ -1380,6 +1585,20 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
          <AppFooter isDesktop={isDesktop} />
        </View>
       </ScrollView>
+
+      {/* Bara de jos, suprapusa peste aplicatie (pandantul headerului) —
+          gazduieste Istoricul, scos din header ca sa nu-l aglomereze. */}
+      <View style={[styles.bottomBar, isWeb && glass]}>
+        <TouchableOpacity
+          style={styles.bottomBarBtn}
+          onPress={() => router.push("/history")}
+          accessibilityRole="button"
+          accessibilityLabel={t("historyTitle")}
+        >
+          <Text style={styles.navEmoji}>📜</Text>
+          <Text style={styles.bottomBarTxt}>{t("historyTitle")}</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -1588,6 +1807,17 @@ const makeStyles = (c: ThemeColors) =>
     marginTop: 6,
   },
   retryButtonText: { color: "#FFF", fontSize: 15, fontWeight: "700" },
+  ocrFillButton: {
+    alignSelf: "flex-start",
+    backgroundColor: c.surface,
+    borderWidth: 1,
+    borderColor: c.border,
+    borderRadius: 12,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+    marginTop: 10,
+  },
+  ocrFillButtonText: { color: c.primary, fontSize: 13.5, fontWeight: "800" },
   // Gauge de scor
   scoreSection: {
     flexDirection: "row",
@@ -1616,6 +1846,7 @@ const makeStyles = (c: ThemeColors) =>
   scoreVerdictCol: { flex: 1, gap: 6 },
   scoreVerdict: { fontSize: 22, fontWeight: "800" },
   scoreWhy: { fontSize: 14, color: c.primary, fontWeight: "600" },
+  methodologyLink: { fontSize: 12.5, color: c.textFaint, fontWeight: "600", marginTop: 2 },
   breakdown: {
     backgroundColor: c.surfaceAlt,
     borderRadius: 12,
@@ -1647,6 +1878,33 @@ const makeStyles = (c: ThemeColors) =>
           borderBottomColor: c.border,
         }),
   },
+  bottomBar: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingTop: 10,
+    // Distanta generoasa fata de butoanele de navigare ale telefonului.
+    paddingBottom: isWeb ? 10 : 56,
+    backgroundColor: c.navbarBg,
+    borderTopWidth: 1,
+    borderTopColor: c.border,
+  },
+  bottomBarBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: c.surface,
+    borderWidth: 1,
+    borderColor: c.border,
+    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    ...(isWeb ? ({ boxShadow: "0 6px 14px rgba(20,48,31,0.10)" } as any) : { elevation: 2 }),
+  },
+  bottomBarTxt: { color: c.primary, fontSize: 14.5, fontWeight: "800" },
   historyButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -1852,6 +2110,21 @@ const makeStyles = (c: ThemeColors) =>
   additiveModalTitle: { fontSize: 18, fontWeight: "bold", color: c.text, flex: 1 },
   additiveModalLevel: { fontSize: 14, fontWeight: "700", marginBottom: 12 },
   additiveModalDesc: { fontSize: 15, color: c.textMuted, lineHeight: 22 },
+  additiveSourcesTitle: {
+    fontSize: 13,
+    fontWeight: "900",
+    color: c.text,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginTop: 10,
+  },
+  additiveSourceLink: {
+    fontSize: 13,
+    color: c.primary,
+    fontWeight: "600",
+    lineHeight: 19,
+    marginTop: 4,
+  },
   additiveModalClose: {
     backgroundColor: c.primary,
     borderRadius: 12,
@@ -1949,6 +2222,8 @@ const makeStyles = (c: ThemeColors) =>
   },
   zoomBackdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
     ...(isWeb ? ({ backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" } as any) : {}) },
+  zoomScrollOuter: { flex: 1, width: "100%" },
+  zoomScrollAll: { flexGrow: 1, justifyContent: "center", alignItems: "center", paddingVertical: 90 },
   zoomCard: { alignItems: "center", justifyContent: "center", gap: 22, paddingHorizontal: 24, width: "100%" },
   zoomCardDesktop: {
     flexDirection: "row",

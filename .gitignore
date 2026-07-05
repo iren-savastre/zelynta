@@ -31,7 +31,12 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
+!.env.example
+
+# date private locale (coduri, chei) — NU se urca niciodata pe git
+/private/
 
 # typescript
 *.tsbuildinfo

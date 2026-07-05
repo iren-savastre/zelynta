@@ -48,7 +48,7 @@
         { key: "company", value: "Irèn Savastre", updated_at: iso(10) },
         { key: "support_email", value: "suport@zelynta.com", updated_at: iso(10) },
         { key: "default_locale", value: "ro", updated_at: iso(10) },
-        { key: "social_facebook", value: "https://facebook.com/zelynta", updated_at: iso(10) },
+        { key: "social_facebook", value: "https://www.facebook.com/profile.php?id=100063203081052", updated_at: iso(10) },
         { key: "social_tiktok", value: "https://tiktok.com/@zelynta", updated_at: iso(10) },
         { key: "social_instagram", value: "https://instagram.com/zelynta", updated_at: iso(10) }
       ],

@@ -1,6 +1,79 @@
 import { additivesExtra } from "./additives.extra";
+import { additiveStories } from "./additives.stories";
 
 export const additivesInfo = {
+  e160b: {
+    level: "caution",
+    name: { ro: "Annatto (bixină/norbixină)", en: "Annatto (bixin/norbixin)", fr: "Rocou (annatto)", it: "Annatto (bissina/norbissina)", es: "Annatto (bija)" },
+    use: { ro: "colorant", en: "colorant", fr: "colorant", it: "colorante", es: "colorante" },
+    desc: {
+      ro: "Colorant natural portocaliu-roșcat din semințele arborelui achiote. Folosit pentru a colora brânzeturi (cheddar, cașcaval) și unt. Autorizat în UE. În general sigur, dar poate provoca reacții alergice sau intoleranță la persoanele sensibile. Prudență.",
+      en: "Natural orange-red colorant from the seeds of the achiote tree. Used to color cheeses (cheddar, kashkaval) and butter. Authorized in the EU. Generally safe, but may cause allergic reactions or intolerance in sensitive people. Caution.",
+      fr: "Colorant naturel orange-rouge issu des graines du rocouyer. Utilisé pour colorer les fromages (cheddar, kashkaval) et le beurre. Autorisé dans l'UE. Généralement sûr, mais peut provoquer des réactions allergiques ou une intolérance chez les personnes sensibles. Prudence.",
+      it: "Colorante naturale arancio-rosso dai semi dell'albero di achiote. Usato per colorare formaggi (cheddar, kashkaval) e burro. Autorizzato nell'UE. Generalmente sicuro, ma può causare reazioni allergiche o intolleranza nelle persone sensibili. Prudenza.",
+      es: "Colorante natural naranja-rojizo de las semillas del árbol de achiote. Usado para colorear quesos (cheddar, kashkaval) y mantequilla. Autorizado en la UE. Generalmente seguro, pero puede causar reacciones alérgicas o intolerancia en personas sensibles. Precaución.",
+    },
+  },
+  e504: {
+    level: "safe",
+    name: { ro: "Carbonat de magneziu", en: "Magnesium carbonate", fr: "Carbonate de magnésium", it: "Carbonato di magnesio", es: "Carbonato de magnesio" },
+    use: { ro: "antiaglomerant / reglator de aciditate", en: "anti-caking agent / acidity regulator", fr: "antiagglomérant / correcteur d'acidité", it: "antiagglomerante / regolatore di acidità", es: "antiaglomerante / regulador de acidez" },
+    desc: {
+      ro: "Sare minerală folosită ca antiaglomerant și reglator de aciditate. Autorizată în UE; EFSA nu impune o doză maximă strictă. Fără riscuri cunoscute la nivelurile uzuale.",
+      en: "Mineral salt used as an anti-caking agent and acidity regulator. Authorized in the EU; EFSA sets no strict maximum dose. No known risks at normal levels.",
+      fr: "Sel minéral utilisé comme antiagglomérant et correcteur d'acidité. Autorisé dans l'UE ; l'EFSA n'impose pas de dose maximale stricte. Aucun risque connu aux niveaux habituels.",
+      it: "Sale minerale usato come antiagglomerante e regolatore di acidità. Autorizzato nell'UE; l'EFSA non impone una dose massima rigorosa. Nessun rischio noto ai livelli normali.",
+      es: "Sal mineral usada como antiaglomerante y regulador de acidez. Autorizada en la UE; la EFSA no impone una dosis máxima estricta. Sin riesgos conocidos a niveles normales.",
+    },
+  },
+  e1105: {
+    level: "caution",
+    name: { ro: "Lizozim", en: "Lysozyme", fr: "Lysozyme", it: "Lisozima", es: "Lisozima" },
+    use: { ro: "conservant", en: "preservative", fr: "conservateur", it: "conservante", es: "conservante" },
+    desc: {
+      ro: "Enzimă extrasă din albușul de ou, folosită la brânzeturile tari și semitari (cașcaval, grana) pentru a împiedica umflarea târzie provocată de bacterii. Autorizată în UE și considerată sigură de EFSA. Atenție: provine din ou, deci este alergen pentru persoanele alergice la ou.",
+      en: "Enzyme extracted from egg white, used in hard and semi-hard cheeses (kashkaval, grana) to prevent late blowing caused by bacteria. Authorized in the EU and considered safe by EFSA. Note: derived from egg, so it is an allergen for people allergic to eggs.",
+      fr: "Enzyme extraite du blanc d'œuf, utilisée dans les fromages à pâte dure et semi-dure (kashkaval, grana) pour empêcher le gonflement tardif dû aux bactéries. Autorisée dans l'UE et jugée sûre par l'EFSA. Attention : issue de l'œuf, c'est un allergène pour les personnes allergiques à l'œuf.",
+      it: "Enzima estratto dall'albume d'uovo, usato nei formaggi a pasta dura e semidura (kashkaval, grana) per impedire il gonfiore tardivo causato dai batteri. Autorizzato nell'UE e considerato sicuro dall'EFSA. Attenzione: deriva dall'uovo, quindi è un allergene per chi è allergico alle uova.",
+      es: "Enzima extraída de la clara de huevo, usada en quesos duros y semiduros (kashkaval, grana) para evitar el hinchamiento tardío causado por bacterias. Autorizada en la UE y considerada segura por la EFSA. Atención: procede del huevo, por lo que es un alérgeno para las personas alérgicas al huevo.",
+    },
+  },
+  e341: {
+    level: "risk",
+    name: { ro: "Fosfați de calciu", en: "Calcium phosphates", fr: "Phosphates de calcium", it: "Fosfati di calcio", es: "Fosfatos de calcio" },
+    use: { ro: "emulsifiant / reglator de aciditate", en: "emulsifier / acidity regulator", fr: "émulsifiant / correcteur d'acidité", it: "emulsionante / regolatore di acidità", es: "emulsionante / regulador de acidez" },
+    desc: {
+      ro: "Sare de fosfat folosită ca emulsifiant și agent de textură în brânzeturi topite, mezeluri și băuturi. EFSA a stabilit în 2019 o doză zilnică admisă de grup pentru fosfați; aportul ridicat de fosfați adăugați este asociat cu riscuri cardiovasculare și renale. De evitat în exces.",
+      en: "Phosphate salt used as an emulsifier and texturing agent in processed cheese, cured meats and drinks. In 2019 EFSA set a group acceptable daily intake for phosphates; high intake of added phosphates is linked to cardiovascular and kidney risks. Best avoided in excess.",
+      fr: "Sel de phosphate utilisé comme émulsifiant et agent de texture dans les fromages fondus, charcuteries et boissons. En 2019, l'EFSA a fixé une dose journalière admissible de groupe pour les phosphates ; un apport élevé de phosphates ajoutés est lié à des risques cardiovasculaires et rénaux. À éviter en excès.",
+      it: "Sale di fosfato usato come emulsionante e agente di struttura in formaggi fusi, salumi e bevande. Nel 2019 l'EFSA ha fissato una dose giornaliera ammissibile di gruppo per i fosfati; un apporto elevato di fosfati aggiunti è associato a rischi cardiovascolari e renali. Da evitare in eccesso.",
+      es: "Sal de fosfato usada como emulsionante y agente de textura en quesos fundidos, embutidos y bebidas. En 2019 la EFSA fijó una dosis diaria admisible de grupo para los fosfatos; una ingesta elevada de fosfatos añadidos se asocia a riesgos cardiovasculares y renales. Evitar en exceso.",
+    },
+  },
+  e451: {
+    level: "risk",
+    name: { ro: "Trifosfați", en: "Triphosphates", fr: "Triphosphates", it: "Trifosfati", es: "Trifosfatos" },
+    use: { ro: "emulsifiant / agent de textură", en: "emulsifier / texturizer", fr: "émulsifiant / agent de texture", it: "emulsionante / agente di struttura", es: "emulsionante / agente de textura" },
+    desc: {
+      ro: "Sare de fosfat folosită ca emulsifiant și pentru textură în brânzeturi topite, mezeluri și pește procesat. EFSA a stabilit în 2019 o doză zilnică admisă de grup pentru fosfați; aportul ridicat de fosfați adăugați este asociat cu riscuri cardiovasculare și renale. De evitat în exces.",
+      en: "Phosphate salt used as an emulsifier and for texture in processed cheese, cured meats and processed fish. In 2019 EFSA set a group acceptable daily intake for phosphates; high intake of added phosphates is linked to cardiovascular and kidney risks. Best avoided in excess.",
+      fr: "Sel de phosphate utilisé comme émulsifiant et pour la texture dans les fromages fondus, charcuteries et poissons transformés. En 2019, l'EFSA a fixé une dose journalière admissible de groupe pour les phosphates ; un apport élevé de phosphates ajoutés est lié à des risques cardiovasculaires et rénaux. À éviter en excès.",
+      it: "Sale di fosfato usato come emulsionante e per la struttura in formaggi fusi, salumi e pesce lavorato. Nel 2019 l'EFSA ha fissato una dose giornaliera ammissibile di gruppo per i fosfati; un apporto elevato di fosfati aggiunti è associato a rischi cardiovascolari e renali. Da evitare in eccesso.",
+      es: "Sal de fosfato usada como emulsionante y para la textura en quesos fundidos, embutidos y pescado procesado. En 2019 la EFSA fijó una dosis diaria admisible de grupo para los fosfatos; una ingesta elevada de fosfatos añadidos se asocia a riesgos cardiovasculares y renales. Evitar en exceso.",
+    },
+  },
+  e452: {
+    level: "risk",
+    name: { ro: "Polifosfați", en: "Polyphosphates", fr: "Polyphosphates", it: "Polifosfati", es: "Polifosfatos" },
+    use: { ro: "emulsifiant / agent de textură", en: "emulsifier / texturizer", fr: "émulsifiant / agent de texture", it: "emulsionante / agente di struttura", es: "emulsionante / agente de textura" },
+    desc: {
+      ro: "Sare de fosfat folosită frecvent ca emulsifiant la brânza topită și pentru reținerea apei în mezeluri și pește. EFSA a stabilit în 2019 o doză zilnică admisă de grup pentru fosfați; aportul ridicat de fosfați adăugați este asociat cu riscuri cardiovasculare și renale. De evitat în exces.",
+      en: "Phosphate salt commonly used as an emulsifier in processed cheese and for water retention in cured meats and fish. In 2019 EFSA set a group acceptable daily intake for phosphates; high intake of added phosphates is linked to cardiovascular and kidney risks. Best avoided in excess.",
+      fr: "Sel de phosphate souvent utilisé comme émulsifiant dans le fromage fondu et pour la rétention d'eau dans les charcuteries et poissons. En 2019, l'EFSA a fixé une dose journalière admissible de groupe pour les phosphates ; un apport élevé de phosphates ajoutés est lié à des risques cardiovasculaires et rénaux. À éviter en excès.",
+      it: "Sale di fosfato spesso usato come emulsionante nel formaggio fuso e per trattenere l'acqua in salumi e pesce. Nel 2019 l'EFSA ha fissato una dose giornaliera ammissibile di gruppo per i fosfati; un apporto elevato di fosfati aggiunti è associato a rischi cardiovascolari e renali. Da evitare in eccesso.",
+      es: "Sal de fosfato usada a menudo como emulsionante en el queso fundido y para retener agua en embutidos y pescado. En 2019 la EFSA fijó una dosis diaria admisible de grupo para los fosfatos; una ingesta elevada de fosfatos añadidos se asocia a riesgos cardiovasculares y renales. Evitar en exceso.",
+    },
+  },
   e100: {
     level: "safe",
     name: { ro: "Curcumină", en: "Curcumin", fr: "Curcumine", it: "Curcumina", es: "Curcumina" },
@@ -242,7 +315,7 @@ export const additivesInfo = {
     },
   },
   e200: {
-    level: "safe",
+    level: "caution",
     name: { ro: "Acid sorbic", en: "Sorbic acid", fr: "Acide sorbique", it: "Acido sorbico", es: "Ácido sórbico" },
     use: { ro: "conservant", en: "preservative", fr: "conservateur", it: "conservante", es: "conservante" },
     desc: {
@@ -254,7 +327,7 @@ export const additivesInfo = {
     },
   },
   e202: {
-    level: "safe",
+    level: "caution",
     name: { ro: "Sorbat de potasiu", en: "Potassium sorbate", fr: "Sorbate de potassium", it: "Sorbato di potassio", es: "Sorbato de potasio" },
     use: { ro: "conservant", en: "preservative", fr: "conservateur", it: "conservante", es: "conservante" },
     desc: {
@@ -448,6 +521,13 @@ export const additivesInfo = {
   e322: {
     level: "safe",
     name: { ro: "Lecitine", en: "Lecithins", fr: "Lécithines", it: "Lecitine", es: "Lecitinas" },
+    // Variante intalnite pe etichete (singular, alte limbi, "lecitina din soia").
+    alt: [
+      "lecitină", "lecitina", "lecithin", "lecithine", "lecithinen", "lecitinen",
+      "lécithine", "lecytyna", "lecytyny", "лецитин", "лецитины", "soy lecithin",
+      "lecitină din soia", "lecitina de soja", "lecitina di soia", "sojalecithine",
+      "sojalecithin", "lécithine de soja", "sunflower lecithin",
+    ],
     use: { ro: "emulsifiant", en: "emulsifier", fr: "émulsifiant", it: "emulsionante", es: "emulgente" },
     desc: {
       ro: "Emulsifiant natural (din soia sau floarea-soarelui). Autorizat în UE și considerat sigur de EFSA; permis mondial. Prezent natural în multe alimente. Dacă provine din soia, soia e alergen cu declarare obligatorie în UE.",
@@ -518,7 +598,7 @@ export const additivesInfo = {
     },
   },
   e339: {
-    level: "moderate",
+    level: "risk",
     name: { ro: "Fosfați de sodiu", en: "Sodium phosphates", fr: "Phosphates de sodium", it: "Fosfati di sodio", es: "Fosfatos de sodio" },
     use: { ro: "corector aciditate", en: "acidity regulator", fr: "correcteur d'acidité", it: "correttore di acidità", es: "regulador de acidez" },
     desc: {
@@ -530,7 +610,7 @@ export const additivesInfo = {
     },
   },
   e340: {
-    level: "moderate",
+    level: "risk",
     name: { ro: "Fosfați de potasiu", en: "Potassium phosphates", fr: "Phosphates de potassium", it: "Fosfati di potassio", es: "Fosfatos de potasio" },
     use: { ro: "corector aciditate", en: "acidity regulator", fr: "correcteur d'acidité", it: "correttore di acidità", es: "regulador de acidez" },
     desc: {
@@ -674,7 +754,7 @@ export const additivesInfo = {
     },
   },
   e450: {
-    level: "moderate",
+    level: "risk",
     name: { ro: "Difosfați", en: "Diphosphates", fr: "Diphosphates", it: "Difosfati", es: "Difosfatos" },
     use: { ro: "afânător", en: "raising agent", fr: "poudre à lever", it: "agente lievitante", es: "gasificante" },
     desc: {
@@ -736,6 +816,14 @@ export const additivesInfo = {
   e500: {
     level: "safe",
     name: { ro: "Bicarbonat de sodiu", en: "Sodium bicarbonate", fr: "Bicarbonate de sodium", it: "Bicarbonato di sodio", es: "Bicarbonato de sodio" },
+    // Variante intalnite pe etichete (plural, alte limbi, denumiri uzuale).
+    alt: [
+      "carbonat de sodiu", "carbonați de sodiu", "sodium carbonates", "sodium carbonate",
+      "natriumcarbonaat", "natriumcarbonaten", "natriumcarbonate", "natriumkarbonat",
+      "carbonates de sodium", "carbonate de sodium", "bicarbonate de soude",
+      "carbonati di sodio", "carbonato di sodio", "carbonatos de sodio", "carbonato de sodio",
+      "węglany sodu", "węglan sodu", "карбонат натрия", "карбонаты натрия", "baking soda",
+    ],
     use: { ro: "afânător", en: "raising agent", fr: "poudre à lever", it: "agente lievitante", es: "gasificante" },
     desc: {
       ro: "Bicarbonatul obișnuit, pentru creșterea aluatului. Autorizat în UE fără limită strictă și considerat sigur de EFSA; permis mondial.",
@@ -748,6 +836,13 @@ export const additivesInfo = {
   e503: {
     level: "safe",
     name: { ro: "Carbonat de amoniu", en: "Ammonium carbonate", fr: "Carbonate d'ammonium", it: "Carbonato di ammonio", es: "Carbonato de amonio" },
+    // Variante intalnite pe etichete (plural, alte limbi, denumiri uzuale).
+    alt: [
+      "carbonați de amoniu", "bicarbonat de amoniu", "ammonium carbonates", "ammonium bicarbonate",
+      "ammoniumcarbonaat", "ammoniumcarbonaten", "ammoniumcarbonate", "ammoniumkarbonat",
+      "hirschhornsalz", "carbonates d'ammonium", "carbonati di ammonio", "carbonatos de amonio",
+      "węglany amonu", "węglan amonu", "карбонат аммония", "карбонаты аммония", "amoniucarbonat",
+    ],
     use: { ro: "afânător", en: "raising agent", fr: "poudre à lever", it: "agente lievitante", es: "gasificante" },
     desc: {
       ro: "Afânător tradițional pentru biscuiți. Autorizat în UE și considerat sigur de EFSA; permis mondial.",
@@ -1007,4 +1102,10 @@ for (const code in additivesExtra) {
   Object.assign(base.name, extra.name);
   Object.assign(base.use, extra.use);
   Object.assign(base.desc, extra.desc);
+}
+
+// Suprascrie desc-ul cu descrierile "poveste" (risk/caution), in toate limbile.
+for (const code in additiveStories) {
+  const base = (additivesInfo as any)[code];
+  if (base) base.desc = additiveStories[code];
 }

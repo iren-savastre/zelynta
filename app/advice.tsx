@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import ThemeFx from "../components/ThemeFx";
 import { getAdviceByCategory } from "../utils/advice";
+import { adviceLabels } from "../i18n/advice";
 import { PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
 const isWeb = Platform.OS === "web";
@@ -25,10 +26,29 @@ export default function AdvicePage() {
   const { width } = useWindowDimensions();
   const isDesktop = isWeb && width >= 900;
   const styles = useMemo(() => makeStyles(colors), [colors]);
-  const params = useLocalSearchParams<{ category?: string; name?: string }>();
+  const params = useLocalSearchParams<{ category?: string; name?: string; score?: string }>();
   const paletteEmoji = (PALETTES.find((p) => p.id === palette) || PALETTES[0]).emoji;
 
   const advice = getAdviceByCategory(params.category ?? "generic", i18n.language);
+
+  // Recomandarea pentru copii tine cont de scor: produsele slabe (0/portocaliu)
+  // nu se recomanda copiilor. Fara scor (undefined) pastram comportamentul vechi.
+  const score = params.score != null ? parseInt(params.score, 10) : NaN;
+  const pickLbl = (f: Record<string, string>) => f[i18n.language] ?? f.en ?? f.ro ?? "";
+  let childKey = advice.labels.children;
+  let childText = advice.children;
+  let childKind: "good" | "moderate" | "bad" = "good";
+  if (!Number.isNaN(score)) {
+    if (score < 40) {
+      childKind = "bad";
+      childKey = pickLbl(adviceLabels.childrenWarn);
+      childText = pickLbl(adviceLabels.childrenBad);
+    } else if (score < 66) {
+      childKind = "moderate";
+      childKey = pickLbl(adviceLabels.childrenWarn);
+      childText = pickLbl(adviceLabels.childrenModerate);
+    }
+  }
 
   const rows: { icon: any; color: string; key: string; text: string }[] = [
     { icon: "leaf", color: "#34d399", key: advice.labels.benefits, text: advice.benefits },
@@ -88,15 +108,31 @@ export default function AdvicePage() {
           ))}
         </View>
 
-        {advice.children !== "" && (
+        {childText !== "" && (
           <View style={styles.childBox}>
             <View style={styles.childHead}>
-              <View style={styles.childIcon}>
-                <Ionicons name="happy" size={20} color="#fff" />
+              <View
+                style={[
+                  styles.childIcon,
+                  childKind === "bad" && { backgroundColor: "#E63E11" },
+                  childKind === "moderate" && { backgroundColor: "#EE8100" },
+                ]}
+              >
+                <Ionicons
+                  name={
+                    childKind === "bad"
+                      ? "alert-circle"
+                      : childKind === "moderate"
+                        ? "warning"
+                        : "happy"
+                  }
+                  size={20}
+                  color="#fff"
+                />
               </View>
-              <Text style={styles.childKey}>{advice.labels.children}</Text>
+              <Text style={styles.childKey}>{childKey}</Text>
             </View>
-            <Text style={styles.childText}>{advice.children}</Text>
+            <Text style={styles.childText}>{childText}</Text>
           </View>
         )}
 

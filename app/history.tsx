@@ -7,6 +7,7 @@ import {
   Alert,
   FlatList,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -81,9 +82,21 @@ export default function History() {
   ];
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.overlay}>
+      {/* Fundalul aplicatiei ramane vizibil; atingerea lui inchide panoul. */}
+      <Pressable
+        style={styles.backdrop}
+        onPress={() => {
+          if (router.canGoBack()) router.back();
+          else router.replace("/");
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={t("cancel")}
+      />
+      <View style={styles.screen}>
       <StatusBar style={colors.isDark ? "light" : "dark"} />
       <ThemeFx emoji={paletteEmoji} />
+      <View style={styles.grabber} />
 
       <View style={[styles.header, isDesktop && styles.headerDesktop]}>
         <TouchableOpacity
@@ -95,7 +108,7 @@ export default function History() {
           accessibilityRole="button"
           accessibilityLabel={t("cancel")}
         >
-          <Ionicons name="chevron-back" size={22} color={colors.primary} />
+          <Ionicons name="chevron-down" size={22} color={colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t("historyTitle")}</Text>
         <TouchableOpacity
@@ -175,6 +188,7 @@ export default function History() {
           )}
         />
       )}
+      </View>
     </View>
   );
 }
@@ -190,13 +204,31 @@ const reliefWeb = (c: ThemeColors): any =>
 
 const makeStyles = (c: ThemeColors) =>
   StyleSheet.create({
-    screen: { flex: 1, backgroundColor: c.bg },
+    // Panou glisant PESTE aplicatie: fundal intunecat + foaie rotunjita jos.
+    overlay: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(8,16,11,0.45)" },
+    backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
+    screen: {
+      height: "90%",
+      backgroundColor: c.bg,
+      borderTopLeftRadius: 26,
+      borderTopRightRadius: 26,
+      overflow: "hidden",
+      ...(isWeb ? ({ boxShadow: "0 -18px 48px rgba(0,0,0,0.35)" } as any) : { elevation: 20 }),
+    },
+    grabber: {
+      alignSelf: "center",
+      width: 44,
+      height: 5,
+      borderRadius: 3,
+      backgroundColor: c.border,
+      marginTop: 10,
+    },
     centered: { maxWidth: 760, alignSelf: "center", width: "100%" },
     header: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingTop: 50,
+      paddingTop: 10,
       paddingBottom: 14,
       paddingHorizontal: 16,
       backgroundColor: c.navbarBg,

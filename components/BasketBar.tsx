@@ -108,7 +108,7 @@ const makeStyles = (c: ThemeColors) =>
   StyleSheet.create({
     fab: {
       position: "absolute",
-      bottom: 24,
+      bottom: 122, // deasupra barei de jos cu Istoric
       right: 20,
       width: 60,
       height: 60,

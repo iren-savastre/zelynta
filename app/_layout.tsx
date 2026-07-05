@@ -22,7 +22,14 @@ function StackNav() {
         <Stack.Screen name="index" options={{ animation: "none" }} />
         <Stack.Screen
           name="history"
-          options={{ animation: "slide_from_bottom", animationDuration: 320 }}
+          options={{
+            // Istoricul se aseaza PESTE aplicatie (panou glisant de jos),
+            // nu ca pagina separata — ecranul din spate ramane vizibil.
+            presentation: "transparentModal",
+            animation: "slide_from_bottom",
+            animationDuration: 320,
+            contentStyle: { backgroundColor: "transparent" },
+          }}
         />
         <Stack.Screen
           name="compare"
