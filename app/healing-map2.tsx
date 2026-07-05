@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 import ThemeFx from "../components/ThemeFx";
-import { MAP2_TEXT } from "../utils/healingTranscript";
+import { HEALING_CONDITIONS, type Condition } from "../utils/healingConditions";
 import { translateText } from "../utils/translate";
 import { PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
@@ -136,28 +136,20 @@ const G: Record<string, L9> = {
     pl: "Serce strony: dziesiątki dolegliwości (nadciśnienie, rak, cukrzyca, lęk, bezsenność…), każda z trzema perspektywami — możliwe przyczyny, podejście farmaceutyczne („Pharma”) i podejście holistyczne („Holistic”). Pełny tekst, przetłumaczony automatycznie, jest poniżej: znajdź dolegliwość i skopiuj dowolny termin, aby samodzielnie go zbadać.",
     nl: "Het hart van de pagina: tientallen kwalen (hypertensie, kanker, diabetes, angst, slapeloosheid…), elk met drie invalshoeken — mogelijke oorzaken, de farmaceutische aanpak (“Pharma”) en de holistische aanpak (“Holistic”). De volledige, automatisch vertaalde tekst staat hieronder: zoek de kwaal en kopieer elke term om zelf onderzoek te doen.",
   },
-  fullTitle: {
-    ro: "Textul complet al paginii",
-    en: "The full text of the page",
-    fr: "Le texte complet de la page",
-    it: "Il testo completo della pagina",
-    es: "El texto completo de la página",
-    de: "Der vollständige Text der Seite",
-    ru: "Полный текст страницы",
-    pl: "Pełny tekst strony",
-    nl: "De volledige tekst van de pagina",
+  indexTitle: {
+    ro: "Index de afecțiuni — apasă pe fiecare pentru detalii",
+    en: "Index of conditions — tap each for details",
+    fr: "Index des affections — touchez chacune pour les détails",
+    it: "Indice delle condizioni — tocca ognuna per i dettagli",
+    es: "Índice de dolencias — toca cada una para ver detalles",
+    de: "Verzeichnis der Beschwerden — für Details antippen",
+    ru: "Указатель недугов — нажмите для подробностей",
+    pl: "Indeks dolegliwości — dotknij, aby zobaczyć szczegóły",
+    nl: "Index van kwalen — tik voor details",
   },
-  fullNote: {
-    ro: "Extras automat de pe hartă și tradus automat — pot exista mici greșeli. Ține apăsat pe un cuvânt ca să-l selectezi și să-l copiezi.",
-    en: "Auto-extracted from the map and auto-translated — small errors may exist. Long-press a word to select and copy it.",
-    fr: "Extrait automatiquement de la carte et traduit automatiquement — de petites erreurs sont possibles. Appui long sur un mot pour le sélectionner et le copier.",
-    it: "Estratto automaticamente dalla mappa e tradotto automaticamente — possono esserci piccoli errori. Tieni premuto su una parola per selezionarla e copiarla.",
-    es: "Extraído automáticamente del mapa y traducido automáticamente — puede haber pequeños errores. Mantén pulsada una palabra para seleccionarla y copiarla.",
-    de: "Automatisch von der Karte extrahiert und automatisch übersetzt — kleine Fehler sind möglich. Halte ein Wort gedrückt, um es zu markieren und zu kopieren.",
-    ru: "Автоматически извлечено с карты и автоматически переведено — возможны небольшие ошибки. Удерживайте слово, чтобы выделить и скопировать его.",
-    pl: "Automatycznie wyodrębnione z mapy i przetłumaczone automatycznie — możliwe drobne błędy. Przytrzymaj słowo, aby je zaznaczyć i skopiować.",
-    nl: "Automatisch van de kaart uitgelezen en automatisch vertaald — kleine fouten zijn mogelijk. Houd een woord lang ingedrukt om het te selecteren en te kopiëren.",
-  },
+  causes: { ro: "Cauze posibile", en: "Possible causes", fr: "Causes possibles", it: "Cause possibili", es: "Causas posibles", de: "Mögliche Ursachen", ru: "Возможные причины", pl: "Możliwe przyczyny", nl: "Mogelijke oorzaken" },
+  pharma: { ro: "Abordarea farmaceutică", en: "Pharmaceutical approach", fr: "Approche pharmaceutique", it: "Approccio farmaceutico", es: "Enfoque farmacéutico", de: "Pharmazeutischer Ansatz", ru: "Фармацевтический подход", pl: "Podejście farmaceutyczne", nl: "Farmaceutische aanpak" },
+  holistic: { ro: "Abordarea holistică", en: "Holistic approach", fr: "Approche holistique", it: "Approccio olistico", es: "Enfoque holístico", de: "Ganzheitlicher Ansatz", ru: "Холистический подход", pl: "Podejście holistyczne", nl: "Holistische aanpak" },
   translating: {
     ro: "⏳ Se traduce automat…",
     en: "⏳ Translating…",
@@ -172,6 +164,78 @@ const G: Record<string, L9> = {
 };
 const g = (key: string, lang: string) => G[key]?.[lang] ?? G[key]?.en ?? "";
 
+// Un card de afectiune: pliabil, cu traducere automata la prima deschidere.
+function ConditionCard({
+  cond,
+  lang,
+  styles,
+  colors,
+}: {
+  cond: Condition;
+  lang: string;
+  styles: any;
+  colors: ThemeColors;
+}) {
+  const [open, setOpen] = useState(false);
+  const [tr, setTr] = useState<Condition | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setTr(null); // limba s-a schimbat -> retradu la urmatoarea deschidere
+  }, [lang]);
+
+  useEffect(() => {
+    if (!open || tr !== null || lang === "en") return;
+    let alive = true;
+    setBusy(true);
+    Promise.all([
+      translateText(cond.name, "en", lang),
+      translateText(cond.causes, "en", lang),
+      translateText(cond.pharma, "en", lang),
+      translateText(cond.holistic, "en", lang),
+    ])
+      .then(([name, causes, pharma, holistic]) => {
+        if (alive) setTr({ key: cond.key, name, causes, pharma, holistic });
+      })
+      .finally(() => alive && setBusy(false));
+    return () => {
+      alive = false;
+    };
+  }, [open, tr, lang, cond]);
+
+  const shown = lang === "en" ? cond : tr ?? cond;
+
+  return (
+    <View style={styles.condCard}>
+      <TouchableOpacity
+        style={styles.condHead}
+        onPress={() => setOpen((v) => !v)}
+        accessibilityRole="button"
+      >
+        <Text style={styles.condName}>{shown.name}</Text>
+        <Ionicons
+          name={open ? "chevron-up" : "chevron-down"}
+          size={18}
+          color={colors.primary}
+        />
+      </TouchableOpacity>
+      {open && (
+        <View style={styles.condBody}>
+          {busy && tr === null && lang !== "en" && (
+            <Text style={styles.condTranslating}>{g("translating", lang)}</Text>
+          )}
+          <Text style={[styles.condLabel, { color: "#EE8100" }]}>{g("causes", lang)}</Text>
+          <Text selectable style={styles.condText}>{shown.causes}</Text>
+          <Text style={[styles.condLabel, { color: "#E63E11" }]}>{g("pharma", lang)}</Text>
+          <Text selectable style={styles.condText}>{shown.pharma}</Text>
+          <Text style={[styles.condLabel, { color: "#038141" }]}>{g("holistic", lang)}</Text>
+          <Text selectable style={styles.condText}>{shown.holistic}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 export default function HealingMap2() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -182,19 +246,6 @@ export default function HealingMap2() {
   const lang = i18n.language;
 
   const contentW = Math.min(width, 820) - 36;
-
-  // Traducerea automata a textului complet (o data per limba, cu cache).
-  const [txt, setTxt] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  useEffect(() => {
-    setTxt(null);
-    if (lang === "en") return;
-    setBusy(true);
-    translateText(MAP2_TEXT, "en", lang)
-      .then(setTxt)
-      .finally(() => setBusy(false));
-  }, [lang]);
-  const displayTxt = lang === "en" ? MAP2_TEXT : txt ?? MAP2_TEXT;
 
   const SECTIONS = [
     { n: "1", tKey: "s1t", dKey: "s1d", color: "#22c55e" },
@@ -243,16 +294,16 @@ export default function HealingMap2() {
           </View>
         ))}
 
-        <Text style={styles.fullTitle}>📖 {g("fullTitle", lang)}</Text>
-        <Text style={styles.fullNote}>{g("fullNote", lang)}</Text>
-        {busy && txt === null && lang !== "en" && (
-          <Text style={styles.fullNote}>{g("translating", lang)}</Text>
-        )}
-        <View style={styles.fullBox}>
-          <Text selectable style={styles.fullBody}>
-            {displayTxt}
-          </Text>
-        </View>
+        <Text style={styles.fullTitle}>🩺 {g("indexTitle", lang)}</Text>
+        {HEALING_CONDITIONS.map((cond) => (
+          <ConditionCard
+            key={cond.key}
+            cond={cond}
+            lang={lang}
+            styles={styles}
+            colors={colors}
+          />
+        ))}
       </ScrollView>
     </View>
   );
@@ -312,15 +363,40 @@ function makeStyles(c: ThemeColors) {
     numBadgeText: { color: "#fff", fontWeight: "900", fontSize: 14 },
     cardTitle: { flex: 1, fontSize: 15.5, fontWeight: "800", color: c.text },
     cardText: { fontSize: 13.5, lineHeight: 20, color: c.textMuted },
-    fullTitle: { fontSize: 18, fontWeight: "900", color: c.text, marginTop: 16, marginBottom: 6 },
-    fullNote: { fontSize: 12, fontStyle: "italic", color: c.textFaint, marginBottom: 8 },
-    fullBox: {
-      backgroundColor: c.surfaceAlt,
+    fullTitle: { fontSize: 18, fontWeight: "900", color: c.text, marginTop: 16, marginBottom: 10 },
+    // Card de afectiune (pliabil)
+    condCard: {
+      backgroundColor: c.surface,
       borderWidth: 1,
       borderColor: c.border,
       borderRadius: 14,
-      padding: 14,
+      marginBottom: 10,
+      overflow: "hidden",
     },
-    fullBody: { fontSize: 13.5, lineHeight: 21, color: c.textMuted },
+    condHead: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 14,
+      paddingHorizontal: 14,
+    },
+    condName: { flex: 1, fontSize: 14.5, fontWeight: "800", color: c.text, lineHeight: 20 },
+    condBody: {
+      paddingHorizontal: 14,
+      paddingBottom: 14,
+      borderTopWidth: 1,
+      borderTopColor: c.border,
+      paddingTop: 12,
+      gap: 4,
+    },
+    condTranslating: { fontSize: 12, fontStyle: "italic", color: c.textFaint, marginBottom: 6 },
+    condLabel: {
+      fontSize: 12,
+      fontWeight: "900",
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+      marginTop: 8,
+    },
+    condText: { fontSize: 13.5, lineHeight: 20, color: c.textMuted },
   });
 }
