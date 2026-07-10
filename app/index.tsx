@@ -39,6 +39,8 @@ import { saveToHistory } from "../utils/history";
 import { getPalmNote, hasPalmOil } from "../utils/palm";
 import { translateText } from "../utils/translate";
 import { pickM } from "../i18n/methodology";
+import BodyDiagram from "../components/BodyDiagram";
+import { organsForAdditive, organName } from "../utils/bodyMap";
 import { localizeInci } from "../utils/inci";
 import { extractAdditiveTags, extractIngredientsSegment, ocrImage } from "../utils/ocr";
 import { analyzeProduct, stripAdditives, productDisplay } from "../utils/score";
@@ -74,6 +76,19 @@ const levelColors: Record<string, string> = {
   moderate: "#FECB02",
   caution: "#EE8100",
   risk: "#E63E11",
+};
+
+// Titlul sectiunii cu silueta corpului (organe afectate), in 9 limbi.
+const bodyTitle: Record<string, string> = {
+  ro: "Ce poate afecta în corp",
+  en: "What it can affect in the body",
+  fr: "Ce qu'il peut affecter dans le corps",
+  it: "Cosa può colpire nel corpo",
+  es: "Qué puede afectar en el cuerpo",
+  de: "Was es im Körper beeinflussen kann",
+  ru: "На что может влиять в организме",
+  pl: "Na co może wpływać w organizmie",
+  nl: "Wat het in het lichaam kan beïnvloeden",
 };
 
 const isWeb = Platform.OS === "web";
@@ -972,6 +987,11 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             onPress={() => setSelectedAdditive(null)}
           >
             <Pressable style={styles.additiveModal} onPress={() => {}} accessibilityViewIsModal accessibilityRole="none">
+              <ScrollView
+                style={styles.additiveModalScroll}
+                contentContainerStyle={{ paddingBottom: 4 }}
+                showsVerticalScrollIndicator={false}
+              >
               <View style={styles.additiveModalHeader}>
                 <View
                   style={[
@@ -999,6 +1019,29 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 </Text>
               )}
               <Text style={styles.additiveModalDesc}>{additiveDesc}</Text>
+
+              {/* Silueta corpului: organele afectate se aprind si pulseaza */}
+              {(() => {
+                const organs = organsForAdditive(selectedAdditive.code);
+                if (!organs.length) return null;
+                const col = selectedAdditive.level
+                  ? levelColors[selectedAdditive.level]
+                  : "#EE8100";
+                return (
+                  <View style={styles.bodyBox}>
+                    <Text style={styles.bodyTitle}>{bodyTitle[lang] ?? bodyTitle.en}</Text>
+                    <BodyDiagram organs={organs} color={col} size={110} />
+                    <View style={styles.organChips}>
+                      {organs.map((oid) => (
+                        <View key={oid} style={[styles.organChip, { borderColor: col }]}>
+                          <View style={[styles.organDot, { backgroundColor: col }]} />
+                          <Text style={styles.organChipText}>{organName(oid, lang)}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                );
+              })()}
 
               {/* Surse științifice — evaluările publice pe care se bazează nivelurile de risc */}
               <Text style={styles.additiveSourcesTitle}>{pickM("sciSources", lang)}</Text>
@@ -1033,6 +1076,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               >
                 <Text style={styles.additiveModalCloseText}>{t("cancel")}</Text>
               </TouchableOpacity>
+              </ScrollView>
             </Pressable>
           </Pressable>
         </Modal>
@@ -1638,8 +1682,10 @@ const makeStyles = (c: ThemeColors) =>
     marginTop: 16,
     ...(isWeb ? { position: "sticky" as any, top: 16, zIndex: 50 } : {}),
   },
-  topBarActions: { flexDirection: "row", alignItems: "center", gap: 10 },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  // Butoanele de actiune (palete/dark/limba) au prioritate — nu se micsoreaza
+  // niciodata; numele „Zelynta" cedeaza spatiu daca ecranul e ingust.
+  topBarActions: { flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 0 },
+  brandRow: { flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 1, minWidth: 0 },
   brandLogo: { width: 38, height: 38 },
   brandName: { fontSize: 22, fontWeight: "800", color: c.primary, letterSpacing: 0.5 },
   scannerScreen: { flex: 1, backgroundColor: "#000" },
@@ -2068,7 +2114,46 @@ const makeStyles = (c: ThemeColors) =>
     padding: 24,
     width: "100%",
     maxWidth: 400,
+    maxHeight: "86%",
   },
+  additiveModalScroll: { width: "100%" },
+  bodyBox: {
+    marginTop: 14,
+    backgroundColor: c.surfaceAlt,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: c.border,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  bodyTitle: {
+    fontSize: 13,
+    fontWeight: "900",
+    color: c.text,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  organChips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 8,
+    paddingHorizontal: 10,
+  },
+  organChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: c.surface,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+  },
+  organDot: { width: 8, height: 8, borderRadius: 4 },
+  organChipText: { fontSize: 12.5, fontWeight: "700", color: c.text },
   additiveModalHeader: {
     flexDirection: "row",
     alignItems: "center",
