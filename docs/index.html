@@ -4945,7 +4945,7 @@
       // n=nume, c=culoare(risc), o=organe, d=descriere scurta (9 limbi; bg/el -> en)
       function D(ro,en,fr,it,es,de,ru,pl,nl){ return {ro:ro,en:en,fr:fr,it:it,es:es,de:de,ru:ru,pl:pl,nl:nl}; }
       var LIST=[
-        { code:"E338", n:"Acid fosforic", c:RED, o:["kidneys","bones","heart"],
+        { code:"E338", n:{ro:"Acid fosforic",en:"Phosphoric acid",fr:"Acide phosphorique",it:"Acido fosforico",es:"Ácido fosfórico",de:"Phosphorsäure",ru:"Фосфорная кислота",pl:"Kwas fosforowy",nl:"Fosforzuur"}, c:RED, o:["kidneys","bones","heart"],
           d:D("Acid din băuturi cola. Aportul mare de fosfați suprasolicită rinichii și scade densitatea osoasă.",
                "Acid in cola drinks. High phosphate intake strains the kidneys and lowers bone density.",
                "Acide des sodas cola. Un apport élevé sollicite les reins et réduit la densité osseuse.",
@@ -4955,7 +4955,7 @@
                "Кислота в кола-напитках. Высокое потребление нагружает почки и снижает плотность костей.",
                "Kwas w napojach typu cola. Wysokie spożycie obciąża nerki i obniża gęstość kości.",
                "Zuur in coladranken. Hoge inname belast de nieren en verlaagt de botdichtheid.") },
-        { code:"E339", n:"Fosfați de sodiu", c:RED, o:["kidneys","bones","heart"],
+        { code:"E339", n:{ro:"Fosfați de sodiu",en:"Sodium phosphates",fr:"Phosphates de sodium",it:"Fosfati di sodio",es:"Fosfatos de sodio",de:"Natriumphosphate",ru:"Фосфаты натрия",pl:"Fosforany sodu",nl:"Natriumfosfaten"}, c:RED, o:["kidneys","bones","heart"],
           d:D("Reglator de aciditate. Aport mare de fosfați: rinichi suprasolicitați, densitate osoasă scăzută, risc cardiovascular.",
                "Acidity regulator. High phosphate intake: strained kidneys, lower bone density, cardiovascular risk.",
                "Régulateur d'acidité. Apport élevé : reins sollicités, densité osseuse réduite, risque cardiovasculaire.",
@@ -4965,7 +4965,7 @@
                "Регулятор кислотности. Высокое потребление: нагрузка на почки, снижение плотности костей, риск для сердца.",
                "Regulator kwasowości. Wysokie spożycie: obciążone nerki, niższa gęstość kości, ryzyko sercowe.",
                "Zuurteregelaar. Hoge inname: belaste nieren, lagere botdichtheid, cardiovasculair risico.") },
-        { code:"E452", n:"Polifosfați", c:RED, o:["kidneys","bones","heart"],
+        { code:"E452", n:{ro:"Polifosfați",en:"Polyphosphates",fr:"Polyphosphates",it:"Polifosfati",es:"Polifosfatos",de:"Polyphosphate",ru:"Полифосфаты",pl:"Polifosforany",nl:"Polyfosfaten"}, c:RED, o:["kidneys","bones","heart"],
           d:D("Săruri de topire în brânzeturi topite. Adaugă la aportul de fosfați (rinichi, oase, inimă).",
                "Melting salts in processed cheese. Add to phosphate intake (kidneys, bones, heart).",
                "Sels de fonte des fromages fondus. S'ajoutent à l'apport en phosphates (reins, os, cœur).",
@@ -4975,7 +4975,7 @@
                "Соли-плавители в плавленом сыре. Добавляют фосфаты (почки, кости, сердце).",
                "Sole topniejące w serach topionych. Zwiększają spożycie fosforanów (nerki, kości, serce).",
                "Smeltzouten in smeltkaas. Verhogen de fosfaatinname (nieren, botten, hart).") },
-        { code:"E250", n:"Nitrit de sodiu", c:RED, o:["stomach","intestines","blood"],
+        { code:"E250", n:{ro:"Nitrit de sodiu",en:"Sodium nitrite",fr:"Nitrite de sodium",it:"Nitrito di sodio",es:"Nitrito de sodio",de:"Natriumnitrit",ru:"Нитрит натрия",pl:"Azotyn sodu",nl:"Natriumnitriet"}, c:RED, o:["stomach","intestines","blood"],
           d:D("Conservant în mezeluri. La căldură formează nitrozamine (cancer digestiv); în exces afectează oxigenul din sânge.",
                "Preservative in cured meats. With heat forms nitrosamines (digestive cancer); in excess affects blood oxygen.",
                "Conservateur des charcuteries. À la chaleur forme des nitrosamines (cancer digestif) ; en excès affecte l'oxygène du sang.",
@@ -4985,7 +4985,7 @@
                "Консервант в колбасах. При нагреве — нитрозамины (рак ЖКТ); в избытке влияет на кислород в крови.",
                "Konserwant w wędlinach. Pod wpływem ciepła nitrozoaminy (rak przewodu pokarmowego); w nadmiarze wpływa na tlen we krwi.",
                "Conserveermiddel in vleeswaren. Bij hitte nitrosaminen (spijsverteringskanker); in overmaat beïnvloedt bloedzuurstof.") },
-        { code:"E251", n:"Nitrat de sodiu", c:RED, o:["stomach","intestines","blood"],
+        { code:"E251", n:{ro:"Nitrat de sodiu",en:"Sodium nitrate",fr:"Nitrate de sodium",it:"Nitrato di sodio",es:"Nitrato de sodio",de:"Natriumnitrat",ru:"Нитрат натрия",pl:"Azotan sodu",nl:"Natriumnitraat"}, c:RED, o:["stomach","intestines","blood"],
           d:D("Conservant în mezeluri. Se transformă în nitriți; aceleași riscuri (nitrozamine, sânge).",
                "Preservative in cured meats. Converts to nitrites; same risks (nitrosamines, blood).",
                "Conservateur des charcuteries. Se transforme en nitrites ; mêmes risques (nitrosamines, sang).",
@@ -4995,7 +4995,7 @@
                "Консервант в колбасах. Превращается в нитриты; те же риски (нитрозамины, кровь).",
                "Konserwant w wędlinach. Przekształca się w azotyny; te same ryzyka (nitrozoaminy, krew).",
                "Conserveermiddel in vleeswaren. Wordt omgezet in nitrieten; zelfde risico's (nitrosaminen, bloed).") },
-        { code:"E102", n:"Tartrazină", c:ORANGE, o:["brain","skin"],
+        { code:"E102", n:{ro:"Tartrazină",en:"Tartrazine",fr:"Tartrazine",it:"Tartrazina",es:"Tartrazina",de:"Tartrazin",ru:"Тартразин",pl:"Tartrazyna",nl:"Tartrazine"}, c:ORANGE, o:["brain","skin"],
           d:D("Colorant galben azoic. Poate da alergii cutanate; în UE avertizează că poate afecta atenția la copii.",
                "Yellow azo dye. May cause skin allergies; in the EU it must warn it may affect attention in children.",
                "Colorant azoïque jaune. Peut causer des allergies cutanées ; dans l'UE, avertit qu'il peut affecter l'attention des enfants.",
@@ -5005,7 +5005,7 @@
                "Жёлтый азокраситель. Может вызывать кожные аллергии; в ЕС предупреждает о влиянии на внимание у детей.",
                "Żółty barwnik azowy. Może powodować alergie skórne; w UE ostrzega o wpływie na uwagę u dzieci.",
                "Gele azokleurstof. Kan huidallergieën geven; in de EU waarschuwing over aandacht bij kinderen.") },
-        { code:"E110", n:"Galben-portocaliu S", c:ORANGE, o:["brain","skin"],
+        { code:"E110", n:{ro:"Galben-portocaliu S",en:"Sunset Yellow",fr:"Jaune orangé S",it:"Giallo tramonto",es:"Amarillo ocaso",de:"Gelborange S",ru:"Жёлтый «солнечный закат»",pl:"Żółcień pomarańczowa",nl:"Zonnegeel FCF"}, c:ORANGE, o:["brain","skin"],
           d:D("Colorant azoic portocaliu. Aceleași avertismente: alergii cutanate și posibil efect asupra atenției copiilor.",
                "Orange azo dye. Same warnings: skin allergies and possible effect on children's attention.",
                "Colorant azoïque orange. Mêmes avertissements : allergies cutanées et effet possible sur l'attention des enfants.",
@@ -5015,7 +5015,7 @@
                "Оранжевый азокраситель. Те же предупреждения: кожные аллергии и возможное влияние на внимание детей.",
                "Pomarańczowy barwnik azowy. Te same ostrzeżenia: alergie skórne i możliwy wpływ na uwagę dzieci.",
                "Oranje azokleurstof. Zelfde waarschuwingen: huidallergieën en mogelijk effect op aandacht van kinderen.") },
-        { code:"E171", n:"Dioxid de titan", c:ORANGE, o:["intestines"],
+        { code:"E171", n:{ro:"Dioxid de titan",en:"Titanium dioxide",fr:"Dioxyde de titane",it:"Biossido di titanio",es:"Dióxido de titanio",de:"Titandioxid",ru:"Диоксид титана",pl:"Dwutlenek tytanu",nl:"Titaandioxide"}, c:ORANGE, o:["intestines"],
           d:D("Colorant alb. EFSA nu-l mai consideră sigur; interzis la alimente în UE din 2022 (posibil efect asupra intestinului/ADN).",
                "White colorant. EFSA no longer deems it safe; banned in EU food since 2022 (possible effect on gut/DNA).",
                "Colorant blanc. L'EFSA ne le juge plus sûr ; interdit dans l'alimentation UE depuis 2022 (effet possible intestin/ADN).",
@@ -5025,7 +5025,7 @@
                "Белый краситель. EFSA больше не считает безопасным; запрещён в продуктах ЕС с 2022 (возможное влияние на кишечник/ДНК).",
                "Biały barwnik. EFSA nie uznaje go już za bezpieczny; zakazany w żywności UE od 2022 (możliwy wpływ na jelita/DNA).",
                "Witte kleurstof. EFSA acht het niet meer veilig; sinds 2022 verboden in EU-voedsel (mogelijk effect op darm/DNA).") },
-        { code:"E220", n:"Dioxid de sulf", c:ORANGE, o:["lungs","stomach"],
+        { code:"E220", n:{ro:"Dioxid de sulf",en:"Sulphur dioxide",fr:"Dioxyde de soufre",it:"Anidride solforosa",es:"Dióxido de azufre",de:"Schwefeldioxid",ru:"Диоксид серы",pl:"Dwutlenek siarki",nl:"Zwaveldioxide"}, c:ORANGE, o:["lungs","stomach"],
           d:D("Conservant (vin, fructe uscate). Poate declanșa crize la astmatici și iritație gastrică.",
                "Preservative (wine, dried fruit). Can trigger asthma attacks and gastric irritation.",
                "Conservateur (vin, fruits secs). Peut déclencher des crises d'asthme et une irritation gastrique.",
@@ -5035,7 +5035,7 @@
                "Консервант (вино, сухофрукты). Может провоцировать приступы астмы и раздражение желудка.",
                "Konserwant (wino, suszone owoce). Może wywołać napady astmy i podrażnienie żołądka.",
                "Conserveermiddel (wijn, gedroogd fruit). Kan astma-aanvallen en maagirritatie veroorzaken.") },
-        { code:"E211", n:"Benzoat de sodiu", c:YELLOW, o:["skin","blood"],
+        { code:"E211", n:{ro:"Benzoat de sodiu",en:"Sodium benzoate",fr:"Benzoate de sodium",it:"Benzoato di sodio",es:"Benzoato de sodio",de:"Natriumbenzoat",ru:"Бензоат натрия",pl:"Benzoesan sodu",nl:"Natriumbenzoaat"}, c:YELLOW, o:["skin","blood"],
           d:D("Conservant în băuturi. Cu vitamina C poate forma benzen (cancerigen); poate da reacții cutanate.",
                "Preservative in drinks. With vitamin C can form benzene (carcinogen); may cause skin reactions.",
                "Conservateur des boissons. Avec la vitamine C peut former du benzène (cancérogène) ; réactions cutanées possibles.",
@@ -5045,7 +5045,7 @@
                "Консервант в напитках. С витамином C может образовать бензол (канцероген); возможны кожные реакции.",
                "Konserwant w napojach. Z witaminą C może tworzyć benzen (rakotwórczy); możliwe reakcje skórne.",
                "Conserveermiddel in dranken. Met vitamine C kan benzeen ontstaan (kankerverwekkend); huidreacties mogelijk.") },
-        { code:"E951", n:"Aspartam", c:YELLOW, o:["brain"],
+        { code:"E951", n:{ro:"Aspartam",en:"Aspartame",fr:"Aspartame",it:"Aspartame",es:"Aspartamo",de:"Aspartam",ru:"Аспартам",pl:"Aspartam",nl:"Aspartaam"}, c:YELLOW, o:["brain"],
           d:D("Îndulcitor. IARC l-a clasat „posibil cancerigen” (2023). De evitat de persoanele cu fenilcetonurie.",
                "Sweetener. IARC classified it \"possibly carcinogenic\" (2023). To avoid for people with PKU.",
                "Édulcorant. Le CIRC l'a classé « peut-être cancérogène » (2023). À éviter en cas de phénylcétonurie.",
@@ -5055,7 +5055,7 @@
                "Подсластитель. IARC отнёс к «возможно канцерогенным» (2023). Избегать при фенилкетонурии.",
                "Słodzik. IARC sklasyfikował jako „możliwie rakotwórczy” (2023). Unikać przy fenyloketonurii.",
                "Zoetstof. Door IARC geclassificeerd als \"mogelijk kankerverwekkend\" (2023). Vermijden bij PKU.") },
-        { code:"E621", n:"Glutamat monosodic (MSG)", c:YELLOW, o:["brain"],
+        { code:"E621", n:{ro:"Glutamat monosodic (MSG)",en:"Monosodium glutamate (MSG)",fr:"Glutamate monosodique (MSG)",it:"Glutammato monosodico (MSG)",es:"Glutamato monosódico (MSG)",de:"Mononatriumglutamat (MSG)",ru:"Глутамат натрия (MSG)",pl:"Glutaminian sodu (MSG)",nl:"Mononatriumglutamaat (MSG)"}, c:YELLOW, o:["brain"],
           d:D("Potențiator de aromă. La persoanele sensibile poate da dureri de cap și senzații de „sindrom al restaurantului chinezesc”.",
                "Flavor enhancer. In sensitive people it may cause headaches and \"Chinese restaurant syndrome\" sensations.",
                "Exhausteur de goût. Chez les personnes sensibles, peut provoquer maux de tête et « syndrome du restaurant chinois ».",
@@ -5088,7 +5088,7 @@
           var chips=item.o.map(function(id){ var nm=(ON[id]&&(ON[id][l]||ON[id].en))||id;
             return '<span class="body-chip" style="border-color:'+item.c+'"><span class="dot" style="background:'+item.c+'"></span>'+nm+'</span>'; }).join("");
           wrap.innerHTML='<div class="body-acc-head"><span class="body-acc-dot" style="background:'+item.c+'"></span>'+
-            '<span class="body-acc-code">'+item.code+'</span><span class="body-acc-name">'+item.n+'</span>'+
+            '<span class="body-acc-code">'+item.code+'</span><span class="body-acc-name">'+(item.n[l]||item.n.en)+'</span>'+
             '<svg class="body-acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>'+
             '<div class="body-acc-body" style="display:'+(i===openIdx?"block":"none")+'"><div class="body-chips">'+chips+'</div><p class="body-desc">'+(item.d[l]||item.d.en)+'</p></div>';
           wrap.querySelector(".body-acc-head").addEventListener("click",function(){ openIdx=(openIdx===i?-1:i); build(); if(openIdx>=0) highlight(LIST[openIdx]); });

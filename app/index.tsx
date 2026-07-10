@@ -1672,7 +1672,7 @@ const makeStyles = (c: ThemeColors) =>
   // niciodata; numele „Zelynta" cedeaza spatiu daca ecranul e ingust.
   topBarActions: { flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 0 },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 1, minWidth: 0 },
-  brandLogo: { width: 38, height: 38 },
+  brandLogo: { width: 38, height: 38, flexShrink: 0 },
   brandName: { fontSize: 22, fontWeight: "800", color: c.primary, letterSpacing: 0.5 },
   scannerScreen: { flex: 1, backgroundColor: "#000" },
   camera: { flex: 1 },
