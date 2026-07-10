@@ -1491,20 +1491,6 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               </TouchableOpacity>
             )}
 
-            {/* Istoric — apare pe pagina produsului (scos din header, era prea plin) */}
-            <TouchableOpacity
-              style={styles.adviceButton}
-              onPress={() => router.push("/history")}
-              accessibilityRole="button"
-              accessibilityLabel={t("historyTitle")}
-            >
-              <Text style={styles.adviceButtonIcon}>📜</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.adviceButtonTitle}>{t("historyTitle")}</Text>
-              </View>
-              <Text style={styles.adviceButtonArrow}>›</Text>
-            </TouchableOpacity>
-
             {/* Alternative mai bune */}
             {(altLoading || alternatives.length > 0) && (
               <>

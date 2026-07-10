@@ -225,12 +225,17 @@
     .body-side { flex:1 1 340px; max-width:460px; }
     .body-organ-glow { animation:bodyPulse 1.8s ease-in-out infinite; transform-origin:center; }
     @keyframes bodyPulse { 0%,100%{ opacity:.22; } 50%{ opacity:.72; } }
-    .body-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
-    .body-tab { border:1px solid var(--line); background:var(--surface); color:var(--muted); font-size:13px; font-weight:700; padding:7px 13px; border-radius:999px; cursor:pointer; transition:.15s; }
-    .body-tab:hover { border-color:var(--green); }
-    .body-tab.active { background:var(--green); color:#fff; border-color:var(--green); }
-    .body-add { font-size:19px; font-weight:800; color:var(--green-dark); margin-bottom:10px; }
-    .body-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+    .body-acc { display:flex; flex-direction:column; gap:8px; max-height:440px; overflow-y:auto; padding-right:4px; }
+    .body-acc-item { border:1px solid var(--line); border-radius:14px; background:var(--surface); overflow:hidden; }
+    .body-acc-item.open { border-color:var(--green); box-shadow:var(--shadow-sm); }
+    .body-acc-head { display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; user-select:none; }
+    .body-acc-dot { width:11px; height:11px; border-radius:50%; flex:0 0 auto; }
+    .body-acc-code { font-weight:800; color:var(--ink); font-size:14.5px; }
+    .body-acc-name { color:var(--muted); font-size:13px; flex:1; }
+    .body-acc-chev { color:var(--muted); transition:transform .2s; flex:0 0 auto; }
+    .body-acc-item.open .body-acc-chev { transform:rotate(180deg); }
+    .body-acc-body { padding:0 14px 14px; }
+    .body-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
     .body-chip { display:inline-flex; align-items:center; gap:7px; border:1px solid var(--leaf); background:var(--surface); font-size:13px; font-weight:700; color:var(--ink); padding:5px 12px; border-radius:999px; }
     .body-chip .dot { width:9px; height:9px; border-radius:50%; background:var(--leaf); }
     .body-desc { font-size:14.5px; line-height:1.6; color:var(--muted); }
@@ -1289,12 +1294,7 @@
           </svg>
         </div>
         <div class="body-side">
-          <div class="body-tabs" id="bodyTabs"></div>
-          <div class="body-info">
-            <div class="body-add" id="bodyAddName">E339 · Fosfați de sodiu</div>
-            <div class="body-chips" id="bodyChips"></div>
-            <p class="body-desc" id="bodyDesc"></p>
-          </div>
+          <div class="body-acc" id="bodyAcc"></div>
         </div>
       </div>
     </div>
@@ -4921,15 +4921,14 @@
     })();
   </script>
 
-  <!-- Showcase siluetă: organele afectate se aprind pentru fiecare aditiv -->
+  <!-- Showcase siluetă: acordeon de aditivi, organele afectate se aprind -->
   <script>
     (function(){
-      var svgG=document.getElementById("bodyOrgans"), tabs=document.getElementById("bodyTabs");
-      var elName=document.getElementById("bodyAddName"), elChips=document.getElementById("bodyChips"), elDesc=document.getElementById("bodyDesc");
-      if(!svgG||!tabs) return;
+      var svgG=document.getElementById("bodyOrgans"), acc=document.getElementById("bodyAcc");
+      if(!svgG||!acc) return;
       var NS="http://www.w3.org/2000/svg";
       var POS={ brain:[50,15,11], lungs:[50,55,15], heart:[44,56,9], stomach:[56,76,10],
-        kidneys:[50,88,13], intestines:[50,100,13], bones:[24,150,9], skin:[76,95,8], blood:[30,66,7] };
+        kidneys:[50,88,13], intestines:[50,100,13], bladder:[50,114,7], bones:[24,150,9], skin:[76,95,8], blood:[30,66,7] };
       var ON={
         brain:{ro:"Creier",en:"Brain",fr:"Cerveau",it:"Cervello",es:"Cerebro",de:"Gehirn",ru:"Мозг",pl:"Mózg",nl:"Hersenen"},
         heart:{ro:"Inimă",en:"Heart",fr:"Cœur",it:"Cuore",es:"Corazón",de:"Herz",ru:"Сердце",pl:"Serce",nl:"Hart"},
@@ -4937,92 +4936,168 @@
         stomach:{ro:"Stomac",en:"Stomach",fr:"Estomac",it:"Stomaco",es:"Estómago",de:"Magen",ru:"Желудок",pl:"Żołądek",nl:"Maag"},
         kidneys:{ro:"Rinichi",en:"Kidneys",fr:"Reins",it:"Reni",es:"Riñones",de:"Nieren",ru:"Почки",pl:"Nerki",nl:"Nieren"},
         intestines:{ro:"Intestine",en:"Intestines",fr:"Intestins",it:"Intestino",es:"Intestinos",de:"Darm",ru:"Кишечник",pl:"Jelita",nl:"Darmen"},
+        bladder:{ro:"Vezică",en:"Bladder",fr:"Vessie",it:"Vescica",es:"Vejiga",de:"Blase",ru:"Мочевой пузырь",pl:"Pęcherz",nl:"Blaas"},
         bones:{ro:"Oase",en:"Bones",fr:"Os",it:"Ossa",es:"Huesos",de:"Knochen",ru:"Кости",pl:"Kości",nl:"Botten"},
         skin:{ro:"Piele",en:"Skin",fr:"Peau",it:"Pelle",es:"Piel",de:"Haut",ru:"Кожа",pl:"Skóra",nl:"Huid"},
         blood:{ro:"Sânge",en:"Blood",fr:"Sang",it:"Sangue",es:"Sangre",de:"Blut",ru:"Кровь",pl:"Krew",nl:"Bloed"}
       };
-      var RED="#E63E11", ORANGE="#EE8100";
-      var DEMOS=[
-        { code:"E339", name:"E339 · Fosfați", color:RED, organs:["kidneys","bones","heart"],
-          d:{ro:"Fosfat folosit ca reglator de aciditate. Un aport ridicat suprasolicită rinichii și e legat de scăderea densității osoase și de risc cardiovascular.",
-             en:"A phosphate used as an acidity regulator. A high intake strains the kidneys and is linked to lower bone density and cardiovascular risk.",
-             fr:"Phosphate utilisé comme régulateur d'acidité. Un apport élevé sollicite les reins et est lié à une densité osseuse plus faible et à un risque cardiovasculaire.",
-             it:"Fosfato usato come regolatore di acidità. Un apporto elevato affatica i reni ed è legato a minor densità ossea e rischio cardiovascolare.",
-             es:"Fosfato usado como regulador de acidez. Un consumo alto sobrecarga los riñones y se asocia a menor densidad ósea y riesgo cardiovascular.",
-             de:"Phosphat als Säureregulator. Hohe Zufuhr belastet die Nieren und ist mit geringerer Knochendichte und Herz-Kreislauf-Risiko verbunden.",
-             ru:"Фосфат-регулятор кислотности. Высокое потребление нагружает почки и связано со снижением плотности костей и сердечно-сосудистым риском.",
-             pl:"Fosforan jako regulator kwasowości. Wysokie spożycie obciąża nerki i wiąże się z niższą gęstością kości oraz ryzykiem sercowo-naczyniowym.",
-             nl:"Fosfaat als zuurteregelaar. Hoge inname belast de nieren en hangt samen met lagere botdichtheid en cardiovasculair risico.",
-             bg:"Фосфат като регулатор на киселинността. Високият прием натоварва бъбреците и е свързан с по-ниска костна плътност и сърдечно-съдов риск.",
-             el:"Φωσφορικό ως ρυθμιστής οξύτητας. Η υψηλή πρόσληψη επιβαρύνει τα νεφρά και συνδέεται με χαμηλότερη οστική πυκνότητα και καρδιαγγειακό κίνδυνο."} },
-        { code:"E250", name:"E250 · Nitrit de sodiu", color:RED, organs:["stomach","intestines","blood"],
-          d:{ro:"Conservant în mezeluri. La căldură poate forma nitrozamine (legate de cancer digestiv) și în exces afectează transportul oxigenului în sânge.",
-             en:"A preservative in cured meats. With heat it can form nitrosamines (linked to digestive cancer) and in excess affects oxygen transport in the blood.",
-             fr:"Conservateur des charcuteries. À la chaleur, il peut former des nitrosamines (liées au cancer digestif) et, en excès, affecte le transport de l'oxygène dans le sang.",
-             it:"Conservante nei salumi. Con il calore può formare nitrosammine (legate al cancro digestivo) e in eccesso altera il trasporto dell'ossigeno nel sangue.",
-             es:"Conservante en embutidos. Con calor puede formar nitrosaminas (asociadas a cáncer digestivo) y en exceso afecta el transporte de oxígeno en la sangre.",
-             de:"Konservierungsmittel in Pökelwaren. Unter Hitze können Nitrosamine entstehen (mit Verdauungskrebs verknüpft); im Übermaß beeinträchtigt es den Sauerstofftransport im Blut.",
-             ru:"Консервант в колбасах. При нагреве образует нитрозамины (связаны с раком ЖКТ), а в избытке нарушает перенос кислорода кровью.",
-             pl:"Konserwant w wędlinach. Pod wpływem ciepła tworzy nitrozoaminy (związane z rakiem układu pokarmowego), a w nadmiarze zaburza transport tlenu we krwi.",
-             nl:"Conserveermiddel in vleeswaren. Bij hitte kan het nitrosaminen vormen (gelinkt aan spijsverteringskanker) en in overmaat verstoort het het zuurstoftransport in het bloed.",
-             bg:"Консервант в колбаси. При нагряване образува нитрозамини (свързани с рак на храносмилането), а в излишък нарушава преноса на кислород в кръвта.",
-             el:"Συντηρητικό σε αλλαντικά. Με τη θερμότητα σχηματίζει νιτροζαμίνες (συνδέονται με πεπτικό καρκίνο) και σε περίσσεια επηρεάζει τη μεταφορά οξυγόνου στο αίμα."} },
-        { code:"E102", name:"E102 · Tartrazină", color:ORANGE, organs:["brain","skin"],
-          d:{ro:"Colorant galben azoic. Poate declanșa reacții alergice pe piele, iar în UE produsele care îl conțin trebuie să avertizeze că poate afecta atenția la copii.",
-             en:"A yellow azo dye. It can trigger skin allergies, and in the EU products with it must warn it may affect attention in children.",
-             fr:"Colorant azoïque jaune. Il peut déclencher des allergies cutanées ; dans l'UE, les produits qui en contiennent doivent avertir qu'il peut affecter l'attention des enfants.",
-             it:"Colorante azoico giallo. Può scatenare allergie cutanee e nell'UE i prodotti che lo contengono devono avvertire che può influire sull'attenzione dei bambini.",
-             es:"Colorante azoico amarillo. Puede provocar alergias en la piel y en la UE los productos que lo llevan deben advertir que puede afectar la atención en niños.",
-             de:"Gelber Azofarbstoff. Kann Hautallergien auslösen; in der EU müssen Produkte damit warnen, dass er die Aufmerksamkeit von Kindern beeinträchtigen kann.",
-             ru:"Жёлтый азокраситель. Может вызывать кожные аллергии; в ЕС продукты с ним обязаны предупреждать о возможном влиянии на внимание у детей.",
-             pl:"Żółty barwnik azowy. Może wywołać alergie skórne; w UE produkty z nim muszą ostrzegać, że może wpływać na uwagę u dzieci.",
-             nl:"Gele azokleurstof. Kan huidallergieën veroorzaken; in de EU moeten producten ermee waarschuwen dat het de aandacht bij kinderen kan beïnvloeden.",
-             bg:"Жълт азо-оцветител. Може да предизвика кожни алергии; в ЕС продуктите с него трябва да предупреждават, че може да повлияе на вниманието при деца.",
-             el:"Κίτρινη αζωχρωστική. Μπορεί να προκαλέσει δερματικές αλλεργίες· στην ΕΕ τα προϊόντα με αυτήν πρέπει να προειδοποιούν ότι μπορεί να επηρεάσει την προσοχή στα παιδιά."} },
-        { code:"E220", name:"E220 · Dioxid de sulf", color:ORANGE, organs:["lungs","stomach"],
-          d:{ro:"Conservant și antioxidant (vin, fructe uscate). Poate declanșa crize la astmatici și iritație gastrică la persoanele sensibile.",
-             en:"A preservative and antioxidant (wine, dried fruit). It can trigger attacks in asthmatics and gastric irritation in sensitive people.",
-             fr:"Conservateur et antioxydant (vin, fruits secs). Il peut déclencher des crises chez les asthmatiques et une irritation gastrique chez les personnes sensibles.",
-             it:"Conservante e antiossidante (vino, frutta secca). Può scatenare crisi negli asmatici e irritazione gastrica nelle persone sensibili.",
-             es:"Conservante y antioxidante (vino, fruta seca). Puede desencadenar crisis en asmáticos e irritación gástrica en personas sensibles.",
-             de:"Konservierungs- und Antioxidationsmittel (Wein, Trockenobst). Kann bei Asthmatikern Anfälle und bei empfindlichen Personen Magenreizungen auslösen.",
-             ru:"Консервант и антиоксидант (вино, сухофрукты). Может провоцировать приступы у астматиков и раздражение желудка у чувствительных людей.",
-             pl:"Konserwant i przeciwutleniacz (wino, suszone owoce). Może wywołać napady u astmatyków i podrażnienie żołądka u osób wrażliwych.",
-             nl:"Conserveermiddel en antioxidant (wijn, gedroogd fruit). Kan aanvallen bij astmapatiënten en maagirritatie bij gevoelige personen veroorzaken.",
-             bg:"Консервант и антиоксидант (вино, сушени плодове). Може да предизвика пристъпи при астматици и стомашно раздразнение при чувствителни хора.",
-             el:"Συντηρητικό και αντιοξειδωτικό (κρασί, αποξηραμένα φρούτα). Μπορεί να προκαλέσει κρίσεις σε ασθματικούς και γαστρικό ερεθισμό σε ευαίσθητα άτομα."} }
+      var RED="#E63E11", ORANGE="#EE8100", YELLOW="#EAB308";
+      // n=nume, c=culoare(risc), o=organe, d=descriere scurta (9 limbi; bg/el -> en)
+      function D(ro,en,fr,it,es,de,ru,pl,nl){ return {ro:ro,en:en,fr:fr,it:it,es:es,de:de,ru:ru,pl:pl,nl:nl}; }
+      var LIST=[
+        { code:"E338", n:"Acid fosforic", c:RED, o:["kidneys","bones","heart"],
+          d:D("Acid din băuturi cola. Aportul mare de fosfați suprasolicită rinichii și scade densitatea osoasă.",
+               "Acid in cola drinks. High phosphate intake strains the kidneys and lowers bone density.",
+               "Acide des sodas cola. Un apport élevé sollicite les reins et réduit la densité osseuse.",
+               "Acido nelle bibite cola. Un apporto elevato affatica i reni e riduce la densità ossea.",
+               "Ácido en refrescos de cola. Un consumo alto sobrecarga los riñones y reduce la densidad ósea.",
+               "Säure in Cola-Getränken. Hohe Zufuhr belastet die Nieren und senkt die Knochendichte.",
+               "Кислота в кола-напитках. Высокое потребление нагружает почки и снижает плотность костей.",
+               "Kwas w napojach typu cola. Wysokie spożycie obciąża nerki i obniża gęstość kości.",
+               "Zuur in coladranken. Hoge inname belast de nieren en verlaagt de botdichtheid.") },
+        { code:"E339", n:"Fosfați de sodiu", c:RED, o:["kidneys","bones","heart"],
+          d:D("Reglator de aciditate. Aport mare de fosfați: rinichi suprasolicitați, densitate osoasă scăzută, risc cardiovascular.",
+               "Acidity regulator. High phosphate intake: strained kidneys, lower bone density, cardiovascular risk.",
+               "Régulateur d'acidité. Apport élevé : reins sollicités, densité osseuse réduite, risque cardiovasculaire.",
+               "Regolatore di acidità. Apporto elevato: reni affaticati, densità ossea ridotta, rischio cardiovascolare.",
+               "Regulador de acidez. Consumo alto: riñones sobrecargados, menor densidad ósea, riesgo cardiovascular.",
+               "Säureregulator. Hohe Zufuhr: belastete Nieren, geringere Knochendichte, Herz-Kreislauf-Risiko.",
+               "Регулятор кислотности. Высокое потребление: нагрузка на почки, снижение плотности костей, риск для сердца.",
+               "Regulator kwasowości. Wysokie spożycie: obciążone nerki, niższa gęstość kości, ryzyko sercowe.",
+               "Zuurteregelaar. Hoge inname: belaste nieren, lagere botdichtheid, cardiovasculair risico.") },
+        { code:"E452", n:"Polifosfați", c:RED, o:["kidneys","bones","heart"],
+          d:D("Săruri de topire în brânzeturi topite. Adaugă la aportul de fosfați (rinichi, oase, inimă).",
+               "Melting salts in processed cheese. Add to phosphate intake (kidneys, bones, heart).",
+               "Sels de fonte des fromages fondus. S'ajoutent à l'apport en phosphates (reins, os, cœur).",
+               "Sali di fusione nei formaggi fusi. Aumentano l'apporto di fosfati (reni, ossa, cuore).",
+               "Sales de fundido en quesos fundidos. Suman al aporte de fosfatos (riñones, huesos, corazón).",
+               "Schmelzsalze in Schmelzkäse. Erhöhen die Phosphatzufuhr (Nieren, Knochen, Herz).",
+               "Соли-плавители в плавленом сыре. Добавляют фосфаты (почки, кости, сердце).",
+               "Sole topniejące w serach topionych. Zwiększają spożycie fosforanów (nerki, kości, serce).",
+               "Smeltzouten in smeltkaas. Verhogen de fosfaatinname (nieren, botten, hart).") },
+        { code:"E250", n:"Nitrit de sodiu", c:RED, o:["stomach","intestines","blood"],
+          d:D("Conservant în mezeluri. La căldură formează nitrozamine (cancer digestiv); în exces afectează oxigenul din sânge.",
+               "Preservative in cured meats. With heat forms nitrosamines (digestive cancer); in excess affects blood oxygen.",
+               "Conservateur des charcuteries. À la chaleur forme des nitrosamines (cancer digestif) ; en excès affecte l'oxygène du sang.",
+               "Conservante nei salumi. Col calore forma nitrosammine (cancro digestivo); in eccesso altera l'ossigeno nel sangue.",
+               "Conservante en embutidos. Con calor forma nitrosaminas (cáncer digestivo); en exceso afecta el oxígeno en sangre.",
+               "Konservierungsmittel in Pökelwaren. Bei Hitze Nitrosamine (Verdauungskrebs); im Übermaß Blutsauerstoff betroffen.",
+               "Консервант в колбасах. При нагреве — нитрозамины (рак ЖКТ); в избытке влияет на кислород в крови.",
+               "Konserwant w wędlinach. Pod wpływem ciepła nitrozoaminy (rak przewodu pokarmowego); w nadmiarze wpływa na tlen we krwi.",
+               "Conserveermiddel in vleeswaren. Bij hitte nitrosaminen (spijsverteringskanker); in overmaat beïnvloedt bloedzuurstof.") },
+        { code:"E251", n:"Nitrat de sodiu", c:RED, o:["stomach","intestines","blood"],
+          d:D("Conservant în mezeluri. Se transformă în nitriți; aceleași riscuri (nitrozamine, sânge).",
+               "Preservative in cured meats. Converts to nitrites; same risks (nitrosamines, blood).",
+               "Conservateur des charcuteries. Se transforme en nitrites ; mêmes risques (nitrosamines, sang).",
+               "Conservante nei salumi. Si trasforma in nitriti; stessi rischi (nitrosammine, sangue).",
+               "Conservante en embutidos. Se convierte en nitritos; mismos riesgos (nitrosaminas, sangre).",
+               "Konservierungsmittel in Pökelwaren. Wird zu Nitriten; gleiche Risiken (Nitrosamine, Blut).",
+               "Консервант в колбасах. Превращается в нитриты; те же риски (нитрозамины, кровь).",
+               "Konserwant w wędlinach. Przekształca się w azotyny; te same ryzyka (nitrozoaminy, krew).",
+               "Conserveermiddel in vleeswaren. Wordt omgezet in nitrieten; zelfde risico's (nitrosaminen, bloed).") },
+        { code:"E102", n:"Tartrazină", c:ORANGE, o:["brain","skin"],
+          d:D("Colorant galben azoic. Poate da alergii cutanate; în UE avertizează că poate afecta atenția la copii.",
+               "Yellow azo dye. May cause skin allergies; in the EU it must warn it may affect attention in children.",
+               "Colorant azoïque jaune. Peut causer des allergies cutanées ; dans l'UE, avertit qu'il peut affecter l'attention des enfants.",
+               "Colorante azoico giallo. Può causare allergie cutanee; nell'UE avverte che può influire sull'attenzione dei bambini.",
+               "Colorante azoico amarillo. Puede causar alergias cutáneas; en la UE advierte que puede afectar la atención en niños.",
+               "Gelber Azofarbstoff. Kann Hautallergien auslösen; in der EU Warnhinweis zur Aufmerksamkeit bei Kindern.",
+               "Жёлтый азокраситель. Может вызывать кожные аллергии; в ЕС предупреждает о влиянии на внимание у детей.",
+               "Żółty barwnik azowy. Może powodować alergie skórne; w UE ostrzega o wpływie na uwagę u dzieci.",
+               "Gele azokleurstof. Kan huidallergieën geven; in de EU waarschuwing over aandacht bij kinderen.") },
+        { code:"E110", n:"Galben-portocaliu S", c:ORANGE, o:["brain","skin"],
+          d:D("Colorant azoic portocaliu. Aceleași avertismente: alergii cutanate și posibil efect asupra atenției copiilor.",
+               "Orange azo dye. Same warnings: skin allergies and possible effect on children's attention.",
+               "Colorant azoïque orange. Mêmes avertissements : allergies cutanées et effet possible sur l'attention des enfants.",
+               "Colorante azoico arancione. Stessi avvisi: allergie cutanee e possibile effetto sull'attenzione dei bambini.",
+               "Colorante azoico naranja. Mismas advertencias: alergias cutáneas y posible efecto en la atención infantil.",
+               "Oranger Azofarbstoff. Gleiche Hinweise: Hautallergien und mögliche Wirkung auf die Aufmerksamkeit von Kindern.",
+               "Оранжевый азокраситель. Те же предупреждения: кожные аллергии и возможное влияние на внимание детей.",
+               "Pomarańczowy barwnik azowy. Te same ostrzeżenia: alergie skórne i możliwy wpływ na uwagę dzieci.",
+               "Oranje azokleurstof. Zelfde waarschuwingen: huidallergieën en mogelijk effect op aandacht van kinderen.") },
+        { code:"E171", n:"Dioxid de titan", c:ORANGE, o:["intestines"],
+          d:D("Colorant alb. EFSA nu-l mai consideră sigur; interzis la alimente în UE din 2022 (posibil efect asupra intestinului/ADN).",
+               "White colorant. EFSA no longer deems it safe; banned in EU food since 2022 (possible effect on gut/DNA).",
+               "Colorant blanc. L'EFSA ne le juge plus sûr ; interdit dans l'alimentation UE depuis 2022 (effet possible intestin/ADN).",
+               "Colorante bianco. L'EFSA non lo ritiene più sicuro; vietato negli alimenti UE dal 2022 (possibile effetto su intestino/DNA).",
+               "Colorante blanco. La EFSA ya no lo considera seguro; prohibido en alimentos UE desde 2022 (posible efecto intestino/ADN).",
+               "Weißer Farbstoff. Von der EFSA nicht mehr als sicher eingestuft; seit 2022 in EU-Lebensmitteln verboten (möglicher Darm-/DNA-Effekt).",
+               "Белый краситель. EFSA больше не считает безопасным; запрещён в продуктах ЕС с 2022 (возможное влияние на кишечник/ДНК).",
+               "Biały barwnik. EFSA nie uznaje go już za bezpieczny; zakazany w żywności UE od 2022 (możliwy wpływ na jelita/DNA).",
+               "Witte kleurstof. EFSA acht het niet meer veilig; sinds 2022 verboden in EU-voedsel (mogelijk effect op darm/DNA).") },
+        { code:"E220", n:"Dioxid de sulf", c:ORANGE, o:["lungs","stomach"],
+          d:D("Conservant (vin, fructe uscate). Poate declanșa crize la astmatici și iritație gastrică.",
+               "Preservative (wine, dried fruit). Can trigger asthma attacks and gastric irritation.",
+               "Conservateur (vin, fruits secs). Peut déclencher des crises d'asthme et une irritation gastrique.",
+               "Conservante (vino, frutta secca). Può scatenare crisi asmatiche e irritazione gastrica.",
+               "Conservante (vino, fruta seca). Puede desencadenar crisis asmáticas e irritación gástrica.",
+               "Konservierungsmittel (Wein, Trockenobst). Kann Asthmaanfälle und Magenreizung auslösen.",
+               "Консервант (вино, сухофрукты). Может провоцировать приступы астмы и раздражение желудка.",
+               "Konserwant (wino, suszone owoce). Może wywołać napady astmy i podrażnienie żołądka.",
+               "Conserveermiddel (wijn, gedroogd fruit). Kan astma-aanvallen en maagirritatie veroorzaken.") },
+        { code:"E211", n:"Benzoat de sodiu", c:YELLOW, o:["skin","blood"],
+          d:D("Conservant în băuturi. Cu vitamina C poate forma benzen (cancerigen); poate da reacții cutanate.",
+               "Preservative in drinks. With vitamin C can form benzene (carcinogen); may cause skin reactions.",
+               "Conservateur des boissons. Avec la vitamine C peut former du benzène (cancérogène) ; réactions cutanées possibles.",
+               "Conservante nelle bevande. Con la vitamina C può formare benzene (cancerogeno); possibili reazioni cutanee.",
+               "Conservante en bebidas. Con vitamina C puede formar benceno (cancerígeno); posibles reacciones cutáneas.",
+               "Konservierungsmittel in Getränken. Mit Vitamin C kann Benzol entstehen (krebserregend); Hautreaktionen möglich.",
+               "Консервант в напитках. С витамином C может образовать бензол (канцероген); возможны кожные реакции.",
+               "Konserwant w napojach. Z witaminą C może tworzyć benzen (rakotwórczy); możliwe reakcje skórne.",
+               "Conserveermiddel in dranken. Met vitamine C kan benzeen ontstaan (kankerverwekkend); huidreacties mogelijk.") },
+        { code:"E951", n:"Aspartam", c:YELLOW, o:["brain"],
+          d:D("Îndulcitor. IARC l-a clasat „posibil cancerigen” (2023). De evitat de persoanele cu fenilcetonurie.",
+               "Sweetener. IARC classified it \"possibly carcinogenic\" (2023). To avoid for people with PKU.",
+               "Édulcorant. Le CIRC l'a classé « peut-être cancérogène » (2023). À éviter en cas de phénylcétonurie.",
+               "Dolcificante. Lo IARC l'ha classificato «possibile cancerogeno» (2023). Da evitare con fenilchetonuria.",
+               "Edulcorante. La IARC lo clasificó «posiblemente cancerígeno» (2023). Evitar con fenilcetonuria.",
+               "Süßstoff. Von der IARC als „möglicherweise krebserregend” eingestuft (2023). Bei PKU meiden.",
+               "Подсластитель. IARC отнёс к «возможно канцерогенным» (2023). Избегать при фенилкетонурии.",
+               "Słodzik. IARC sklasyfikował jako „możliwie rakotwórczy” (2023). Unikać przy fenyloketonurii.",
+               "Zoetstof. Door IARC geclassificeerd als \"mogelijk kankerverwekkend\" (2023). Vermijden bij PKU.") },
+        { code:"E621", n:"Glutamat monosodic (MSG)", c:YELLOW, o:["brain"],
+          d:D("Potențiator de aromă. La persoanele sensibile poate da dureri de cap și senzații de „sindrom al restaurantului chinezesc”.",
+               "Flavor enhancer. In sensitive people it may cause headaches and \"Chinese restaurant syndrome\" sensations.",
+               "Exhausteur de goût. Chez les personnes sensibles, peut provoquer maux de tête et « syndrome du restaurant chinois ».",
+               "Esaltatore di sapidità. Nelle persone sensibili può causare mal di testa e «sindrome da ristorante cinese».",
+               "Potenciador del sabor. En personas sensibles puede causar dolores de cabeza y «síndrome del restaurante chino».",
+               "Geschmacksverstärker. Bei empfindlichen Personen Kopfschmerzen und „China-Restaurant-Syndrom” möglich.",
+               "Усилитель вкуса. У чувствительных людей может вызывать головные боли и «синдром китайского ресторана».",
+               "Wzmacniacz smaku. U osób wrażliwych może powodować bóle głowy i „syndrom chińskiej restauracji”.",
+               "Smaakversterker. Bij gevoelige personen hoofdpijn en \"Chinees-restaurantsyndroom\" mogelijk.") }
       ];
-      var cur=0;
+      var openIdx=0;
       function lang(){ var l=document.documentElement.lang||"ro"; return ON.brain[l]?l:"en"; }
-      function render(){
-        var l=lang(), demo=DEMOS[cur];
+      function highlight(item){
         svgG.innerHTML="";
-        demo.organs.forEach(function(id){
+        item.o.forEach(function(id){
           var p=POS[id]; if(!p) return;
-          var glow=document.createElementNS(NS,"circle");
-          glow.setAttribute("cx",p[0]); glow.setAttribute("cy",p[1]); glow.setAttribute("r",p[2]);
-          glow.setAttribute("fill",demo.color); glow.setAttribute("class","body-organ-glow");
-          svgG.appendChild(glow);
-          var dot=document.createElementNS(NS,"circle");
-          dot.setAttribute("cx",p[0]); dot.setAttribute("cy",p[1]); dot.setAttribute("r","3.4");
-          dot.setAttribute("fill",demo.color); dot.setAttribute("stroke","#fff"); dot.setAttribute("stroke-width","0.8");
-          svgG.appendChild(dot);
+          var g=document.createElementNS(NS,"circle");
+          g.setAttribute("cx",p[0]); g.setAttribute("cy",p[1]); g.setAttribute("r",p[2]);
+          g.setAttribute("fill",item.c); g.setAttribute("class","body-organ-glow"); svgG.appendChild(g);
+          var d=document.createElementNS(NS,"circle");
+          d.setAttribute("cx",p[0]); d.setAttribute("cy",p[1]); d.setAttribute("r","3.4");
+          d.setAttribute("fill",item.c); d.setAttribute("stroke","#fff"); d.setAttribute("stroke-width","0.8"); svgG.appendChild(d);
         });
-        elName.textContent=demo.name; elName.style.color=demo.color;
-        elChips.innerHTML=demo.organs.map(function(id){
-          var nm=(ON[id]&&(ON[id][l]||ON[id].en))||id;
-          return '<span class="body-chip" style="border-color:'+demo.color+'"><span class="dot" style="background:'+demo.color+'"></span>'+nm+'</span>';
-        }).join("");
-        elDesc.textContent=demo.d[l]||demo.d.en;
-        Array.prototype.forEach.call(tabs.children,function(b,i){ b.classList.toggle("active",i===cur); });
       }
-      DEMOS.forEach(function(demo,i){
-        var b=document.createElement("button"); b.type="button"; b.className="body-tab"; b.textContent=demo.code;
-        b.addEventListener("click",function(){ cur=i; render(); });
-        tabs.appendChild(b);
-      });
-      render();
-      new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
+      function build(){
+        var l=lang();
+        acc.innerHTML="";
+        LIST.forEach(function(item,i){
+          var wrap=document.createElement("div"); wrap.className="body-acc-item"+(i===openIdx?" open":"");
+          var chips=item.o.map(function(id){ var nm=(ON[id]&&(ON[id][l]||ON[id].en))||id;
+            return '<span class="body-chip" style="border-color:'+item.c+'"><span class="dot" style="background:'+item.c+'"></span>'+nm+'</span>'; }).join("");
+          wrap.innerHTML='<div class="body-acc-head"><span class="body-acc-dot" style="background:'+item.c+'"></span>'+
+            '<span class="body-acc-code">'+item.code+'</span><span class="body-acc-name">'+item.n+'</span>'+
+            '<svg class="body-acc-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>'+
+            '<div class="body-acc-body" style="display:'+(i===openIdx?"block":"none")+'"><div class="body-chips">'+chips+'</div><p class="body-desc">'+(item.d[l]||item.d.en)+'</p></div>';
+          wrap.querySelector(".body-acc-head").addEventListener("click",function(){ openIdx=(openIdx===i?-1:i); build(); if(openIdx>=0) highlight(LIST[openIdx]); });
+          acc.appendChild(wrap);
+        });
+        highlight(LIST[openIdx>=0?openIdx:0]);
+      }
+      build();
+      new MutationObserver(build).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
     })();
   </script>
 </body>
