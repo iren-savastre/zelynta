@@ -23,7 +23,6 @@ import {
     useWindowDimensions,
     View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import JuicyButton from "../components/JuicyButton";
 import AppFooter from "../components/AppFooter";
 import NavMarquee from "../components/NavMarquee";
@@ -36,7 +35,6 @@ import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
 import { persistAppLanguage } from "../i18n/i18n";
 import { fetchProductByBarcode } from "../utils/apiClient";
 import { useBasket } from "../utils/basket";
-import { isFavorite, toggleFavorite } from "../utils/favorites";
 import { saveToHistory } from "../utils/history";
 import { getPalmNote, hasPalmOil } from "../utils/palm";
 import { translateText } from "../utils/translate";
@@ -169,7 +167,6 @@ export default function Index() {
   const { width } = useWindowDimensions();
   const isDesktop = isWeb && width >= 900;
   const isWide = isWeb && width >= 600; // tabletă+: aliniat sus (fără gol jos)
-  const isNarrow = width < 480; // telefon: navbar compact, fără text la Istoric
   const params = useLocalSearchParams<{ barcode?: string }>();
 
   // Roșia care țopăie 🍅 — bucla clasica: saritura + aterizare cu bounce.
@@ -249,7 +246,6 @@ export default function Index() {
   const [ocrMode, setOcrMode] = useState(false);
   const cameraRef = useRef<CameraView>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
-  const [favorite, setFavorite] = useState(false);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const [alternatives, setAlternatives] = useState<Alternative[]>([]);
   const [altLoading, setAltLoading] = useState(false);
@@ -592,9 +588,7 @@ useEffect(() => {
       score,
       scannedAt: Date.now(),
     });
-    // Starea de favorit
     setShowBreakdown(false);
-    isFavorite(product.code ?? barcode).then(setFavorite);
     // Caută alternative mai bune
     setAlternatives([]);
     setAltLoading(true);
@@ -614,14 +608,6 @@ useEffect(() => {
     };
   }
 
-  async function onToggleFavorite() {
-    if (!product) return;
-    const now = await toggleFavorite(currentHistoryItem());
-    setFavorite(now);
-    if (Platform.OS !== "web") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    }
-  }
  function buildNutrientBadges() {
     const rows: {
       label: string;
@@ -1905,23 +1891,6 @@ const makeStyles = (c: ThemeColors) =>
     ...(isWeb ? ({ boxShadow: "0 6px 14px rgba(20,48,31,0.10)" } as any) : { elevation: 2 }),
   },
   bottomBarTxt: { color: c.primary, fontSize: 14.5, fontWeight: "800" },
-  historyButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: c.surface,
-    borderRadius: 14,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: c.border,
-    ...(isWeb ? { boxShadow: "0 6px 14px rgba(20,48,31,0.12)" } : { elevation: 3 }),
-  },
-  historyButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: c.primary,
-  },
   flagButton: {
     backgroundColor: c.surface,
     borderRadius: 14,
