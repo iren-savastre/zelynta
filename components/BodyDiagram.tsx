@@ -1,11 +1,27 @@
 import { useEffect, useRef } from "react";
 import { Animated, View } from "react-native";
-import Svg, { Circle, G, Path, Defs, RadialGradient, Stop } from "react-native-svg";
+import Svg, {
+  Circle, G, Path, Defs, RadialGradient, LinearGradient, Stop,
+  Ellipse, Line, Polyline, Rect,
+} from "react-native-svg";
 import { ORGANS, type OrganId } from "../utils/bodyMap";
 
 const AC = Animated.createAnimatedComponent(Circle);
 
-// Silueta umana stilizata (viewBox 100 x 220) cu organele care se aprind.
+// --- ADN dublu-helix (precalculat) pe lateral, viewBox 100x220 ---
+const DNA_CX = 88, DNA_TOP = 40, DNA_BOT = 198, DNA_AMP = 7, DNA_K = (2 * Math.PI) / 42;
+const dnaA: string[] = [], dnaB: string[] = [], dnaRungs: { x1: number; x2: number; y: number; front: boolean }[] = [];
+for (let y = DNA_TOP; y <= DNA_BOT; y += 4) {
+  const p = DNA_K * (y - DNA_TOP);
+  dnaA.push(`${(DNA_CX + DNA_AMP * Math.sin(p)).toFixed(1)},${y}`);
+  dnaB.push(`${(DNA_CX - DNA_AMP * Math.sin(p)).toFixed(1)},${y}`);
+}
+for (let y = DNA_TOP; y <= DNA_BOT; y += 12) {
+  const p = DNA_K * (y - DNA_TOP);
+  dnaRungs.push({ x1: DNA_CX + DNA_AMP * Math.sin(p), x2: DNA_CX - DNA_AMP * Math.sin(p), y, front: Math.cos(p) > 0 });
+}
+
+// Corp uman holografic masculin (viewBox 100 x 220) cu organele care se aprind.
 // `organs` = lista de organe afectate; `color` = culoarea riscului (glow).
 export default function BodyDiagram({
   organs,
@@ -27,7 +43,7 @@ export default function BodyDiagram({
     loop.start();
     return () => loop.stop();
   }, [pulse]);
-  const glowOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.2, 0.75] });
+  const glowOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.25, 0.85] });
   const glowR = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] });
 
   const active = new Set(organs);
@@ -37,27 +53,56 @@ export default function BodyDiagram({
       <Svg width={size} height={size * 2.2} viewBox="0 0 100 220">
         <Defs>
           <RadialGradient id="glow" cx="50%" cy="50%" r="50%">
-            <Stop offset="0%" stopColor={color} stopOpacity="0.9" />
+            <Stop offset="0%" stopColor={color} stopOpacity="0.95" />
             <Stop offset="100%" stopColor={color} stopOpacity="0" />
+          </RadialGradient>
+          <LinearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%" stopColor="#00e5ff" stopOpacity="0.55" />
+            <Stop offset="100%" stopColor="#0088ff" stopOpacity="0.14" />
+          </LinearGradient>
+          <RadialGradient id="disc" cx="50%" cy="50%" r="50%">
+            <Stop offset="0%" stopColor="#00d0ff" stopOpacity="0.5" />
+            <Stop offset="100%" stopColor="#00d0ff" stopOpacity="0" />
           </RadialGradient>
         </Defs>
 
-        {/* Silueta corpului (front) */}
-        <G fill="#c7d2cc" opacity={0.55}>
-          {/* cap */}
-          <Circle cx="50" cy="16" r="12" />
-          {/* gat */}
-          <Path d="M45 27 h10 v6 h-10 z" />
-          {/* trunchi */}
-          <Path d="M34 33 q16 -6 32 0 l3 60 q-19 8 -38 0 z" />
-          {/* brate */}
-          <Path d="M34 36 l-14 44 4 2 14 -42 z" />
-          <Path d="M66 36 l14 44 -4 2 -14 -42 z" />
-          {/* bazin */}
-          <Path d="M31 92 q19 8 38 0 l-4 26 h-30 z" />
-          {/* picioare */}
-          <Path d="M37 118 l-3 90 7 0 4 -88 z" />
-          <Path d="M63 118 l3 90 -7 0 -4 -88 z" />
+        {/* fundal intunecat pentru contrast holografic */}
+        <Rect x="0" y="0" width="100" height="220" rx="10" fill="#04101c" />
+        {/* disc de lumina sub picioare */}
+        <Ellipse cx="50" cy="212" rx="34" ry="5" fill="url(#disc)" />
+
+        {/* corp translucid MASCULIN (umeri lati, V-taper, solduri inguste) */}
+        {/* stratul de "glow" difuz (stroke gros translucid dedesubt) */}
+        <G fill="none" stroke="#00e5ff" strokeOpacity={0.22} strokeWidth={3.4} strokeLinejoin="round">
+          <BodyPaths />
+        </G>
+        <G fill="url(#body)" stroke="#5fefff" strokeWidth={1.1} strokeLinejoin="round">
+          <BodyPaths />
+        </G>
+
+        {/* linii de scanare pe torso */}
+        <G stroke="#7ff6ff" strokeWidth={0.4} opacity={0.3}>
+          {[40, 52, 64, 76, 88, 100].map((y) => (
+            <Line key={y} x1="30" y1={y} x2="70" y2={y} />
+          ))}
+        </G>
+
+        {/* retea de energie centrala */}
+        <G stroke="#37c8ff" strokeWidth={0.5} opacity={0.5} fill="none">
+          <Path d="M50 30 L50 92 M50 52 L40 74 M50 52 L60 74 M50 74 L44 100 M50 74 L56 100" />
+        </G>
+
+        {/* ADN dublu-helix */}
+        <G>
+          <Polyline points={dnaA.join(" ")} fill="none" stroke="#5fefff" strokeWidth={1} opacity={0.9} />
+          <Polyline points={dnaB.join(" ")} fill="none" stroke="#3fbfe6" strokeWidth={1} opacity={0.6} />
+          {dnaRungs.map((r, i) => (
+            <G key={i}>
+              <Line x1={r.x1} y1={r.y} x2={r.x2} y2={r.y} stroke={r.front ? "#7ff6ff" : "#2aa0d0"} strokeWidth={1} opacity={r.front ? 0.9 : 0.4} />
+              <Circle cx={r.x1} cy={r.y} r={1.2} fill="#aef6ff" />
+              <Circle cx={r.x2} cy={r.y} r={1.2} fill="#aef6ff" />
+            </G>
+          ))}
         </G>
 
         {/* Aura pulsatoare + punct pe fiecare organ afectat */}
@@ -67,19 +112,37 @@ export default function BodyDiagram({
           const animR = Animated.multiply(glowR, o.r);
           return (
             <G key={id}>
-              <AC
-                cx={o.cx}
-                cy={o.cy}
-                r={animR as any}
-                fill="url(#glow)"
-                opacity={glowOpacity as any}
-              />
-              <Circle cx={o.cx} cy={o.cy} r={3.4} fill={color} />
-              <Circle cx={o.cx} cy={o.cy} r={3.4} fill="none" stroke="#fff" strokeWidth={0.8} />
+              <AC cx={o.cx} cy={o.cy} r={animR as any} fill="url(#glow)" opacity={glowOpacity as any} />
+              <Circle cx={o.cx} cy={o.cy} r={2.6} fill={color} />
+              <Circle cx={o.cx} cy={o.cy} r={2.6} fill="none" stroke="#fff" strokeWidth={0.7} />
             </G>
           );
         })}
       </Svg>
     </View>
+  );
+}
+
+// Formele corpului masculin (refolosite pentru stratul de glow + cel principal)
+function BodyPaths() {
+  return (
+    <>
+      {/* cap */}
+      <Ellipse cx="50" cy="15" rx="7" ry="8" />
+      {/* gat */}
+      <Path d="M46 22 h8 v6 h-8 z" />
+      {/* umeri / trapez lat */}
+      <Path d="M50 27 q-6 1 -10 3 q-11 4 -15 11 q7 -3 14 -3 h22 q7 0 14 3 q-4 -7 -15 -11 q-4 -2 -10 -3 z" />
+      {/* tors piept in V (lat sus, ingust la talie) */}
+      <Path d="M30 40 q20 -5 40 0 l-9 52 q-11 3 -22 0 z" />
+      {/* brate */}
+      <Path d="M31 42 l-9 46 q-1 5 3 6 q4 1 5 -4 l8 -46 z" />
+      <Path d="M69 42 l9 46 q1 5 -3 6 q-4 1 -5 -4 l-8 -46 z" />
+      {/* bazin ingust */}
+      <Path d="M40 92 q10 4 20 0 l-2 16 q-8 3 -16 0 z" />
+      {/* picioare drepte/musculoase */}
+      <Path d="M42 108 h7 l-2 96 q-1 6 -4 6 q-3 0 -4 -6 l-2 -64 q-1 -18 5 -32 z" />
+      <Path d="M58 108 h-7 l2 96 q1 6 4 6 q3 0 4 -6 l2 -64 q1 -18 -5 -32 z" />
+    </>
   );
 }
