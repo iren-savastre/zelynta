@@ -1372,7 +1372,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 <View style={[styles.novaBadge, { backgroundColor: packagingColor }]}>
                   <Text style={styles.novaBadgeText}>{packagingText}</Text>
                 </View>
-                {packaging === "plastic" && isBeverage && (
+                {packaging === "plastic" && (
                   <Text style={styles.microNote}>{t("microplasticNote")}</Text>
                 )}
               </>
