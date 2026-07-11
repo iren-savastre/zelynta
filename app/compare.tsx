@@ -336,7 +336,7 @@ const makeStyles = (c: ThemeColors) =>
     },
     iconTileGhost: { width: 42, height: 42 },
     headerTitle: { fontSize: 19, fontWeight: "800", color: c.text },
-    scroll: { padding: 16, gap: 12, paddingBottom: 120 },
+    scroll: { padding: 16, gap: 12, paddingBottom: 170 },
     scrollDesktop: { maxWidth: 760, alignSelf: "center", width: "100%" },
     hint: { fontSize: 14, color: c.textMuted, textAlign: "center", marginBottom: 6, fontWeight: "600" },
     errBox: {
@@ -397,7 +397,7 @@ const makeStyles = (c: ThemeColors) =>
     checkOn: { backgroundColor: c.primary, borderColor: c.primary },
     checkMark: { color: "#FFF", fontSize: 15, fontWeight: "900" },
 
-    ctaWrap: { position: "absolute", bottom: 24, left: 16, right: 16 },
+    ctaWrap: { position: "absolute", bottom: isWeb ? 24 : 42, left: 16, right: 16 },
     ctaWrapDesktop: { left: 0, right: 0, alignItems: "center" },
     cta: {
       flexDirection: "row",
