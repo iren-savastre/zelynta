@@ -96,13 +96,11 @@ export async function getBetterAlternatives(
         score: analyzeProduct(p, lang).score,
       };
     })
-    // Doar produse valide și strict mai sănătoase decât cel scanat
-    .filter((p): p is Alternative => p !== null && p.score > currentScore)
+    // Doar produse VERZI (scor ≥ 66, sănătoase) și mai bune decât cel scanat.
+    // Recomandăm exclusiv opțiuni clar sănătoase, nu doar „mai puțin rele".
+    .filter((p): p is Alternative => p !== null && p.score >= 66 && p.score > currentScore)
     .sort((a, b) => b.score - a.score);
 
-  // Arătăm ORICE produs mai sănătos decât cel scanat — inclusiv unele portocalii
-  // sau galbene, dacă produsul scanat e și mai slab. Așa utilizatorul vede o gamă
-  // realistă de opțiuni, nu doar cele perfect verzi. (Toate sunt strict mai bune.)
   const ranked = scored;
 
   // Deduplicare după nume — construim un bazin mai larg (până la 20 de opțiuni bune).
