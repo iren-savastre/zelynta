@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Animated, View } from "react-native";
 import Svg, {
   Circle, G, Path, Defs, RadialGradient, LinearGradient, Stop,
-  Ellipse, Line, Polyline, Rect,
+  Ellipse, Line, Polyline,
 } from "react-native-svg";
 import { ORGANS, type OrganId } from "../utils/bodyMap";
 
@@ -57,8 +57,8 @@ export default function BodyDiagram({
             <Stop offset="100%" stopColor={color} stopOpacity="0" />
           </RadialGradient>
           <LinearGradient id="body" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#00e5ff" stopOpacity="0.55" />
-            <Stop offset="100%" stopColor="#0088ff" stopOpacity="0.14" />
+            <Stop offset="0%" stopColor="#00b4e5" stopOpacity="0.42" />
+            <Stop offset="100%" stopColor="#0088ff" stopOpacity="0.12" />
           </LinearGradient>
           <RadialGradient id="disc" cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor="#00d0ff" stopOpacity="0.5" />
@@ -66,8 +66,6 @@ export default function BodyDiagram({
           </RadialGradient>
         </Defs>
 
-        {/* fundal intunecat pentru contrast holografic */}
-        <Rect x="0" y="0" width="100" height="220" rx="10" fill="#04101c" />
         {/* disc de lumina sub picioare */}
         <Ellipse cx="50" cy="212" rx="34" ry="5" fill="url(#disc)" />
 
@@ -76,12 +74,12 @@ export default function BodyDiagram({
         <G fill="none" stroke="#00e5ff" strokeOpacity={0.22} strokeWidth={3.4} strokeLinejoin="round">
           <BodyPaths />
         </G>
-        <G fill="url(#body)" stroke="#5fefff" strokeWidth={1.1} strokeLinejoin="round">
+        <G fill="url(#body)" stroke="#1f9fca" strokeWidth={1.2} strokeLinejoin="round">
           <BodyPaths />
         </G>
 
         {/* linii de scanare pe torso */}
-        <G stroke="#7ff6ff" strokeWidth={0.4} opacity={0.3}>
+        <G stroke="#4fb3d0" strokeWidth={0.4} opacity={0.45}>
           {[40, 52, 64, 76, 88, 100].map((y) => (
             <Line key={y} x1="30" y1={y} x2="70" y2={y} />
           ))}
@@ -94,13 +92,13 @@ export default function BodyDiagram({
 
         {/* ADN dublu-helix */}
         <G>
-          <Polyline points={dnaA.join(" ")} fill="none" stroke="#5fefff" strokeWidth={1} opacity={0.9} />
-          <Polyline points={dnaB.join(" ")} fill="none" stroke="#3fbfe6" strokeWidth={1} opacity={0.6} />
+          <Polyline points={dnaA.join(" ")} fill="none" stroke="#1f9fca" strokeWidth={1} opacity={0.95} />
+          <Polyline points={dnaB.join(" ")} fill="none" stroke="#3fa8c8" strokeWidth={1} opacity={0.7} />
           {dnaRungs.map((r, i) => (
             <G key={i}>
-              <Line x1={r.x1} y1={r.y} x2={r.x2} y2={r.y} stroke={r.front ? "#7ff6ff" : "#2aa0d0"} strokeWidth={1} opacity={r.front ? 0.9 : 0.4} />
-              <Circle cx={r.x1} cy={r.y} r={1.2} fill="#aef6ff" />
-              <Circle cx={r.x2} cy={r.y} r={1.2} fill="#aef6ff" />
+              <Line x1={r.x1} y1={r.y} x2={r.x2} y2={r.y} stroke={r.front ? "#2f9fc0" : "#2aa0d0"} strokeWidth={1} opacity={r.front ? 0.9 : 0.4} />
+              <Circle cx={r.x1} cy={r.y} r={1.2} fill="#2f9fc0" />
+              <Circle cx={r.x2} cy={r.y} r={1.2} fill="#2f9fc0" />
             </G>
           ))}
         </G>
