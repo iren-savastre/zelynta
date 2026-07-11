@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, View } from "react-native";
-import Svg, { Circle, Ellipse, G, Path, Defs, RadialGradient, Stop } from "react-native-svg";
+import Svg, { Circle, G, Path, Defs, RadialGradient, Stop } from "react-native-svg";
 import { ORGANS, type OrganId } from "../utils/bodyMap";
 
 const AC = Animated.createAnimatedComponent(Circle);
