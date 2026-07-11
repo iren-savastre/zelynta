@@ -35,7 +35,7 @@ const G: Record<string, L9> = {
     de: "Karte 2 — Leitfaden & Index",
     ru: "Карта 2 — Руководство и указатель",
     pl: "Mapa 2 — Przewodnik i indeks",
-    nl: "Kaart 2 — Gids & index",
+    nl: "Kaart 2 — Gids & index", bg: "Карта 2 — Ръководство & индекс", el: "Χάρτης 2 — Οδηγός & ευρετήριο",
   },
   intro: {
     ro: "Pagina a doua a hărții The Healing Web este „manualul” primei pagini: explică filosofia hărții și adună într-un singur loc statisticile, diagrama corp–minte și marele index de afecțiuni cu remediile asociate. Mai jos ai fiecare componentă explicată, apoi întregul text al paginii, lizibil și copiabil.",
@@ -46,7 +46,7 @@ const G: Record<string, L9> = {
     de: "Die zweite Seite der The-Healing-Web-Karte ist das „Handbuch“ der ersten: Sie erklärt die Philosophie der Karte und versammelt Statistiken, das Körper–Geist-Diagramm und das große Verzeichnis der Beschwerden mit den zugehörigen Mitteln. Unten findest du jede Komponente erklärt und dann den vollständigen Text der Seite, lesbar und kopierbar.",
     ru: "Вторая страница карты The Healing Web — это «руководство» к первой: она объясняет философию карты и собирает в одном месте статистику, диаграмму тело–разум и большой указатель недугов с соответствующими средствами. Ниже — объяснение каждого компонента, а затем полный текст страницы, удобный для чтения и копирования.",
     pl: "Druga strona mapy The Healing Web to „podręcznik” pierwszej: wyjaśnia filozofię mapy i zbiera w jednym miejscu statystyki, diagram ciało–umysł oraz wielki indeks dolegliwości z przypisanymi środkami. Poniżej znajdziesz wyjaśnienie każdego elementu, a następnie pełny tekst strony, czytelny i możliwy do skopiowania.",
-    nl: "De tweede pagina van The Healing Web-kaart is de “handleiding” van de eerste: ze legt de filosofie van de kaart uit en bundelt de statistieken, het lichaam–geest-diagram en de grote index van kwalen met bijbehorende remedies. Hieronder vind je elk onderdeel uitgelegd, en daarna de volledige tekst van de pagina, leesbaar en kopieerbaar.",
+    nl: "De tweede pagina van The Healing Web-kaart is de “handleiding” van de eerste: ze legt de filosofie van de kaart uit en bundelt de statistieken, het lichaam–geest-diagram en de grote index van kwalen met bijbehorende remedies. Hieronder vind je elk onderdeel uitgelegd, en daarna de volledige tekst van de pagina, leesbaar en kopieerbaar.", bg: "Втората страница на картата The Healing Web е „ръководството” на първата: обяснява философията на картата и събира на едно място статистиката, диаграмата тяло–ум и големия указател на заболявания със свързаните средства. По-долу е обяснен всеки компонент, а след това пълният текст на страницата — четим и копируем.", el: "Η δεύτερη σελίδα του χάρτη The Healing Web είναι το «εγχειρίδιο» της πρώτης: εξηγεί τη φιλοσοφία του χάρτη και συγκεντρώνει τα στατιστικά, το διάγραμμα σώμα–νους και το μεγάλο ευρετήριο παθήσεων με τις σχετικές θεραπείες. Παρακάτω εξηγείται κάθε στοιχείο και έπειτα το πλήρες κείμενο της σελίδας, ευανάγνωστο και αντιγράψιμο.",
   },
   s1t: {
     ro: "Arborele vieții",
@@ -57,7 +57,7 @@ const G: Record<string, L9> = {
     de: "Der Baum des Lebens",
     ru: "Древо жизни",
     pl: "Drzewo życia",
-    nl: "De levensboom",
+    nl: "De levensboom", bg: "Дървото на живота", el: "Το δέντρο της ζωής",
   },
   s1d: {
     ro: "Ilustrația centrală: sănătatea ca un arbore cu rădăcini (alimentație, somn, mișcare, liniște) și ramuri (organele și sistemele corpului). Mesajul autorului: îngrijește rădăcinile, iar coroana înflorește.",
@@ -68,7 +68,7 @@ const G: Record<string, L9> = {
     de: "Die zentrale Illustration: Gesundheit als Baum mit Wurzeln (Ernährung, Schlaf, Bewegung, Ruhe) und Ästen (Organe und Systeme des Körpers). Die Botschaft des Autors: Pflege die Wurzeln, und die Krone blüht.",
     ru: "Центральная иллюстрация: здоровье как дерево с корнями (питание, сон, движение, покой) и ветвями (органы и системы тела). Послание автора: заботьтесь о корнях — и крона расцветёт.",
     pl: "Centralna ilustracja: zdrowie jako drzewo z korzeniami (jedzenie, sen, ruch, spokój) i gałęziami (narządy i układy ciała). Przesłanie autora: dbaj o korzenie, a korona zakwitnie.",
-    nl: "De centrale illustratie: gezondheid als een boom met wortels (voeding, slaap, beweging, rust) en takken (de organen en systemen van het lichaam). De boodschap van de maker: verzorg de wortels en de kruin bloeit.",
+    nl: "De centrale illustratie: gezondheid als een boom met wortels (voeding, slaap, beweging, rust) en takken (de organen en systemen van het lichaam). De boodschap van de maker: verzorg de wortels en de kruin bloeit.", bg: "Централната илюстрация: здравето като дърво с корени (хранене, сън, движение, спокойствие) и клони (органите и системите на тялото). Посланието на автора: погрижи се за корените и короната ще разцъфти.", el: "Η κεντρική εικόνα: η υγεία ως δέντρο με ρίζες (διατροφή, ύπνος, κίνηση, ηρεμία) και κλαδιά (τα όργανα και συστήματα του σώματος). Το μήνυμα του δημιουργού: φρόντισε τις ρίζες και η κορυφή θα ανθίσει.",
   },
   s2t: {
     ro: "Statisticile de sănătate",
@@ -79,7 +79,7 @@ const G: Record<string, L9> = {
     de: "Die Gesundheitsstatistiken",
     ru: "Статистика здоровья",
     pl: "Statystyki zdrowotne",
-    nl: "De gezondheidsstatistieken",
+    nl: "De gezondheidsstatistieken", bg: "Здравната статистика", el: "Τα στατιστικά υγείας",
   },
   s2d: {
     ro: "Două tabele cu date din SUA: principalele cauze de deces (boli de inimă, cancer, erori medicale…) și cele mai răspândite afecțiuni cronice (hipertensiune, colesterol, alergii…). Le găsești redesenate, animate, și în pagina principală Healing Web, la secțiunea „Diagrame”.",
@@ -90,7 +90,7 @@ const G: Record<string, L9> = {
     de: "Zwei Tabellen mit US-Daten: die häufigsten Todesursachen (Herzkrankheiten, Krebs, medizinische Fehler…) und die verbreitetsten chronischen Beschwerden (Bluthochdruck, Cholesterin, Allergien…). Du findest sie neu gezeichnet und animiert auf der Healing-Web-Hauptseite im Abschnitt „Diagramme“.",
     ru: "Две таблицы с данными по США: основные причины смерти (болезни сердца, рак, медицинские ошибки…) и самые распространённые хронические недуги (гипертония, холестерин, аллергии…). Они перерисованы и анимированы на главной странице Healing Web в разделе «Диаграммы».",
     pl: "Dwie tabele z danymi z USA: główne przyczyny zgonów (choroby serca, rak, błędy medyczne…) oraz najczęstsze schorzenia przewlekłe (nadciśnienie, cholesterol, alergie…). Znajdziesz je przerysowane i animowane na głównej stronie Healing Web, w sekcji „Diagramy”.",
-    nl: "Twee tabellen met Amerikaanse data: de belangrijkste doodsoorzaken (hartziekten, kanker, medische fouten…) en de meest voorkomende chronische aandoeningen (hypertensie, cholesterol, allergieën…). Je vindt ze hertekend en geanimeerd op de Healing Web-hoofdpagina, sectie “Diagrammen”.",
+    nl: "Twee tabellen met Amerikaanse data: de belangrijkste doodsoorzaken (hartziekten, kanker, medische fouten…) en de meest voorkomende chronische aandoeningen (hypertensie, cholesterol, allergieën…). Je vindt ze hertekend en geanimeerd op de Healing Web-hoofdpagina, sectie “Diagrammen”.", bg: "Две таблици с американски данни: водещите причини за смърт (сърдечни заболявания, рак, медицински грешки…) и най-разпространените хронични заболявания (хипертония, холестерол, алергии…). Ще ги намериш преначертани и анимирани на главната страница Healing Web, раздел „Диаграми”.", el: "Δύο πίνακες με δεδομένα των ΗΠΑ: οι κύριες αιτίες θανάτου (καρδιοπάθειες, καρκίνος, ιατρικά λάθη…) και οι πιο συχνές χρόνιες παθήσεις (υπέρταση, χοληστερόλη, αλλεργίες…). Θα τα βρεις ξανασχεδιασμένα και κινούμενα στην κύρια σελίδα Healing Web, ενότητα «Διαγράμματα».",
   },
   s3t: {
     ro: "Diagrama corp–minte (cele 7 chakre)",
@@ -101,7 +101,7 @@ const G: Record<string, L9> = {
     de: "Das Körper–Geist-Diagramm (die 7 Chakren)",
     ru: "Диаграмма тело–разум (7 чакр)",
     pl: "Diagram ciało–umysł (7 czakr)",
-    nl: "Het lichaam–geest-diagram (de 7 chakra's)",
+    nl: "Het lichaam–geest-diagram (de 7 chakra's)", bg: "Диаграмата тяло–ум (7-те чакри)", el: "Το διάγραμμα σώμα–νους (τα 7 τσάκρα)",
   },
   s3d: {
     ro: "Silueta umană cu cele 7 centre energetice din tradiția orientală, de la Rădăcină (stabilitate) la Coroană (conexiune cu Sursa). Fiecare chakră e explicată în pagina principală Healing Web.",
@@ -112,7 +112,7 @@ const G: Record<string, L9> = {
     de: "Die menschliche Silhouette mit den 7 Energiezentren der östlichen Tradition, von der Wurzel (Stabilität) bis zur Krone (Verbindung zur Quelle). Jedes Chakra wird auf der Healing-Web-Hauptseite erklärt.",
     ru: "Силуэт человека с 7 энергетическими центрами восточной традиции — от Корня (стабильность) до Короны (связь с Источником). Каждая чакра объяснена на главной странице Healing Web.",
     pl: "Sylwetka człowieka z 7 centrami energetycznymi tradycji wschodniej — od Korzenia (stabilność) po Koronę (połączenie ze Źródłem). Każda czakra jest wyjaśniona na głównej stronie Healing Web.",
-    nl: "Het menselijk silhouet met de 7 energiecentra uit de oosterse traditie, van Wortel (stabiliteit) tot Kroon (verbinding met de Bron). Elke chakra wordt uitgelegd op de Healing Web-hoofdpagina.",
+    nl: "Het menselijk silhouet met de 7 energiecentra uit de oosterse traditie, van Wortel (stabiliteit) tot Kroon (verbinding met de Bron). Elke chakra wordt uitgelegd op de Healing Web-hoofdpagina.", bg: "Човешкият силует със 7-те енергийни центъра от източната традиция, от Корен (стабилност) до Корона (връзка с Източника). Всяка чакра е обяснена на главната страница Healing Web.", el: "Το ανθρώπινο περίγραμμα με τα 7 ενεργειακά κέντρα της ανατολικής παράδοσης, από τη Ρίζα (σταθερότητα) ως το Στέμμα (σύνδεση με την Πηγή). Κάθε τσάκρα εξηγείται στην κύρια σελίδα Healing Web.",
   },
   s4t: {
     ro: "Indexul de afecțiuni & remedii",
@@ -123,7 +123,7 @@ const G: Record<string, L9> = {
     de: "Das Verzeichnis der Beschwerden & Mittel",
     ru: "Указатель недугов и средств",
     pl: "Indeks dolegliwości i środków",
-    nl: "De index van kwalen & remedies",
+    nl: "De index van kwalen & remedies", bg: "Указателят на заболявания & средства", el: "Το ευρετήριο παθήσεων & θεραπειών",
   },
   s4d: {
     ro: "Inima paginii: zeci de afecțiuni (hipertensiune, cancer, diabet, anxietate, insomnie…), fiecare cu trei perspective — cauze posibile, abordarea farmaceutică („Pharma”) și abordarea holistică („Holistic”). Textul complet, tradus automat, e mai jos: caută afecțiunea, apoi copiază orice termen ca să-l cercetezi singur.",
@@ -134,7 +134,7 @@ const G: Record<string, L9> = {
     de: "Das Herz der Seite: Dutzende Beschwerden (Bluthochdruck, Krebs, Diabetes, Angst, Schlaflosigkeit…), jede mit drei Perspektiven — mögliche Ursachen, der pharmazeutische Ansatz („Pharma“) und der ganzheitliche Ansatz („Holistic“). Der vollständige, automatisch übersetzte Text steht unten: Finde die Beschwerde und kopiere jeden Begriff, um selbst zu recherchieren.",
     ru: "Сердце страницы: десятки недугов (гипертония, рак, диабет, тревожность, бессонница…), каждый с тремя ракурсами — возможные причины, фармацевтический подход («Pharma») и холистический подход («Holistic»). Полный текст с автопереводом ниже: найдите недуг и скопируйте любой термин, чтобы изучить его самостоятельно.",
     pl: "Serce strony: dziesiątki dolegliwości (nadciśnienie, rak, cukrzyca, lęk, bezsenność…), każda z trzema perspektywami — możliwe przyczyny, podejście farmaceutyczne („Pharma”) i podejście holistyczne („Holistic”). Pełny tekst, przetłumaczony automatycznie, jest poniżej: znajdź dolegliwość i skopiuj dowolny termin, aby samodzielnie go zbadać.",
-    nl: "Het hart van de pagina: tientallen kwalen (hypertensie, kanker, diabetes, angst, slapeloosheid…), elk met drie invalshoeken — mogelijke oorzaken, de farmaceutische aanpak (“Pharma”) en de holistische aanpak (“Holistic”). De volledige, automatisch vertaalde tekst staat hieronder: zoek de kwaal en kopieer elke term om zelf onderzoek te doen.",
+    nl: "Het hart van de pagina: tientallen kwalen (hypertensie, kanker, diabetes, angst, slapeloosheid…), elk met drie invalshoeken — mogelijke oorzaken, de farmaceutische aanpak (“Pharma”) en de holistische aanpak (“Holistic”). De volledige, automatisch vertaalde tekst staat hieronder: zoek de kwaal en kopieer elke term om zelf onderzoek te doen.", bg: "Сърцето на страницата: десетки заболявания (хипертония, рак, диабет, тревожност, безсъние…), всяко с три гледни точки — възможни причини, фармацевтичен подход („Pharma”) и холистичен подход („Holistic”). Пълният, автоматично преведен текст е по-долу: намери заболяването и копирай всеки термин, за да проучиш сам.", el: "Η καρδιά της σελίδας: δεκάδες παθήσεις (υπέρταση, καρκίνος, διαβήτης, άγχος, αϋπνία…), καθεμία με τρεις οπτικές — πιθανές αιτίες, φαρμακευτική προσέγγιση («Pharma») και ολιστική προσέγγιση («Holistic»). Το πλήρες, αυτόματα μεταφρασμένο κείμενο είναι παρακάτω: βρες την πάθηση και αντίγραψε όποιον όρο θέλεις για να ερευνήσεις μόνος σου.",
   },
   indexTitle: {
     ro: "Index de afecțiuni — apasă pe fiecare pentru detalii",
@@ -145,11 +145,11 @@ const G: Record<string, L9> = {
     de: "Verzeichnis der Beschwerden — für Details antippen",
     ru: "Указатель недугов — нажмите для подробностей",
     pl: "Indeks dolegliwości — dotknij, aby zobaczyć szczegóły",
-    nl: "Index van kwalen — tik voor details",
+    nl: "Index van kwalen — tik voor details", bg: "Указател на заболявания — докосни за подробности", el: "Ευρετήριο παθήσεων — άγγιξε για λεπτομέρειες",
   },
-  causes: { ro: "Cauze posibile", en: "Possible causes", fr: "Causes possibles", it: "Cause possibili", es: "Causas posibles", de: "Mögliche Ursachen", ru: "Возможные причины", pl: "Możliwe przyczyny", nl: "Mogelijke oorzaken" },
-  pharma: { ro: "Abordarea farmaceutică", en: "Pharmaceutical approach", fr: "Approche pharmaceutique", it: "Approccio farmaceutico", es: "Enfoque farmacéutico", de: "Pharmazeutischer Ansatz", ru: "Фармацевтический подход", pl: "Podejście farmaceutyczne", nl: "Farmaceutische aanpak" },
-  holistic: { ro: "Abordarea holistică", en: "Holistic approach", fr: "Approche holistique", it: "Approccio olistico", es: "Enfoque holístico", de: "Ganzheitlicher Ansatz", ru: "Холистический подход", pl: "Podejście holistyczne", nl: "Holistische aanpak" },
+  causes: { ro: "Cauze posibile", en: "Possible causes", fr: "Causes possibles", it: "Cause possibili", es: "Causas posibles", de: "Mögliche Ursachen", ru: "Возможные причины", pl: "Możliwe przyczyny", nl: "Mogelijke oorzaken", bg: "Възможни причини", el: "Πιθανές αιτίες" },
+  pharma: { ro: "Abordarea farmaceutică", en: "Pharmaceutical approach", fr: "Approche pharmaceutique", it: "Approccio farmaceutico", es: "Enfoque farmacéutico", de: "Pharmazeutischer Ansatz", ru: "Фармацевтический подход", pl: "Podejście farmaceutyczne", nl: "Farmaceutische aanpak", bg: "Фармацевтичен подход", el: "Φαρμακευτική προσέγγιση" },
+  holistic: { ro: "Abordarea holistică", en: "Holistic approach", fr: "Approche holistique", it: "Approccio olistico", es: "Enfoque holístico", de: "Ganzheitlicher Ansatz", ru: "Холистический подход", pl: "Podejście holistyczne", nl: "Holistische aanpak", bg: "Холистичен подход", el: "Ολιστική προσέγγιση" },
   translating: {
     ro: "⏳ Se traduce automat…",
     en: "⏳ Translating…",
@@ -159,7 +159,7 @@ const G: Record<string, L9> = {
     de: "⏳ Wird übersetzt…",
     ru: "⏳ Идёт перевод…",
     pl: "⏳ Tłumaczenie…",
-    nl: "⏳ Vertalen…",
+    nl: "⏳ Vertalen…", bg: "⏳ Превод…", el: "⏳ Μετάφραση…",
   },
 };
 const g = (key: string, lang: string) => G[key]?.[lang] ?? G[key]?.en ?? "";

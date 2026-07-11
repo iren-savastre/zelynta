@@ -89,6 +89,8 @@ const bodyTitle: Record<string, string> = {
   ru: "На что может влиять в организме",
   pl: "Na co może wpływać w organizmie",
   nl: "Wat het in het lichaam kan beïnvloeden",
+  bg: "На какво може да въздейства в тялото",
+  el: "Τι μπορεί να επηρεάσει στο σώμα",
 };
 
 const isWeb = Platform.OS === "web";
@@ -987,6 +989,16 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             onPress={() => setSelectedAdditive(null)}
           >
             <Pressable style={styles.additiveModal} onPress={() => {}} accessibilityViewIsModal accessibilityRole="none">
+              {/* X fix sus-dreapta — mereu vizibil, chiar si cand derulezi */}
+              <TouchableOpacity
+                style={styles.additiveModalX}
+                onPress={() => setSelectedAdditive(null)}
+                accessibilityRole="button"
+                accessibilityLabel={t("cancel")}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={styles.additiveModalXText}>✕</Text>
+              </TouchableOpacity>
               <ScrollView
                 style={styles.additiveModalScroll}
                 contentContainerStyle={{ paddingBottom: 4 }}
@@ -2103,6 +2115,19 @@ const makeStyles = (c: ThemeColors) =>
     maxHeight: "86%",
   },
   additiveModalScroll: { width: "100%" },
+  additiveModalX: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: c.surfaceAlt,
+  },
+  additiveModalXText: { fontSize: 17, fontWeight: "800", color: c.textMuted, lineHeight: 20 },
   bodyBox: {
     marginTop: 14,
     backgroundColor: c.surfaceAlt,

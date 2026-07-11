@@ -13,6 +13,8 @@ const PALM_LABEL: Record<string, string> = {
   ru: "Пальмовое масло",
   pl: "Olej palmowy",
   nl: "Palmolie",
+  bg: "Палмово масло",
+  el: "Φοινικέλαιο",
 };
 
 const PALM_NOTE: Record<string, string> = {
@@ -25,6 +27,8 @@ const PALM_NOTE: Record<string, string> = {
   ru: "Содержит пальмовое масло — много насыщенных жиров. При рафинировании могут образовываться загрязнители (глицидиловые эфиры), которые EFSA считает возможно канцерогенными. Употребляйте умеренно.",
   pl: "Zawiera olej palmowy — bogaty w tłuszcze nasycone. Podczas rafinacji może tworzyć zanieczyszczenia (estry glicydylowe), które EFSA uznaje za potencjalnie rakotwórcze. Spożywaj z umiarem.",
   nl: "Bevat palmolie — rijk aan verzadigde vetten. Bij raffinage kunnen verontreinigingen (glycidylesters) ontstaan die de EFSA als mogelijk kankerverwekkend beschouwt. Met mate consumeren.",
+  bg: "Съдържа палмово масло — богато на наситени мазнини. При рафиниране може да образува замърсители (глицидилови естери), които EFSA счита за възможно канцерогенни. Консумирайте умерено.",
+  el: "Περιέχει φοινικέλαιο — πλούσιο σε κορεσμένα λιπαρά. Κατά τη διύλιση μπορεί να σχηματίσει προσμείξεις (γλυκιδυλεστέρες) που η EFSA θεωρεί πιθανώς καρκινογόνες. Καταναλώστε με μέτρο.",
 };
 
 function pick(field: Record<string, string>, lang: string) {
