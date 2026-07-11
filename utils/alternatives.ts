@@ -103,17 +103,24 @@ export async function getBetterAlternatives(
   // Preferăm alternative clar mai bune (+10); dacă nu sunt destule, completăm
   // cu orice e mai sănătos, ca să nu rămână gol.
   const clearlyBetter = scored.filter((p) => p.score >= currentScore + 10);
-  const ranked = clearlyBetter.length >= 3 ? clearlyBetter : scored;
+  const ranked = clearlyBetter.length >= 4 ? clearlyBetter : scored;
 
-  // Deduplicare după nume + top 3
+  // Deduplicare după nume — construim un bazin mai larg (până la 20 de opțiuni bune).
   const seen = new Set<string>();
-  const unique: Alternative[] = [];
+  const pool2: Alternative[] = [];
   for (const p of ranked) {
     const key = p.name.toLowerCase().trim();
     if (!key || seen.has(key)) continue;
     seen.add(key);
-    unique.push(p);
-    if (unique.length >= 3) break;
+    pool2.push(p);
+    if (pool2.length >= 20) break;
   }
-  return unique;
+
+  // Amestecăm bazinul (Fisher-Yates) și afișăm până la 8 — utilizatorul vede că
+  // există MAI MULTE soluții, în ordine aleatorie, nu doar cea mai bună.
+  for (let i = pool2.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool2[i], pool2[j]] = [pool2[j], pool2[i]];
+  }
+  return pool2.slice(0, 8);
 }
