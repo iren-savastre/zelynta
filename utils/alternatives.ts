@@ -100,10 +100,10 @@ export async function getBetterAlternatives(
     .filter((p): p is Alternative => p !== null && p.score > currentScore)
     .sort((a, b) => b.score - a.score);
 
-  // Preferăm alternative clar mai bune (+10); dacă nu sunt destule, completăm
-  // cu orice e mai sănătos, ca să nu rămână gol.
-  const clearlyBetter = scored.filter((p) => p.score >= currentScore + 10);
-  const ranked = clearlyBetter.length >= 4 ? clearlyBetter : scored;
+  // Arătăm ORICE produs mai sănătos decât cel scanat — inclusiv unele portocalii
+  // sau galbene, dacă produsul scanat e și mai slab. Așa utilizatorul vede o gamă
+  // realistă de opțiuni, nu doar cele perfect verzi. (Toate sunt strict mai bune.)
+  const ranked = scored;
 
   // Deduplicare după nume — construim un bazin mai larg (până la 20 de opțiuni bune).
   const seen = new Set<string>();
