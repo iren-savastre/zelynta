@@ -81,7 +81,6 @@ const COLS: { head: string; headIc: any; items: Item[] }[] = [
       { label: "footerFeatures", route: "/", ic: "sparkles-outline" },
       { label: "footerHow", route: "/advice", ic: "list-outline" },
       { label: "footerFaq", route: "/legal/support", ic: "help-circle-outline" },
-      { label: "The Healing Web", route: "/healing", ic: "git-network-outline" },
     ],
   },
   {
