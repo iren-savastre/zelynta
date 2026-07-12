@@ -1112,6 +1112,7 @@ for (const code in additivesBgEl) {
   if (!base) continue;
   Object.assign(base.name, be.name);
   Object.assign(base.use, be.use);
+  if (be.desc) Object.assign(base.desc, be.desc);
 }
 
 // Suprascrie desc-ul cu descrierile "poveste" (risk/caution), in toate limbile.
