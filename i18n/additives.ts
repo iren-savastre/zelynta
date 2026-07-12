@@ -1,5 +1,6 @@
 import { additivesExtra } from "./additives.extra";
 import { additiveStories } from "./additives.stories";
+import { additivesBgEl } from "./additives.bgel";
 
 export const additivesInfo = {
   e160b: {
@@ -1102,6 +1103,15 @@ for (const code in additivesExtra) {
   Object.assign(base.name, extra.name);
   Object.assign(base.use, extra.use);
   Object.assign(base.desc, extra.desc);
+}
+
+// Imbina bulgara (bg) + greaca (el) pentru nume + categorie (din additives.bgel.ts).
+for (const code in additivesBgEl) {
+  const base = (additivesInfo as any)[code];
+  const be = additivesBgEl[code];
+  if (!base) continue;
+  Object.assign(base.name, be.name);
+  Object.assign(base.use, be.use);
 }
 
 // Suprascrie desc-ul cu descrierile "poveste" (risk/caution), in toate limbile.
