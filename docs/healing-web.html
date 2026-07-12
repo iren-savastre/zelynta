@@ -2617,7 +2617,11 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       });
       curBtn.addEventListener("click",function(e){ e.stopPropagation(); var op=dd.classList.toggle("open"); curBtn.setAttribute("aria-expanded",op?"true":"false"); });
       document.addEventListener("click",function(){ dd.classList.remove("open"); curBtn.setAttribute("aria-expanded","false"); });
-      render();
+      // ruleaza render() dupa ce TOATA pagina e in DOM (altfel sectiunile de mai jos — diagrame, legenda,
+      // chakre, statistici, index — raman netraduse, fiindca inca nu erau create cand scriptul a rulat)
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", render);
+      else render();
+      window.__healRender = render;
     })();
   </script>
 
