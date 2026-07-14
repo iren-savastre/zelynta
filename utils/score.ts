@@ -314,7 +314,12 @@ export function analyzeProduct(product: any, lang: string): Analysis {
     }
   };
 
-  additives.forEach((a) => judge(a.name ? `${a.code} · ${a.name}` : a.code, a.level));
+  // La COSMETICE nu aplicam penalizarile aditivilor ALIMENTARI: clasificarile lor
+  // (ex. „benzoatul formeaza benzen cu vitamina C cand e inghitit") sunt pentru mancare,
+  // nu pentru un produs care se aplica/clateste pe piele. Scorul cosmetic se bazeaza pe
+  // hazardele cosmetice (parabeni, sulfati, alergeni de parfum) din getCosmetics.
+  const scoredAdditives = isCosmetic ? [] : additives;
+  scoredAdditives.forEach((a) => judge(a.name ? `${a.code} · ${a.name}` : a.code, a.level));
   cosmetics.forEach((c) => judge(c.code, c.level));
 
   let finalScore = Math.max(0, Math.round(score));
@@ -322,7 +327,7 @@ export function analyzeProduct(product: any, lang: string): Analysis {
   if (hasCaution && finalScore > 65) finalScore = 65;
 
   reasons.sort((a, b) => a.delta - b.delta);
-  return { score: finalScore, reasons, additives, cosmetics };
+  return { score: finalScore, reasons, additives: scoredAdditives, cosmetics };
 }
 
 export function scoreColor(score: number) {
