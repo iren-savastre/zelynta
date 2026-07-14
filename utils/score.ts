@@ -272,10 +272,16 @@ export function analyzeProduct(product: any, lang: string): Analysis {
   // si aditivi, identic indiferent de metoda de scanare (cod de bare sau poza).
   const isCosmetic =
     cosmetics.length > 0 ||
-    /toothpaste|dentifrice|pasta de dinti|zahnpasta|cosmetic|hygiene|shampoo|shampoing|sampon|soap|savon|sapun|deodorant|cream|creme|lotion|gel de dus|shower/i.test(
+    // provine din baza de cosmetice OpenBeautyFacts (lookup dupa cod de bare)
+    /beaut|cosmet|personal.?care|skin.?care|face.?care|hair.?care/i.test(
+      ((product?.categories_tags ?? []) as string[]).join(",") + (product?._source ?? "")
+    ) ||
+    // tipuri de produs cosmetic/ingrijire, in mai multe limbi
+    /toothpaste|dentifrice|pasta de dinti|zahnpasta|cosmetic|hygiene|igien|shampoo|shampoing|sampon|soap|savon|sapun|deodorant|antiperspirant|cream|creme|crema|crème|lotion|lotiune|gel de dus|shower|cleanser|cleansing|face wash|demachiant|serum|\bser\b|toner|tonic|micellar|micelar|moistur|hydrating|hidratant|exfoliat|scrub|peeling|\bmask\b|masca|mască|masque|balm|balsam|conditioner|balsam de par|after.?shave|sunscreen|\bspf\b|make.?up|makeup|machiaj|mascara|foundation|fond de ten|concealer|nail|oja|skincare|skin care|face care|hair(?!\w)/i.test(
       (product?.categories ?? "") +
         ((product?.categories_tags ?? []) as string[]).join(",") +
-        (product?.product_name ?? "")
+        (product?.product_name ?? "") +
+        (product?.brands ?? "")
     );
 
   // Fara NICIO valoare nutritionala la un ALIMENT (ex. produs citit din poza —
