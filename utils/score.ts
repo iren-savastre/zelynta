@@ -220,8 +220,19 @@ export function getCosmetics(product: any, lang: string): AnalyzedAdditive[] {
     product?.ingredients_text ||
     ""
   ).toLowerCase();
+  // Produs declarat „fara parfum" — nu semnala parfum ca substanta de urmarit.
+  const fragranceFree =
+    /sans\s+parfum|parfum[-\s]*free|fragrance[-\s]*free|without\s+(?:parfum|fragrance)|f[aă]r[aă]\s+parfum|no\s+(?:parfum|fragrance)/i.test(
+      text
+    );
   return Object.keys(cosmeticsInfo)
-    .filter((key) => text.includes(key))
+    .filter((key) => {
+      // potrivire pe cuvant intreg (nu substring — evita „parfum” din „sans parfum”, etc.)
+      const re = new RegExp("\\b" + key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i");
+      if (!re.test(text)) return false;
+      if (key === "parfum" && fragranceFree) return false;
+      return true;
+    })
     .map((key) => {
       const info = (cosmeticsInfo as any)[key];
       return {
