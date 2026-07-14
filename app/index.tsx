@@ -732,9 +732,6 @@ useEffect(() => {
     : packaging === "carton" ? t("packagingCarton")
     : packaging === "plastic" ? t("packagingPlastic")
     : t("packagingUnknown");
-    const isBeverage = /water|eau|apa|drink|beverage|boisson|soda|juice|jus|cola|limonad/i.test(
-    (product?.categories ?? "") + (product?.product_name ?? "") + (product?.brands ?? "")
-  );
 const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
   return (
