@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
@@ -251,7 +250,6 @@ export default function Index() {
     }
   }, [params.barcode]);
   const [barcode, setBarcode] = useState("");
-  const [showManual, setShowManual] = useState(false);
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [error, setError] = useState("");
@@ -1161,55 +1159,34 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
         <Text style={styles.subtitle}>{t("subtitle")}</Text>
 
 
-        <View style={styles.scanRow}>
-          <View style={styles.scanBtnWrap}>
-            <JuicyButton
-              big
-              emoji="🍅"
-              label={t("scanButton")}
-              onPress={openScanner}
-              colorTop={scanTop}
-              colorBottom={scanBottom}
-            />
-          </View>
-          <TouchableOpacity
-            style={[styles.manualToggle, isWeb && glass, showManual && { borderColor: colors.primary }]}
-            onPress={() => setShowManual((v) => !v)}
-            accessibilityRole="button"
-            accessibilityLabel={t("placeholder")}
-          >
-            <Ionicons
-              name={showManual ? "close" : "keypad-outline"}
-              size={22}
-              color={showManual ? colors.primary : colors.textMuted}
-            />
-          </TouchableOpacity>
-        </View>
+        <JuicyButton
+          big
+          emoji="🍅"
+          label={t("scanButton")}
+          onPress={openScanner}
+          colorTop={scanTop}
+          colorBottom={scanBottom}
+        />
 
-        {showManual && (
-          <>
-            <TextInput
-              style={[styles.input, isWeb && glass]}
-              placeholder={t("placeholder")}
-              value={barcode}
-              onChangeText={setBarcode}
-              keyboardType="numeric"
-              returnKeyType="done"
-              onSubmitEditing={fetchProduct}
-              accessibilityLabel={t("placeholder")}
-              autoFocus
-            />
+        <TextInput
+          style={[styles.input, isWeb && glass]}
+          placeholder={t("placeholder")}
+          value={barcode}
+          onChangeText={setBarcode}
+          keyboardType="numeric"
+          returnKeyType="done"
+          onSubmitEditing={fetchProduct}
+          accessibilityLabel={t("placeholder")}
+        />
 
-            <JuicyButton
-              emoji="🍏"
-              label={t("searchButton")}
-              onPress={fetchProduct}
-              disabled={!barcode || loading}
-              colorTop={searchTop}
-              colorBottom={searchBottom}
-            />
-          </>
-        )}
+        <JuicyButton
+          emoji="🍏"
+          label={t("searchButton")}
+          onPress={fetchProduct}
+          disabled={!barcode || loading}
+          colorTop={searchTop}
+          colorBottom={searchBottom}
+        />
 
         </View>
 
@@ -2046,25 +2023,6 @@ const makeStyles = (c: ThemeColors) =>
     alignItems: "center",
   },
   scanBigButtonText: { color: "#FFFFFF", fontSize: 18, fontWeight: "700" },
-  scanRow: {
-    width: "100%",
-    maxWidth: 400,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  scanBtnWrap: { flex: 1 },
-  manualToggle: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: c.border,
-    backgroundColor: c.inputBg,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
   input: {
     width: "100%",
     maxWidth: 400,
