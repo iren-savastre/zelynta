@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
@@ -1168,25 +1169,28 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           colorBottom={scanBottom}
         />
 
-        <TextInput
-          style={[styles.input, isWeb && glass]}
-          placeholder={t("placeholder")}
-          value={barcode}
-          onChangeText={setBarcode}
-          keyboardType="numeric"
-          returnKeyType="done"
-          onSubmitEditing={fetchProduct}
-          accessibilityLabel={t("placeholder")}
-        />
-
-        <JuicyButton
-          emoji="🍏"
-          label={t("searchButton")}
-          onPress={fetchProduct}
-          disabled={!barcode || loading}
-          colorTop={searchTop}
-          colorBottom={searchBottom}
-        />
+        <View style={styles.manualRow}>
+          <TextInput
+            style={[styles.inputSmall, isWeb && glass]}
+            placeholder={t("placeholder")}
+            placeholderTextColor={colors.textMuted}
+            value={barcode}
+            onChangeText={setBarcode}
+            keyboardType="numeric"
+            returnKeyType="done"
+            onSubmitEditing={fetchProduct}
+            accessibilityLabel={t("placeholder")}
+          />
+          <TouchableOpacity
+            style={[styles.searchIconBtn, { backgroundColor: searchTop }, (!barcode || loading) && { opacity: 0.5 }]}
+            onPress={fetchProduct}
+            disabled={!barcode || loading}
+            accessibilityRole="button"
+            accessibilityLabel={t("searchButton")}
+          >
+            <Ionicons name="search" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
 
         </View>
 
@@ -2023,6 +2027,32 @@ const makeStyles = (c: ThemeColors) =>
     alignItems: "center",
   },
   scanBigButtonText: { color: "#FFFFFF", fontSize: 18, fontWeight: "700" },
+  manualRow: {
+    width: "100%",
+    maxWidth: 320,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  inputSmall: {
+    flex: 1,
+    backgroundColor: c.inputBg,
+    color: c.text,
+    borderWidth: 1,
+    borderColor: c.border,
+    borderRadius: 10,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    fontSize: 14,
+  },
+  searchIconBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   input: {
     width: "100%",
     maxWidth: 400,
