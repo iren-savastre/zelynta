@@ -58,7 +58,7 @@ export default function PaletteButton({ glass }: { glass?: any }) {
                       setOpen(false);
                     }}
                     accessibilityRole="button"
-                    accessibilityLabel={p.label}
+                    accessibilityLabel={t("palette_" + p.id, { defaultValue: p.label })}
                   >
                     <View
                       style={[
@@ -76,7 +76,7 @@ export default function PaletteButton({ glass }: { glass?: any }) {
                         { color: active ? colors.primary : colors.textMuted, fontWeight: active ? "800" : "600" },
                       ]}
                     >
-                      {p.label}
+                      {t("palette_" + p.id, { defaultValue: p.label })}
                     </Text>
                   </TouchableOpacity>
                 );

@@ -3,6 +3,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Alert,
   FlatList,
@@ -29,6 +30,7 @@ export default function History() {
   const router = useRouter();
   const { colors, palette } = useTheme();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isDesktop = isWeb && width >= 900;
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const paletteEmoji = (PALETTES.find((p) => p.id === palette) || PALETTES[0]).emoji;
@@ -156,7 +158,11 @@ export default function History() {
         <FlatList
           data={items}
           keyExtractor={(item) => item.barcode}
-          contentContainerStyle={[styles.list, isDesktop && styles.listDesktop]}
+          contentContainerStyle={[
+            styles.list,
+            isDesktop && styles.listDesktop,
+            { paddingBottom: 16 + Math.max(insets.bottom, 12) },
+          ]}
           showsVerticalScrollIndicator={false}
           ListFooterComponent={
             <TouchableOpacity
