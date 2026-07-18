@@ -4327,7 +4327,33 @@
       document.querySelectorAll(".zrow").forEach(function(s){ s.classList.toggle("active", s.dataset.z===t.id); });
       zBuildFx(t); }
     zBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="#14301f" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.6-3.6-6.4-9-6.4Z"/><circle cx="7.6" cy="11.6" r="1.35" fill="#e11d48" stroke="none"/><circle cx="10.3" cy="7.7" r="1.35" fill="#f59e0b" stroke="none"/><circle cx="14.6" cy="7.7" r="1.35" fill="#2563eb" stroke="none"/><circle cx="17" cy="11.6" r="1.35" fill="#0d9488" stroke="none"/></svg>';
-    zMenu.innerHTML='<h5>Temă · fructe & plante</h5>'+ZTHEMES.map(function(t){ return '<button type="button" class="zrow" data-z="'+t.id+'" title="'+t.label+'" aria-label="'+t.label+'" style="--gl:'+t.g+'"><span class="zsw-em">'+zIcon(t.id)+'</span><span>'+t.label+'</span><span class="ck">✓</span></button>'; }).join("");
+    var ZPAL_LABELS={
+      "":{ro:"Verde clasic",en:"Classic green",fr:"Vert classique",it:"Verde classico",es:"Verde clásico",de:"Klassisches Grün",ru:"Классический зелёный",pl:"Klasyczna zieleń",nl:"Klassiek groen",bg:"Класическо зелено",el:"Κλασικό πράσινο"},
+      mint:{ro:"Mentă",en:"Mint",fr:"Menthe",it:"Menta",es:"Menta",de:"Minze",ru:"Мята",pl:"Mięta",nl:"Munt",bg:"Мента",el:"Μέντα"},
+      sage:{ro:"Salvie",en:"Sage",fr:"Sauge",it:"Salvia",es:"Salvia",de:"Salbei",ru:"Шалфей",pl:"Szałwia",nl:"Salie",bg:"Градински чай",el:"Φασκόμηλο"},
+      eucalyptus:{ro:"Eucalipt",en:"Eucalyptus",fr:"Eucalyptus",it:"Eucalipto",es:"Eucalipto",de:"Eukalyptus",ru:"Эвкалипт",pl:"Eukaliptus",nl:"Eucalyptus",bg:"Евкалипт",el:"Ευκάλυπτος"},
+      rosemary:{ro:"Rozmarin",en:"Rosemary",fr:"Romarin",it:"Rosmarino",es:"Romero",de:"Rosmarin",ru:"Розмарин",pl:"Rozmaryn",nl:"Rozemarijn",bg:"Розмарин",el:"Δεντρολίβανο"},
+      lavender:{ro:"Lavandă",en:"Lavender",fr:"Lavande",it:"Lavanda",es:"Lavanda",de:"Lavendel",ru:"Лаванда",pl:"Lawenda",nl:"Lavendel",bg:"Лавандула",el:"Λεβάντα"},
+      chamomile:{ro:"Mușețel",en:"Chamomile",fr:"Camomille",it:"Camomilla",es:"Manzanilla",de:"Kamille",ru:"Ромашка",pl:"Rumianek",nl:"Kamille",bg:"Лайка",el:"Χαμομήλι"},
+      ginger:{ro:"Ghimbir",en:"Ginger",fr:"Gingembre",it:"Zenzero",es:"Jengibre",de:"Ingwer",ru:"Имбирь",pl:"Imbir",nl:"Gember",bg:"Джинджифил",el:"Τζίντζερ"},
+      lemon:{ro:"Lămâie",en:"Lemon",fr:"Citron",it:"Limone",es:"Limón",de:"Zitrone",ru:"Лимон",pl:"Cytryna",nl:"Citroen",bg:"Лимон",el:"Λεμόνι"},
+      orange:{ro:"Portocală",en:"Orange",fr:"Orange",it:"Arancia",es:"Naranja",de:"Orange",ru:"Апельсин",pl:"Pomarańcza",nl:"Sinaasappel",bg:"Портокал",el:"Πορτοκάλι"},
+      peach:{ro:"Piersică",en:"Peach",fr:"Pêche",it:"Pesca",es:"Melocotón",de:"Pfirsich",ru:"Персик",pl:"Brzoskwinia",nl:"Perzik",bg:"Праскова",el:"Ροδάκινο"},
+      raspberry:{ro:"Zmeură",en:"Raspberry",fr:"Framboise",it:"Lampone",es:"Frambuesa",de:"Himbeere",ru:"Малина",pl:"Malina",nl:"Framboos",bg:"Малина",el:"Σμέουρο"},
+      blueberry:{ro:"Afine",en:"Blueberry",fr:"Myrtille",it:"Mirtillo",es:"Arándano",de:"Heidelbeere",ru:"Черника",pl:"Jagoda",nl:"Bosbes",bg:"Боровинка",el:"Μύρτιλο"},
+      blackberry:{ro:"Mure",en:"Blackberry",fr:"Mûre",it:"Mora",es:"Mora",de:"Brombeere",ru:"Ежевика",pl:"Jeżyna",nl:"Braam",bg:"Къпина",el:"Βατόμουρο"},
+      pomegranate:{ro:"Rodie",en:"Pomegranate",fr:"Grenade",it:"Melograno",es:"Granada",de:"Granatapfel",ru:"Гранат",pl:"Granat",nl:"Granaatappel",bg:"Нар",el:"Ρόδι"}
+    };
+    var ZMENU_TITLE={ro:"Temă · fructe & plante",en:"Theme · fruits & plants",fr:"Thème · fruits & plantes",it:"Tema · frutti & piante",es:"Tema · frutas y plantas",de:"Thema · Früchte & Pflanzen",ru:"Тема · фрукты и растения",pl:"Motyw · owoce i rośliny",nl:"Thema · fruit & planten",bg:"Тема · плодове и растения",el:"Θέμα · φρούτα & φυτά"};
+    function zLabel(id){ var lang=document.documentElement.lang||"ro"; var m=ZPAL_LABELS[id]||{}; return m[lang]||m.ro||id; }
+    function zRenderMenu(){
+      var lang=document.documentElement.lang||"ro";
+      zMenu.innerHTML='<h5>'+(ZMENU_TITLE[lang]||ZMENU_TITLE.ro)+'</h5>'+ZTHEMES.map(function(t){ var lb=zLabel(t.id); return '<button type="button" class="zrow" data-z="'+t.id+'" title="'+lb+'" aria-label="'+lb+'" style="--gl:'+t.g+'"><span class="zsw-em">'+zIcon(t.id)+'</span><span>'+lb+'</span><span class="ck">✓</span></button>'; }).join("");
+      var cur=""; try{cur=localStorage.getItem("zelynta_site_theme")||"";}catch(e){}
+      zMenu.querySelectorAll(".zrow").forEach(function(s){ s.classList.toggle("active", s.dataset.z===cur); });
+    }
+    window.__zRenderMenu=zRenderMenu;
+    zRenderMenu();
     var zBack=document.createElement("div"); zBack.className="ztheme-backdrop"; document.body.appendChild(zBack);
     zBtn.setAttribute("aria-expanded","false");
     function zOpen(){ if(window.__closeDD) window.__closeDD(); zMenu.classList.add("show"); zBack.classList.add("show"); zBtn.setAttribute("aria-expanded","true"); }
@@ -4335,7 +4361,7 @@
     window.__zClose=zClose;
     zBtn.addEventListener("click",function(e){ e.stopPropagation(); zMenu.classList.contains("show")?zClose():zOpen(); });
     zBack.addEventListener("click",zClose);
-    zMenu.querySelectorAll(".zrow").forEach(function(s){ s.addEventListener("click",function(){ zApply(s.dataset.z); zClose(); }); });
+    zMenu.addEventListener("click",function(e){ var b=e.target.closest(".zrow"); if(b){ zApply(b.dataset.z); zClose(); } });
     document.addEventListener("click",function(e){ if(zWrap && !zWrap.contains(e.target)) zClose(); });
     document.addEventListener("keydown",function(e){ if(e.key==="Escape") zClose(); });
     (function(){ var saved=""; try{ saved=localStorage.getItem("zelynta_site_theme")||""; }catch(e){} zApply(saved); })();
@@ -4526,6 +4552,7 @@
         const k = el.getAttribute("data-i18n-html");
         if (dict[k]) el.innerHTML = dict[k];
       });
+      if (window.__zRenderMenu) window.__zRenderMenu();
       var ft=document.getElementById("featTitleEl");
       if(ft && dict.featTitle){ ft.innerHTML = dict.featTitle.replace("Zelynta", '<span class="brand-inline" tabindex="0" title="Zelynta"><span class="wave bi-text"><span>Z</span><span>e</span><span>l</span><span>y</span><span>n</span><span>t</span><span>a</span></span><img class="bi-logo" src="icon.png" alt="Zelynta"></span>'); }
       cur.innerHTML = flag(l.cc,l.label) + "<span>"+l.label+"</span><span class='chev'>▾</span>";
