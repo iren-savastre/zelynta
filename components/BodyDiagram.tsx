@@ -57,8 +57,8 @@ export default function BodyDiagram({
             <Stop offset="100%" stopColor={color} stopOpacity="0" />
           </RadialGradient>
           <LinearGradient id="body" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#00b4e5" stopOpacity="0.42" />
-            <Stop offset="100%" stopColor="#0088ff" stopOpacity="0.12" />
+            <Stop offset="0%" stopColor="#00a8dc" stopOpacity="0.62" />
+            <Stop offset="100%" stopColor="#0074e0" stopOpacity="0.30" />
           </LinearGradient>
           <RadialGradient id="disc" cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor="#00d0ff" stopOpacity="0.5" />
@@ -71,10 +71,10 @@ export default function BodyDiagram({
 
         {/* corp translucid MASCULIN (umeri lati, V-taper, solduri inguste) */}
         {/* stratul de "glow" difuz (stroke gros translucid dedesubt) */}
-        <G fill="none" stroke="#00e5ff" strokeOpacity={0.22} strokeWidth={3.4} strokeLinejoin="round">
+        <G fill="none" stroke="#00cfff" strokeOpacity={0.30} strokeWidth={3.8} strokeLinejoin="round">
           <BodyPaths />
         </G>
-        <G fill="url(#body)" stroke="#1f9fca" strokeWidth={1.2} strokeLinejoin="round">
+        <G fill="url(#body)" stroke="#0d6f96" strokeWidth={1.7} strokeLinejoin="round">
           <BodyPaths />
         </G>
 
