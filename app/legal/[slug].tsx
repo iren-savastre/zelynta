@@ -52,7 +52,7 @@ export default function LegalPage() {
         <Text style={styles.topTitle} numberOfLines={1}>
           {headerTitle}
         </Text>
-        <View style={styles.backBtn} />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView
@@ -122,6 +122,7 @@ function makeStyles(c: ThemeColors) {
       justifyContent: "center",
       backgroundColor: c.surfaceAlt,
     },
+    headerSpacer: { width: 40, height: 40 },
     topTitle: { flex: 1, fontSize: 17, fontWeight: "800", color: c.text, textAlign: "center" },
     content: {
       paddingHorizontal: 18,
