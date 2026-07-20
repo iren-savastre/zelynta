@@ -278,11 +278,13 @@
         radial-gradient(800px 500px at 8% 0%, rgba(var(--a1),0.14), transparent 60%),
         radial-gradient(700px 600px at 100% 30%, rgba(var(--a2),0.16), transparent 55%),
         linear-gradient(180deg,var(--bg-soft) 0%, #f4f8f2 70%); }
-    .lang-band { padding:26px 0 34px; background:linear-gradient(180deg,#f4f8f2 0%, var(--bg-soft) 100%); }
-    .lang-band .wrap { text-align:center; }
-    .lang-band-title { font-size:clamp(15px,2.4vw,20px); font-weight:800; letter-spacing:.01em; color:var(--green-dark,#1f5c26); margin:0 0 16px; }
-    .lang-band-video { max-width:760px; margin:0 auto; border-radius:18px; overflow:hidden; box-shadow:0 18px 44px rgba(31,55,38,0.18); line-height:0; }
-    .lang-band-video video { width:100%; height:auto; display:block; }
+    .ticker-bar { width:100%; overflow:hidden; background:linear-gradient(90deg,var(--green-dark,#1f5c26),var(--green,#2E7D32)); border-top:1px solid rgba(255,255,255,0.12); border-bottom:1px solid rgba(255,255,255,0.12); }
+    .ticker-track { display:inline-flex; white-space:nowrap; will-change:transform; animation:tickerScroll 42s linear infinite; }
+    .ticker-bar:hover .ticker-track { animation-play-state:paused; }
+    .ticker-item { display:inline-flex; align-items:center; gap:12px; padding:12px 0; color:#fff; font-weight:700; font-size:15px; letter-spacing:.01em; }
+    .ticker-sep { padding:0 26px; color:#9fe0a8; font-size:13px; }
+    @keyframes tickerScroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .ticker-track { animation:none; } }
     .hero-grid { display:grid; grid-template-columns: 1.05fr 0.95fr; gap:48px; align-items:center; }
     .hero h1 { font-size:clamp(32px, 5vw, 52px); font-weight:800; }
     .hero .lead { margin-left:0; max-width:540px; }
@@ -1123,16 +1125,25 @@
     </div>
   </section>
 
-  <!-- ===== Bandă video: disponibilă în 11 limbi ===== -->
-  <section class="lang-band" aria-label="Zelynta în 11 limbi">
-    <div class="wrap">
-      <p class="lang-band-title" data-i18n="langBandTitle">Aceeași aplicație, în 11 limbi</p>
-      <div class="lang-band-video">
-        <video src="zelynta-limbi.mp4" autoplay muted loop playsinline preload="metadata"
-               aria-label="Zelynta prezentată în 11 limbi"></video>
-      </div>
-    </div>
-  </section>
+  <!-- ===== Bară derulantă (ticker) sub header: sloganul în 11 limbi ===== -->
+  <div class="ticker-bar" role="marquee" aria-label="Zelynta în 11 limbi">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+  <script>
+    (function(){
+      var slogans=[
+        "Scanează. Înțelege. Alege.","Scan. Understand. Choose.","Scanne. Comprends. Choisis.",
+        "Scansiona. Capisci. Scegli.","Escanea. Entiende. Elige.","Scanne. Verstehe. Wähle.",
+        "Сканируй. Пойми. Выбери.","Skanuj. Zrozum. Wybierz.","Scan. Begrijp. Kies.",
+        "Сканирай. Разбери. Избери.","Σάρωσε. Κατάλαβε. Διάλεξε."
+      ];
+      var one=slogans.map(function(s){
+        return '<span class="ticker-item">🍅 '+s+'</span><span class="ticker-sep">◆</span>';
+      }).join("");
+      var track=document.getElementById("tickerTrack");
+      if(track){ track.innerHTML=one+one; } // dublat pentru buclă continuă
+    })();
+  </script>
 
   <!-- ===== Prompter (mesaje animate, identitatea aplicației) ===== -->
   <div class="trust">
