@@ -70,9 +70,14 @@ const STORES: { img: any; url: string; label: string }[] = [
   { img: require("../assets/images/app-store.png"), url: STORE_URL, label: "App Store" },
 ];
 
+// Linkuri externe pentru coloana „Susține".
+const REVIEW_URL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
+const DONATE_URL = "https://www.buymeacoffee.com/zelynta"; // creeaza contul cu username "zelynta"
+const PARTNERS_URL = "mailto:suport@zelynta.com?subject=Parteneriat%20Zelynta";
+
 // head/label sunt CHEI i18n (traduse cu t() la randare).
-// route = navigare în app (fără 404). Conținutul Legal/Suport e importat din paginile site-ului.
-type Item = { label: string; route: string; ic: any };
+// route = navigare în app (fără 404); url = link extern (Linking.openURL).
+type Item = { label: string; route?: string; url?: string; ic: any };
 const COLS: { head: string; headIc: any; items: Item[] }[] = [
   {
     head: "footerColProduct",
@@ -100,6 +105,15 @@ const COLS: { head: string; headIc: any; items: Item[] }[] = [
       { label: "footerContact", route: "/legal/contact", ic: "mail-outline" },
       { label: "footerSupport", route: "/legal/support", ic: "help-buoy-outline" },
       { label: "footerReport", route: "/legal/report", ic: "warning-outline" },
+    ],
+  },
+  {
+    head: "footerColSupportUs",
+    headIc: "heart",
+    items: [
+      { label: "footerReviews", url: REVIEW_URL, ic: "star-outline" },
+      { label: "footerDonate", url: DONATE_URL, ic: "cafe-outline" },
+      { label: "footerPartners", url: PARTNERS_URL, ic: "briefcase-outline" },
     ],
   },
 ];
@@ -186,7 +200,11 @@ export default function AppFooter({
                   <Text style={styles.colHead}>{t(c.head)}</Text>
                 </View>
                 {c.items.map((it, i) => (
-                  <TouchableOpacity key={i} style={styles.linkRow} onPress={() => router.push(it.route as any)}>
+                  <TouchableOpacity
+                    key={i}
+                    style={styles.linkRow}
+                    onPress={() => (it.url ? open(it.url) : router.push(it.route as any))}
+                  >
                     <Ionicons name={it.ic} size={15} color="#7fbf95" />
                     <Text style={styles.link}>{t(it.label)}</Text>
                   </TouchableOpacity>
