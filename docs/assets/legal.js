@@ -314,6 +314,38 @@
   applyI18n(document);
   injectIcons(document);
 
+  /* ---------- butoane „Descarcă": mesaj „în curând" în loc de link mort ---------- */
+  (function(){
+    var MSG={
+      ro:"📲 În curând pe Google Play! Aplicația este în verificare finală.",
+      en:"📲 Coming soon on Google Play! The app is in final review.",
+      fr:"📲 Bientôt sur Google Play ! L'application est en cours de validation finale.",
+      it:"📲 Presto su Google Play! L'app è in revisione finale.",
+      es:"📲 ¡Muy pronto en Google Play! La app está en revisión final.",
+      de:"📲 Bald bei Google Play! Die App ist in der Endprüfung.",
+      ru:"📲 Скоро в Google Play! Приложение проходит финальную проверку.",
+      pl:"📲 Wkrótce w Google Play! Aplikacja jest w końcowej weryfikacji.",
+      nl:"📲 Binnenkort in Google Play! De app is in de laatste beoordeling.",
+      bg:"📲 Скоро в Google Play! Приложението е в окончателна проверка.",
+      el:"📲 Σύντομα στο Google Play! Η εφαρμογή βρίσκεται σε τελικό έλεγχο."
+    };
+    function toast(){
+      var m=MSG[LANG]||MSG.en;
+      var t=document.getElementById("zSoonToast");
+      if(!t){ t=document.createElement("div"); t.id="zSoonToast";
+        t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);"+
+        "background:#14301f;color:#fff;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:600;"+
+        "max-width:90vw;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.35);z-index:99999;opacity:0;"+
+        "transition:opacity .25s,transform .25s;";
+        document.body.appendChild(t); }
+      t.textContent=m; t.style.opacity="1"; t.style.transform="translateX(-50%) translateY(0)";
+      clearTimeout(toast._h); toast._h=setTimeout(function(){ t.style.opacity="0"; t.style.transform="translateX(-50%) translateY(20px)"; },3200);
+    }
+    document.querySelectorAll('a[href*="releases/latest"]').forEach(function(a){
+      a.addEventListener("click",function(e){ e.preventDefault(); toast(); });
+    });
+  })();
+
   /* ---------- reveal la scroll (respectă reduced-motion) ---------- */
   var reduceMo = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(!reduceMo && "IntersectionObserver" in window){
