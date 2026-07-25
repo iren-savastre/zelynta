@@ -578,6 +578,7 @@ export default function Index() {
         saturatedFat: t("saturatedFat"),
         salt: t("salt"),
         noData: t("noNutritionData"),
+        noCosmeticData: t("noCosmeticData"),
       };
       return map[r.key] ?? r.key;
     }

@@ -307,6 +307,22 @@ export function analyzeProduct(product: any, lang: string): Analysis {
     reasons.push({ kind: "nutrient", key: "noData", delta: -50 });
   }
 
+  // La COSMETICE, scorul se bazeaza pe lista de ingrediente. Daca produsul e citit
+  // dupa codul de bare fara ingrediente (ex. Nivea negasita cu compozitie), NU putem
+  // sti ce contine — deci nu are voie sa apara „100% sanatos". Aplicam un scor neutru
+  // si aratam motivul: utilizatorul e invitat sa scaneze eticheta pentru un scor real.
+  const cosmeticText = String(
+    product?.[`ingredients_text_${lang}`] ||
+      product?.ingredients_text_en ||
+      product?.ingredients_text ||
+      ""
+  ).trim();
+  const noCosmeticData = isCosmetic && cosmeticText === "";
+  if (noCosmeticData) {
+    score -= 45;
+    reasons.push({ kind: "nutrient", key: "noCosmeticData", delta: -45 });
+  }
+
   let hasRisk = false;
   let hasCaution = false;
   const judge = (name: string, level: string | null) => {
