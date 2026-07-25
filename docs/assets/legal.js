@@ -107,6 +107,7 @@
       '<header class="nav"><div class="wrap nav-inner">'+
       '<a class="brand" href="'+ROOT+'index.html"><img src="'+ROOT+'icon.png" alt="Zelynta" width="32" height="32" decoding="async"/>'+waveBrand()+'</a>'+
       '<nav class="nav-links" aria-label="Principal">'+
+      '<a href="'+ROOT+'index.html">'+esc(T("nav_home"))+'</a>'+
       '<a href="'+ROOT+'legal/index.html">'+esc(T("nav_legal"))+'</a>'+
       '<a href="'+ROOT+'support.html">'+esc(T("nav_support"))+'</a>'+
       '<a href="'+ROOT+'contact.html">'+esc(T("nav_contact"))+'</a>'+
