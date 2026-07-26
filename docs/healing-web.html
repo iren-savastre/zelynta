@@ -2870,10 +2870,12 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         tx=px-(px-tx)*(ns/scale); ty=py-(py-ty)*(ns/scale); scale=ns; constrain(); apply();
       }
       function openLb(src){
+        // deschidem intai fereastra, ca stage-ul sa aiba dimensiuni reale, apoi centram
+        lb.classList.add("open"); document.body.style.overflow="hidden";
         img.onload=function(){ natW=img.naturalWidth; natH=img.naturalHeight; fit(); };
         img.src=src;
         if(img.complete && img.naturalWidth){ natW=img.naturalWidth; natH=img.naturalHeight; fit(); }
-        lb.classList.add("open"); document.body.style.overflow="hidden";
+        requestAnimationFrame(fit); // dupa ce fereastra e vizibila (dimensiuni corecte)
         if(hint){ hint.style.opacity="1"; clearTimeout(openLb._h); openLb._h=setTimeout(function(){ hint.style.opacity="0"; },2800); }
       }
       function closeLb(){ lb.classList.remove("open"); document.body.style.overflow=""; }
