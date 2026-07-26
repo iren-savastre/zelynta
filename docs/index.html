@@ -119,7 +119,7 @@
     [data-ztheme="pomegranate"]{ --green:#9f1239; --green-2:#be123c; --green-dark:#5c0f25; --leaf:#9f1239; --lime:#fb7185; --a1:159,18,57; --a2:251,113,133; --bg-soft:#fbe0e6; --surface-2:#fdf2f4; }
     /* ===== strat de animație ambientală (motive plutitoare) ===== */
     #zfx{ position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
-    .zfx-item{ position:absolute; line-height:1; opacity:.14; user-select:none; }
+    .zfx-item{ position:absolute; line-height:1; opacity:.22; animation:zfloat ease-in-out infinite; will-change:transform; user-select:none; }
     @keyframes zfloat{ 0%{transform:translateY(8px) rotate(-6deg)} 50%{transform:translateY(-20px) rotate(8deg)} 100%{transform:translateY(8px) rotate(-6deg)} }
     @media (prefers-reduced-motion: reduce){ .zfx-item{ animation:none; opacity:.1; } }
     * { box-sizing: border-box; margin: 0; padding: 0; }
