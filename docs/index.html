@@ -4634,6 +4634,8 @@
     window.__closeMobileMenu=closeMobileMenu;
     burger.addEventListener("click",e=>{ e.stopPropagation(); const willOpen=mm.style.display!=="flex"; if(willOpen){ if(window.__zClose) window.__zClose(); if(window.__closeDD) window.__closeDD(); } mm.style.display=willOpen?"flex":"none"; burger.setAttribute("aria-expanded",willOpen?"true":"false"); });
     mm.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{ closeMobileMenu(); }));
+    // atingere oriunde in afara meniului -> se inchide
+    document.addEventListener("click",e=>{ if(mm.style.display==="flex" && !mm.contains(e.target) && !burger.contains(e.target)) closeMobileMenu(); });
 
     /* ---------- cookie consent ---------- */
     const banner=document.getElementById("cookieBanner");
