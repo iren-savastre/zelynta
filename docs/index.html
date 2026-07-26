@@ -4858,15 +4858,23 @@
       if(!fab||!toTop) return;
       toTop.addEventListener("click",function(){ window.scrollTo({top:0,behavior:"smooth"}); });
       // butonul apare doar dupa ce ai derulat putin
-      window.addEventListener("scroll",function(){
-        if(window.scrollY>320) fab.classList.add("show"); else fab.classList.remove("show");
-      },{passive:true});
+      var zbot=document.getElementById("zbotFab");
+      function onScroll(){
+        // aproape de finalul paginii (footer) -> ascunde butoanele ca sa nu acopere textul
+        var nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 160;
+        if(window.scrollY>320 && !nearBottom) fab.classList.add("show"); else fab.classList.remove("show");
+        if(zbot) zbot.classList.toggle("hidden", nearBottom);
+      }
+      window.addEventListener("scroll",onScroll,{passive:true});
+      window.addEventListener("resize",onScroll,{passive:true});
+      onScroll();
     })();
   </script>
 
   <!-- Asistent Zelynta (chatbot cu raspunsuri automate, urmeaza limba + paleta) -->
   <style>
-    .zbot-fab{position:fixed;left:18px;bottom:22px;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;padding:0;z-index:61;background:linear-gradient(180deg,var(--green-2,#3E9E3A),var(--green,#2E7D32));box-shadow:0 12px 28px rgba(20,48,31,.30);display:flex;align-items:center;justify-content:center;transition:transform .18s ease,box-shadow .2s ease;animation:zbotPulse 3.4s ease-in-out infinite}
+    .zbot-fab{position:fixed;left:18px;bottom:22px;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;padding:0;z-index:61;background:linear-gradient(180deg,var(--green-2,#3E9E3A),var(--green,#2E7D32));box-shadow:0 12px 28px rgba(20,48,31,.30);display:flex;align-items:center;justify-content:center;transition:transform .18s ease,box-shadow .2s ease,opacity .28s ease;animation:zbotPulse 3.4s ease-in-out infinite}
+    .zbot-fab.hidden{opacity:0;pointer-events:none;transform:translateY(18px)}
     .zbot-fab:hover{transform:scale(1.08)}
     .zbot-fab img{width:38px;height:38px;border-radius:50%;background:#fff;object-fit:cover}
     .zbot-fab::after{content:"";position:absolute;top:7px;right:7px;width:11px;height:11px;border-radius:50%;background:#ff5a5f;border:2px solid #fff}
