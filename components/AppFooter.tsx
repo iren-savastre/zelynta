@@ -16,7 +16,7 @@ import { type ThemeColors } from "../utils/theme";
 import WaveText from "./WaveText";
 
 const isWeb = Platform.OS === "web";
-const SITE = "https://iren-savastre.github.io/zelynta/";
+const SITE = "https://zelynta.com/";
 const FOOT = "#10231a";
 
 function open(url: string) {

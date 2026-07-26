@@ -39,7 +39,7 @@ export async function getBetterAlternatives(
         `&page_size=100&sort_by=unique_scans_n`;
 
       const res = await fetchWithTimeout(url, {
-        headers: { "User-Agent": "Zelynta/1.0 (https://iren-savastre.github.io/zelynta/)" },
+        headers: { "User-Agent": "Zelynta/1.0 (https://zelynta.com/)" },
       });
       if (!res.ok) continue;
       const data = await res.json();

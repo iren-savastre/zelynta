@@ -13,7 +13,7 @@ export async function fetchProductByBarcode(code: string): Promise<any | null> {
   for (const { base, db } of DATABASES) {
     try {
       const res = await fetchWithTimeout(`${base}/api/v2/product/${code}.json`, {
-        headers: { "User-Agent": "Zelynta/1.0 (https://iren-savastre.github.io/zelynta/)" },
+        headers: { "User-Agent": "Zelynta/1.0 (https://zelynta.com/)" },
       });
       if (!res.ok) continue;
       const data = await res.json();
