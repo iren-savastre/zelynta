@@ -333,13 +333,13 @@
       var m=MSG[LANG]||MSG.en;
       var t=document.getElementById("zSoonToast");
       if(!t){ t=document.createElement("div"); t.id="zSoonToast";
-        t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);"+
+        t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);"+
         "background:#14301f;color:#fff;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:600;"+
         "max-width:90vw;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.35);z-index:99999;opacity:0;"+
-        "transition:opacity .25s,transform .25s;";
+        "transition:opacity .25s;";
         document.body.appendChild(t); }
-      t.textContent=m; t.style.opacity="1"; t.style.transform="translateX(-50%) translateY(0)";
-      clearTimeout(toast._h); toast._h=setTimeout(function(){ t.style.opacity="0"; t.style.transform="translateX(-50%) translateY(20px)"; },3200);
+      t.textContent=m; t.style.opacity="1";
+      clearTimeout(toast._h); toast._h=setTimeout(function(){ t.style.opacity="0"; },3200);
     }
     document.querySelectorAll('a[href*="releases/latest"]').forEach(function(a){
       a.addEventListener("click",function(e){ e.preventDefault(); toast(); });
