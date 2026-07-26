@@ -2962,40 +2962,38 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       var img=document.getElementById("lbImg"), hint=document.getElementById("lbHint");
       var imgs=document.querySelectorAll(".zoom");
       if(!lb||!stage||!img) return;
-      var scale=1, minScale=1, maxScale=1, tx=0, ty=0, natW=0, natH=0, rot=0;
+      var scale=1, minScale=1, maxScale=1, px=0, py=0, natW=0, natH=0, rot=0;
       function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
-      function apply(){ img.style.transform="translate("+tx+"px,"+ty+"px) rotate("+rot+"deg) scale("+scale+")"; }
-      function constrain(){
-        var sw=stage.clientWidth, sh=stage.clientHeight, iw=natW*scale, ih=natH*scale;
-        tx = iw<=sw ? (sw-iw)/2 : clamp(tx, sw-iw, 0);
-        ty = ih<=sh ? (sh-ih)/2 : clamp(ty, sh-ih, 0);
+      // Transformare in jurul CENTRULUI: imaginea e mereu centrata (px=py=0);
+      // roteste si scaleaza pe centrul ei, iar px/py = deplasare la tragere.
+      function apply(){
+        var cx=stage.clientWidth/2, cy=stage.clientHeight/2;
+        img.style.transform="translate("+(cx+px)+"px,"+(cy+py)+"px) rotate("+rot+"deg) scale("+scale+") translate("+(-natW/2)+"px,"+(-natH/2)+"px)";
       }
-      function limitsFor(){ // recalculeaza limitele de zoom pt orientarea curenta
-        var sw=stage.clientWidth, sh=stage.clientHeight;
-        var rotated=(rot%180)!==0;
+      function limitsFor(){
+        var sw=stage.clientWidth, sh=stage.clientHeight, rotated=(rot%180)!==0;
         var effW=rotated?natH:natW, effH=rotated?natW:natH;
         minScale=Math.min(sw/effW, sh/effH); maxScale=minScale*9;
       }
-      function center(){ // centreaza imaginea rotita+scalata pe mijlocul ferestrei
-        var sw=stage.clientWidth, sh=stage.clientHeight;
-        var rotated=(rot%180)!==0, W=natW*scale, H=natH*scale;
-        var bx,by; if(rot===0){bx=0;by=0;} else if(rot===90){bx=-H;by=0;} else if(rot===180){bx=-W;by=-H;} else {bx=0;by=-W;}
-        var bw=rotated?H:W, bh=rotated?W:H;
-        tx=(sw-bw)/2 - bx; ty=(sh-bh)/2 - by; apply();
+      function constrain(){ // nu lasa imaginea sa fuga complet in afara
+        var sw=stage.clientWidth, sh=stage.clientHeight, rotated=(rot%180)!==0;
+        var ew=(rotated?natH:natW)*scale, eh=(rotated?natW:natH)*scale;
+        var mx=Math.max(0,(ew-sw)/2), my=Math.max(0,(eh-sh)/2);
+        px=clamp(px,-mx,mx); py=clamp(py,-my,my);
       }
       function fit(){
-        var sw=stage.clientWidth, sh=stage.clientHeight;
-        if(!natW||!natH||!sw||!sh) return;
-        limitsFor(); scale=minScale; center();
+        if(!natW||!natH||!stage.clientWidth||!stage.clientHeight) return;
+        limitsFor(); scale=minScale; px=0; py=0; apply();
       }
-      function rotate90(){ // rotire pe centru, pastrand marimea (nu se muta stanga/dreapta)
+      function rotate90(){ // rotire 90° pe centru, pastrand marimea
         rot=(rot+90)%360;
         if(!natW||!natH||!stage.clientWidth) return;
-        var prev=scale; limitsFor(); scale=clamp(prev, minScale, maxScale); center();
+        var prev=scale; limitsFor(); scale=clamp(prev,minScale,maxScale); px=0; py=0; apply();
       }
-      function zoomAt(px,py,factor){
-        var ns=clamp(scale*factor, minScale, maxScale); if(ns===scale) return;
-        tx=px-(px-tx)*(ns/scale); ty=py-(py-ty)*(ns/scale); scale=ns; constrain(); apply();
+      function zoomAt(sx,sy,factor){ // zoom pastrand fix punctul de sub cursor
+        var ns=clamp(scale*factor,minScale,maxScale); if(ns===scale) return;
+        var f=ns/scale, cx=stage.clientWidth/2, cy=stage.clientHeight/2;
+        px=sx+f*((cx+px)-sx)-cx; py=sy+f*((cy+py)-sy)-cy; scale=ns; constrain(); apply();
       }
       function openLb(src){
         // deschidem intai fereastra, ca stage-ul sa aiba dimensiuni reale, apoi centram
@@ -3035,7 +3033,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         if(ids.length===2){
           var a=pts[ids[0]],b=pts[ids[1]], dist=Math.hypot(a.x-b.x,a.y-b.y), r=stage.getBoundingClientRect();
           if(lastDist) zoomAt((a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top, dist/lastDist); lastDist=dist;
-        } else if(dragging){ tx+=e.clientX-lastX; ty+=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; constrain(); apply(); }
+        } else if(dragging){ px+=e.clientX-lastX; py+=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; constrain(); apply(); }
       });
       function up(e){ delete pts[e.pointerId]; if(Object.keys(pts).length<2) lastDist=0; if(!Object.keys(pts).length){ dragging=false; stage.classList.remove("grabbing"); } }
       stage.addEventListener("pointerup",up); stage.addEventListener("pointercancel",up);
