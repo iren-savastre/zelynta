@@ -4858,11 +4858,12 @@
       if(!fab||!toTop) return;
       toTop.addEventListener("click",function(){ window.scrollTo({top:0,behavior:"smooth"}); });
       // butonul apare doar dupa ce ai derulat putin
-      var zbot=document.getElementById("zbotFab");
       function onScroll(){
         // aproape de finalul paginii (footer) -> ascunde butoanele ca sa nu acopere textul
         var nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 160;
         if(window.scrollY>320 && !nearBottom) fab.classList.add("show"); else fab.classList.remove("show");
+        // asistentul (stanga) e definit mai jos in pagina -> il cautam acum, cand exista sigur
+        var zbot=document.getElementById("zbotFab");
         if(zbot) zbot.classList.toggle("hidden", nearBottom);
       }
       window.addEventListener("scroll",onScroll,{passive:true});
