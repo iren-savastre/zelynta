@@ -128,6 +128,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: var(--ink); line-height: 1.6; background: var(--surface-2);
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden; /* nimic nu iese lateral din ecran (pagina fixa pe latime) */
     }
     .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
     section { padding: 72px 0; }
@@ -1015,6 +1016,12 @@
       section { padding:54px 0; }
       .ft-top { grid-template-columns:1fr; }
       .sec-wrap, .final { padding:32px 20px; }
+      /* header incape pe telefon: la limba lasam doar steagul (fara textul limbii),
+         spatii mai mici, ca meniul ≡ sa nu mai fie taiat in dreapta */
+      .nav-inner { gap:8px; }
+      .nav-right { gap:7px; }
+      .lang-cur { padding:0 9px; gap:5px; }
+      .lang-cur span:not(.chev) { display:none; }
     }
     @media (prefers-reduced-motion: reduce) { * { animation:none !important; scroll-behavior:auto; } }
   </style>
