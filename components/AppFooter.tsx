@@ -73,7 +73,7 @@ const STORES: { img: any; url: string; label: string }[] = [
 // Linkuri externe pentru coloana „Susține".
 const REVIEW_URL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
 const DONATE_URL = "https://www.buymeacoffee.com/zelynta"; // creeaza contul cu username "zelynta"
-const PARTNERS_URL = "mailto:zelynta.app@yahoo.com?subject=Parteneriat%20Zelynta";
+const PARTNERS_URL = "mailto:suport@zelynta.com?subject=Parteneriat%20Zelynta";
 
 // head/label sunt CHEI i18n (traduse cu t() la randare).
 // route = navigare în app (fără 404); url = link extern (Linking.openURL).

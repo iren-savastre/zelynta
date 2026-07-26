@@ -54,7 +54,7 @@
     "operatingSystem": "Android, Web",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
     "description": "Aplicație de scanare produse: scor de sănătate, aditivi explicați, avertismente și alternative, din baze de date deschise.",
-    "publisher": { "@type": "Organization", "name": "Zelynta", "email": "zelynta.app@yahoo.com" },
+    "publisher": { "@type": "Organization", "name": "Zelynta", "email": "suport@zelynta.com" },
     "sameAs": ["https://www.facebook.com/profile.php?id=100063203081052"]
   }
   </script>
@@ -1596,7 +1596,7 @@
         <details class="qa"><summary><span data-i18n="q5">Pot șterge datele mele?</span><span class="pl">+</span></summary><div class="a" data-i18n="a5">Da. Poți goli istoricul și favoritele din aplicație; fiind locale, dispar de pe dispozitiv.</div></details>
         <details class="qa"><summary><span data-i18n="q6">Funcționează pe mobil?</span><span class="pl">+</span></summary><div class="a" data-i18n="a6">Da, e gândită mobile-first (Android) și are și o versiune web.</div></details>
         <details class="qa"><summary><span data-i18n="q7">Ce se întâmplă dacă produsul nu e găsit?</span><span class="pl">+</span></summary><div class="a" data-i18n="a7">Poți încerca citirea ingredientelor din poză sau căuta alt cod. Bazele deschise pot fi incomplete.</div></details>
-        <details class="qa"><summary><span data-i18n="q8">Cum contactez suportul?</span><span class="pl">+</span></summary><div class="a" data-i18n="a8">Prin adresa de e-mail din subsol — zelynta.app@yahoo.com.</div></details>
+        <details class="qa"><summary><span data-i18n="q8">Cum contactez suportul?</span><span class="pl">+</span></summary><div class="a" data-i18n="a8">Prin adresa de e-mail din subsol — suport@zelynta.com.</div></details>
         <details class="qa"><summary><span data-i18n="q9">Aplicația folosește camera telefonului?</span><span class="pl">+</span></summary><div class="a" data-i18n="a9">Da, pentru scanarea codului de bare și pentru citirea ingredientelor din poză. Accesul la cameră se acordă din sistem.</div></details>
         <details class="qa"><summary><span data-i18n="q10">Pot căuta manual un produs?</span><span class="pl">+</span></summary><div class="a" data-i18n="a10">Da. Poți introduce manual codul de bare, fără să scanezi.</div></details>
         <details class="qa"><summary><span data-i18n="q11">Pagina folosește cookie-uri?</span><span class="pl">+</span></summary><div class="a" data-i18n="a11">Folosim doar stocare strict necesară (ex. limba aleasă). Analytics și marketing sunt dezactivate până când le accepți.</div></details>
@@ -1771,7 +1771,7 @@
           <a href="support.html"><svg class="ft-li-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.4"/><line x1="5" y1="5" x2="9.4" y2="9.4"/><line x1="14.6" y1="14.6" x2="19" y2="19"/><line x1="19" y1="5" x2="14.6" y2="9.4"/><line x1="9.4" y1="14.6" x2="5" y2="19"/></svg><span data-i18n="ftSupport">Suport</span></a>
           <a href="privacy-contact.html"><svg class="ft-li-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><circle cx="12" cy="10" r="2"/><path d="M9 15.2a3 3 0 0 1 6 0"/></svg><span data-i18n="ftDpo">Contact confidențialitate</span></a>
           <a href="report-problem.html"><svg class="ft-li-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.5 20h19L12 4Z"/><line x1="12" y1="10" x2="12" y2="14"/><line x1="12" y1="17.4" x2="12" y2="17.4"/></svg><span data-i18n="ftReport">Raportează o problemă</span></a>
-          <a href="mailto:zelynta.app@yahoo.com"><svg class="ft-li-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M4.5 7l7.5 5.5L19.5 7"/></svg><span>zelynta.app@yahoo.com</span></a>
+          <a href="mailto:suport@zelynta.com"><svg class="ft-li-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M4.5 7l7.5 5.5L19.5 7"/></svg><span>suport@zelynta.com</span></a>
         </div>
       </div>
 
@@ -4697,7 +4697,7 @@
       } else {
         const subject=encodeURIComponent("[Zelynta] "+type+" — "+name);
         const body=encodeURIComponent(msg+"\n\n— "+name+" ("+email+")");
-        setTimeout(()=>{ window.location.href="mailto:zelynta.app@yahoo.com?subject="+subject+"&body="+body; okDone(); },400);
+        setTimeout(()=>{ window.location.href="mailto:suport@zelynta.com?subject="+subject+"&body="+body; okDone(); },400);
       }
     });
 
@@ -4796,7 +4796,7 @@
         } else {
           var subject=encodeURIComponent("[Zelynta] Recenzie "+rating()+"/5 - "+name.value.trim());
           var body=encodeURIComponent("Nume: "+name.value.trim()+"\nNickname: "+nick.value.trim()+"\nRating: "+rating()+"/5\nTitlu: "+titleI.value.trim()+"\n\n"+text.value.trim());
-          setTimeout(function(){ window.location.href="mailto:zelynta.app@yahoo.com?subject="+subject+"&body="+body; done(); },300);
+          setTimeout(function(){ window.location.href="mailto:suport@zelynta.com?subject="+subject+"&body="+body; done(); },300);
         }
       });
       function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
