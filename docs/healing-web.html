@@ -2833,7 +2833,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
   <div class="lb" id="lightbox" role="dialog" aria-label="Hartă — zoom">
     <div class="lb-bar">
       <button data-z="out" aria-label="Micșorează">−</button>
-      <button data-z="reset" aria-label="Resetează">↻</button>
+      <button data-z="reset" aria-label="Rotește 90°" title="Rotește 90°">↻</button>
       <button data-z="in" aria-label="Mărește">+</button>
       <button id="lbClose" aria-label="Închide">✕</button>
     </div>
@@ -2849,9 +2849,9 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       var img=document.getElementById("lbImg"), hint=document.getElementById("lbHint");
       var imgs=document.querySelectorAll(".zoom");
       if(!lb||!stage||!img) return;
-      var scale=1, minScale=1, maxScale=1, tx=0, ty=0, natW=0, natH=0;
+      var scale=1, minScale=1, maxScale=1, tx=0, ty=0, natW=0, natH=0, rot=0;
       function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
-      function apply(){ img.style.transform="translate("+tx+"px,"+ty+"px) scale("+scale+")"; }
+      function apply(){ img.style.transform="translate("+tx+"px,"+ty+"px) rotate("+rot+"deg) scale("+scale+")"; }
       function constrain(){
         var sw=stage.clientWidth, sh=stage.clientHeight, iw=natW*scale, ih=natH*scale;
         tx = iw<=sw ? (sw-iw)/2 : clamp(tx, sw-iw, 0);
@@ -2860,10 +2860,16 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       function fit(){
         var sw=stage.clientWidth, sh=stage.clientHeight;
         if(!natW||!natH||!sw||!sh) return;
-        minScale=Math.min(sw/natW, sh/natH);
-        maxScale=minScale*9; // zoom amplu, ca înainte (imaginile sunt deja de rezoluție mare)
+        var rotated=(rot%180)!==0;
+        var effW=rotated?natH:natW, effH=rotated?natW:natH; // dimensiuni dupa rotire
+        minScale=Math.min(sw/effW, sh/effH);
+        maxScale=minScale*9; // zoom amplu (imaginile sunt de rezolutie mare)
         scale=minScale;
-        tx=(sw-natW*scale)/2; ty=(sh-natH*scale)/2; apply();
+        var W=natW*scale, H=natH*scale;
+        // coltul minim al chenarului rotit (origine 0,0), pt centrare corecta
+        var bx,by; if(rot===0){bx=0;by=0;} else if(rot===90){bx=-H;by=0;} else if(rot===180){bx=-W;by=-H;} else {bx=0;by=-W;}
+        var bw=rotated?H:W, bh=rotated?W:H;
+        tx=(sw-bw)/2 - bx; ty=(sh-bh)/2 - by; apply();
       }
       function zoomAt(px,py,factor){
         var ns=clamp(scale*factor, minScale, maxScale); if(ns===scale) return;
@@ -2871,6 +2877,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       }
       function openLb(src){
         // deschidem intai fereastra, ca stage-ul sa aiba dimensiuni reale, apoi centram
+        rot=0; // pornim mereu neîntors
         lb.classList.add("open"); document.body.style.overflow="hidden";
         img.onload=function(){ natW=img.naturalWidth; natH=img.naturalHeight; fit(); };
         img.src=src;
@@ -2886,7 +2893,9 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       Array.prototype.forEach.call(lb.querySelectorAll(".lb-bar button[data-z]"),function(b){
         b.addEventListener("click",function(){
           var cx=stage.clientWidth/2, cy=stage.clientHeight/2, z=b.getAttribute("data-z");
-          if(z==="in") zoomAt(cx,cy,1.5); else if(z==="out") zoomAt(cx,cy,1/1.5); else fit();
+          if(z==="in") zoomAt(cx,cy,1.5); else if(z==="out") zoomAt(cx,cy,1/1.5);
+          else if(z==="reset"){ rot=(rot+90)%360; fit(); } // rotire 90° + reincadrare
+          else fit();
         });
       });
       stage.addEventListener("wheel",function(e){ e.preventDefault(); var r=stage.getBoundingClientRect(); zoomAt(e.clientX-r.left,e.clientY-r.top, e.deltaY<0?1.18:1/1.18); },{passive:false});
