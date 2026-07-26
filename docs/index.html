@@ -4843,33 +4843,19 @@
     @media (prefers-reduced-motion:reduce){.scroll-fab,.sfab{transition:none}}
   </style>
   <div id="scrollFab" class="scroll-fab" aria-hidden="true">
-    <button id="toTopBtn" class="sfab sfab-top" type="button" aria-label="Sus" title="Sus">
+    <button id="toTopBtn" class="sfab sfab-main" type="button" aria-label="Sus" title="Sus">
       <svg viewBox="0 0 24 24"><path d="M6 14l6-6 6 6"/></svg>
-    </button>
-    <button id="autoScrollBtn" class="sfab sfab-main" type="button" aria-label="Derulare automată" title="Derulare automată">
-      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </button>
   </div>
   <script>
     (function(){
       var fab=document.getElementById("scrollFab");
-      var auto=document.getElementById("autoScrollBtn");
       var toTop=document.getElementById("toTopBtn");
-      if(!fab||!auto||!toTop) return;
-      var ICON_PLAY='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-      var ICON_PAUSE='<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
-      var running=false, raf=null;
-      function atBottom(){ return window.innerHeight+window.scrollY >= document.documentElement.scrollHeight-2; }
-      function tick(){ if(!running) return; window.scrollBy(0,2); if(atBottom()){ stop(); return; } raf=requestAnimationFrame(tick); }
-      function start(){ if(atBottom()) return; running=true; auto.innerHTML=ICON_PAUSE; auto.setAttribute("aria-label","Oprește derularea"); tick(); }
-      function stop(){ running=false; if(raf) cancelAnimationFrame(raf); auto.innerHTML=ICON_PLAY; auto.setAttribute("aria-label","Derulare automată"); }
-      auto.addEventListener("click",function(){ running?stop():start(); });
-      toTop.addEventListener("click",function(){ stop(); window.scrollTo({top:0,behavior:"smooth"}); });
-      // oprește autoscroll-ul dacă utilizatorul derulează manual
-      window.addEventListener("wheel",function(){ if(running) stop(); },{passive:true});
-      window.addEventListener("touchmove",function(){ if(running) stop(); },{passive:true});
+      if(!fab||!toTop) return;
+      toTop.addEventListener("click",function(){ window.scrollTo({top:0,behavior:"smooth"}); });
+      // butonul apare doar dupa ce ai derulat putin
       window.addEventListener("scroll",function(){
-        if(window.scrollY>320) fab.classList.add("show"); else { fab.classList.remove("show"); if(running) stop(); }
+        if(window.scrollY>320) fab.classList.add("show"); else fab.classList.remove("show");
       },{passive:true});
     })();
   </script>
