@@ -2857,19 +2857,28 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         tx = iw<=sw ? (sw-iw)/2 : clamp(tx, sw-iw, 0);
         ty = ih<=sh ? (sh-ih)/2 : clamp(ty, sh-ih, 0);
       }
-      function fit(){
+      function limitsFor(){ // recalculeaza limitele de zoom pt orientarea curenta
         var sw=stage.clientWidth, sh=stage.clientHeight;
-        if(!natW||!natH||!sw||!sh) return;
         var rotated=(rot%180)!==0;
-        var effW=rotated?natH:natW, effH=rotated?natW:natH; // dimensiuni dupa rotire
-        minScale=Math.min(sw/effW, sh/effH);
-        maxScale=minScale*9; // zoom amplu (imaginile sunt de rezolutie mare)
-        scale=minScale;
-        var W=natW*scale, H=natH*scale;
-        // coltul minim al chenarului rotit (origine 0,0), pt centrare corecta
+        var effW=rotated?natH:natW, effH=rotated?natW:natH;
+        minScale=Math.min(sw/effW, sh/effH); maxScale=minScale*9;
+      }
+      function center(){ // centreaza imaginea rotita+scalata pe mijlocul ferestrei
+        var sw=stage.clientWidth, sh=stage.clientHeight;
+        var rotated=(rot%180)!==0, W=natW*scale, H=natH*scale;
         var bx,by; if(rot===0){bx=0;by=0;} else if(rot===90){bx=-H;by=0;} else if(rot===180){bx=-W;by=-H;} else {bx=0;by=-W;}
         var bw=rotated?H:W, bh=rotated?W:H;
         tx=(sw-bw)/2 - bx; ty=(sh-bh)/2 - by; apply();
+      }
+      function fit(){
+        var sw=stage.clientWidth, sh=stage.clientHeight;
+        if(!natW||!natH||!sw||!sh) return;
+        limitsFor(); scale=minScale; center();
+      }
+      function rotate90(){ // rotire pe centru, pastrand marimea (nu se muta stanga/dreapta)
+        rot=(rot+90)%360;
+        if(!natW||!natH||!stage.clientWidth) return;
+        var prev=scale; limitsFor(); scale=clamp(prev, minScale, maxScale); center();
       }
       function zoomAt(px,py,factor){
         var ns=clamp(scale*factor, minScale, maxScale); if(ns===scale) return;
@@ -2894,7 +2903,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         b.addEventListener("click",function(){
           var cx=stage.clientWidth/2, cy=stage.clientHeight/2, z=b.getAttribute("data-z");
           if(z==="in") zoomAt(cx,cy,1.5); else if(z==="out") zoomAt(cx,cy,1/1.5);
-          else if(z==="reset"){ rot=(rot+90)%360; fit(); } // rotire 90° + reincadrare
+          else if(z==="reset"){ rotate90(); } // rotire 90° pe centru, pastrand marimea
           else fit();
         });
       });
