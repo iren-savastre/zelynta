@@ -1298,6 +1298,9 @@
 
       <div class="body-demo">
         <div class="body-fig">
+          <model-viewer id="organ3d" camera-controls auto-rotate interaction-prompt="none" shadow-intensity="0.5" exposure="1.05" loading="lazy" style="display:none;width:100%;max-width:340px;height:360px;margin:0 auto"></model-viewer>
+          <p id="organ3dCap" class="muted" style="display:none;font-size:11px;margin:2px 0 0"><span id="organ3dName"></span> · <a href="https://github.com/yihalem123/Human-Organ3D" target="_blank" rel="noopener">3D: Human-Organ3D (MIT)</a></p>
+          <div id="bodySvgWrap">
           <svg viewBox="0 0 100 220" width="200" aria-hidden="true">
             <defs>
               <filter id="holoGlow" x="-60%" y="-60%" width="220%" height="220%">
@@ -1346,6 +1349,7 @@
             </g>
             <g id="bodyOrgans"></g>
           </svg>
+          </div>
         </div>
         <div class="body-side">
           <div class="body-acc" id="bodyAcc"></div>
@@ -5005,6 +5009,9 @@
   <script>
     (function(){
       var svgG=document.getElementById("bodyOrgans"), acc=document.getElementById("bodyAcc");
+      var organ3d=document.getElementById("organ3d"), organ3dCap=document.getElementById("organ3dCap"), organ3dName=document.getElementById("organ3dName"), bodySvgWrap=document.getElementById("bodySvgWrap");
+      // organe cu model 3D disponibil (restul cad pe silueta 2D)
+      var ORGAN_MODEL={ heart:"heart", kidneys:"kidney", lungs:"lung", stomach:"stomach", liver:"liver" };
       if(!svgG||!acc) return;
       var NS="http://www.w3.org/2000/svg";
       var POS={ brain:[50,15,11], lungs:[50,55,15], heart:[44,56,9], stomach:[56,76,10],
@@ -5183,6 +5190,18 @@
           d.setAttribute("cx",p[0]); d.setAttribute("cy",p[1]); d.setAttribute("r","3.4");
           d.setAttribute("fill",item.c); d.setAttribute("stroke","#fff"); d.setAttribute("stroke-width","0.8"); svgG.appendChild(d);
         });
+        // Daca organul afectat are model 3D -> il aratam rotativ; altfel silueta 2D
+        var mdl=null, mid=null;
+        for(var i=0;i<item.o.length;i++){ if(ORGAN_MODEL[item.o[i]]){ mdl=ORGAN_MODEL[item.o[i]]; mid=item.o[i]; break; } }
+        if(mdl && organ3d){
+          if(organ3d.getAttribute("src")!=="models/"+mdl+".glb") organ3d.setAttribute("src","models/"+mdl+".glb");
+          organ3d.style.display="block"; if(bodySvgWrap) bodySvgWrap.style.display="none";
+          if(organ3dCap){ organ3dCap.style.display="block"; if(organ3dName){ var l=lang(); organ3dName.textContent=(ON[mid]&&(ON[mid][l]||ON[mid].en))||mid; } }
+        } else {
+          if(organ3d) organ3d.style.display="none";
+          if(organ3dCap) organ3dCap.style.display="none";
+          if(bodySvgWrap) bodySvgWrap.style.display="block";
+        }
       }
       function build(){
         var l=lang();
@@ -5204,5 +5223,7 @@
       new MutationObserver(build).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
     })();
   </script>
+  <!-- model-viewer (Google) pentru organele 3D din sectiunea "Ce organ afecteaza" -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 </body>
 </html>
