@@ -225,6 +225,9 @@
     /* ===== Body diagram showcase ===== */
     .body-demo { display:flex; flex-wrap:wrap; gap:32px; align-items:center; justify-content:center; margin-top:34px; text-align:left; }
     .body-fig { flex:0 0 auto; background:var(--surface-2); border:1px solid var(--line); border-radius:24px; padding:14px 22px; box-shadow:var(--shadow-sm); }
+    .organ-tab { border:1px solid var(--line); background:var(--surface); color:var(--muted); font-size:12px; font-weight:700; padding:5px 12px; border-radius:999px; cursor:pointer; transition:background .15s,color .15s,border-color .15s; }
+    .organ-tab.active { background:var(--green); color:#fff; border-color:var(--green); }
+    .organ-tab:hover { border-color:var(--green); }
     .body-side { flex:1 1 340px; max-width:460px; }
     .body-organ-glow { animation:bodyPulse 1.8s ease-in-out infinite; transform-origin:center; }
     @keyframes bodyPulse { 0%,100%{ opacity:.22; } 50%{ opacity:.72; } }
@@ -1299,7 +1302,8 @@
       <div class="body-demo">
         <div class="body-fig">
           <model-viewer id="organ3d" camera-controls auto-rotate interaction-prompt="none" shadow-intensity="0.5" exposure="1.05" loading="lazy" style="display:none;width:100%;max-width:340px;height:360px;margin:0 auto"></model-viewer>
-          <p id="organ3dCap" class="muted" style="display:none;font-size:11px;margin:2px 0 0"><span id="organ3dName"></span> · <a href="https://github.com/yihalem123/Human-Organ3D" target="_blank" rel="noopener">3D: Human-Organ3D (MIT)</a></p>
+          <div id="organTabs" style="display:none;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px"></div>
+          <p id="organ3dCap" class="muted" style="display:none;font-size:11px;margin:6px 0 0"><span id="organ3dName"></span> · <a href="https://github.com/yihalem123/Human-Organ3D" target="_blank" rel="noopener">3D: Human-Organ3D (MIT)</a></p>
           <div id="bodySvgWrap">
           <svg viewBox="0 0 100 220" width="200" aria-hidden="true">
             <defs>
@@ -5009,7 +5013,7 @@
   <script>
     (function(){
       var svgG=document.getElementById("bodyOrgans"), acc=document.getElementById("bodyAcc");
-      var organ3d=document.getElementById("organ3d"), organ3dCap=document.getElementById("organ3dCap"), organ3dName=document.getElementById("organ3dName"), bodySvgWrap=document.getElementById("bodySvgWrap");
+      var organ3d=document.getElementById("organ3d"), organ3dCap=document.getElementById("organ3dCap"), organ3dName=document.getElementById("organ3dName"), bodySvgWrap=document.getElementById("bodySvgWrap"), organTabs=document.getElementById("organTabs");
       // organe cu model 3D disponibil (restul cad pe silueta 2D)
       var ORGAN_MODEL={ heart:"heart", kidneys:"kidney", lungs:"lung", stomach:"stomach", liver:"liver" };
       if(!svgG||!acc) return;
@@ -5190,16 +5194,28 @@
           d.setAttribute("cx",p[0]); d.setAttribute("cy",p[1]); d.setAttribute("r","3.4");
           d.setAttribute("fill",item.c); d.setAttribute("stroke","#fff"); d.setAttribute("stroke-width","0.8"); svgG.appendChild(d);
         });
-        // Daca organul afectat are model 3D -> il aratam rotativ; altfel silueta 2D
-        var mdl=null, mid=null;
-        for(var i=0;i<item.o.length;i++){ if(ORGAN_MODEL[item.o[i]]){ mdl=ORGAN_MODEL[item.o[i]]; mid=item.o[i]; break; } }
-        if(mdl && organ3d){
-          if(organ3d.getAttribute("src")!=="models/"+mdl+".glb") organ3d.setAttribute("src","models/"+mdl+".glb");
-          organ3d.style.display="block"; if(bodySvgWrap) bodySvgWrap.style.display="none";
-          if(organ3dCap){ organ3dCap.style.display="block"; if(organ3dName){ var l=lang(); organ3dName.textContent=(ON[mid]&&(ON[mid][l]||ON[mid].en))||mid; } }
+        // TOATE organele afectate care au model 3D -> butoane de comutare; altfel silueta 2D
+        var mods=item.o.filter(function(id){ return ORGAN_MODEL[id]; });
+        if(mods.length && organ3d){
+          if(bodySvgWrap) bodySvgWrap.style.display="none";
+          organ3d.style.display="block"; if(organ3dCap) organ3dCap.style.display="block";
+          var lg=lang();
+          function showOrgan(id){
+            var m=ORGAN_MODEL[id];
+            if(organ3d.getAttribute("src")!=="models/"+m+".glb") organ3d.setAttribute("src","models/"+m+".glb");
+            if(organ3dName) organ3dName.textContent=(ON[id]&&(ON[id][lg]||ON[id].en))||id;
+            if(organTabs) Array.prototype.forEach.call(organTabs.children,function(b){ b.classList.toggle("active", b.getAttribute("data-o")===id); });
+          }
+          if(organTabs){
+            organTabs.style.display = mods.length>1 ? "flex" : "none";
+            organTabs.innerHTML=mods.map(function(id){ var nm=(ON[id]&&(ON[id][lg]||ON[id].en))||id; return '<button type="button" class="organ-tab" data-o="'+id+'">'+nm+'</button>'; }).join("");
+            Array.prototype.forEach.call(organTabs.children,function(b){ b.addEventListener("click",function(){ showOrgan(b.getAttribute("data-o")); }); });
+          }
+          showOrgan(mods[0]);
         } else {
           if(organ3d) organ3d.style.display="none";
           if(organ3dCap) organ3dCap.style.display="none";
+          if(organTabs) organTabs.style.display="none";
           if(bodySvgWrap) bodySvgWrap.style.display="block";
         }
       }
