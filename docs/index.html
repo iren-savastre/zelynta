@@ -1296,12 +1296,6 @@
       <h2 data-i18n="bodyTitle" style="margin-top:14px">Ce organ afectează fiecare aditiv</h2>
       <p class="lead" data-i18n="bodySub">La fiecare aditiv cu risc, Zelynta îți arată pe o siluetă exact ce organe pot fi afectate — pe înțelesul tuturor, bazat pe evaluările EFSA și IARC.</p>
 
-      <!-- ===== Model 3D anatomic interactiv (rotativ) — sursa: Human-Organ3D (MIT) ===== -->
-      <model-viewer src="models/anatomy.glb" alt="Model 3D anatomic — organe umane" camera-controls auto-rotate
-        interaction-prompt="none" shadow-intensity="0.6" exposure="1.05" loading="lazy" reveal="auto"
-        style="width:100%;max-width:540px;height:520px;margin:22px auto 4px;display:block;--poster-color:transparent"></model-viewer>
-      <p class="muted" style="font-size:12px;margin:0 0 4px">Model 3D open-source · <a href="https://github.com/yihalem123/Human-Organ3D" target="_blank" rel="noopener">Human-Organ3D (MIT)</a></p>
-
       <div class="body-demo">
         <div class="body-fig">
           <svg viewBox="0 0 100 220" width="200" aria-hidden="true">
@@ -5210,7 +5204,5 @@
       new MutationObserver(build).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
     })();
   </script>
-  <!-- model-viewer (Google) pentru modelul 3D anatomic; se incarca o singura data -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 </body>
 </html>
