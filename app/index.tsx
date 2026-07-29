@@ -1223,6 +1223,23 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           <View style={[styles.errorCard, isWeb && glassStrong]}>
             <Text style={styles.errorIcon}>😕</Text>
             <Text style={styles.errorTitle}>{error}</Text>
+            {error === t("errorNotFound") && (
+              <Text style={styles.errorHint}>{t("notFoundHint")}</Text>
+            )}
+            {error === t("errorNotFound") && (
+              <TouchableOpacity
+                style={styles.ocrFillButton}
+                onPress={() => {
+                  setError("");
+                  setOcrMode(true);
+                  openScanner();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("readIngredients")}
+              >
+                <Text style={styles.ocrFillButtonText}>📷 {t("readIngredients")}</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={styles.retryButton}
               onPress={() => (barcode ? fetchProduct() : openScanner())}
@@ -1831,6 +1848,7 @@ const makeStyles = (c: ThemeColors) =>
   },
   errorIcon: { fontSize: 44 },
   errorTitle: { fontSize: 16, color: c.textMuted, textAlign: "center", fontWeight: "600" },
+  errorHint: { fontSize: 13.5, color: c.textMuted, textAlign: "center", lineHeight: 20, marginTop: 6, maxWidth: 300 },
   retryButton: {
     backgroundColor: c.primary,
     borderRadius: 12,
