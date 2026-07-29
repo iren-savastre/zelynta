@@ -2996,13 +2996,21 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         px=sx+f*((cx+px)-sx)-cx; py=sy+f*((cy+py)-sy)-cy; scale=ns; constrain(); apply();
       }
       function openLb(src){
-        // deschidem intai fereastra, ca stage-ul sa aiba dimensiuni reale, apoi centram
         rot=0; // pornim mereu neîntors
         lb.classList.add("open"); document.body.style.overflow="hidden";
-        img.onload=function(){ natW=img.naturalWidth; natH=img.naturalHeight; fit(); };
+        // Reincearca centrarea pana cand stage-ul are dimensiuni STABILE
+        // (fereastra e in animatie de deschidere, latimea se schimba cateva frame-uri).
+        var lastW=-1, tries=0;
+        function attempt(){
+          var w=stage.clientWidth, h=stage.clientHeight;
+          if(natW && natH && w && h){ fit(); if(w!==lastW && tries++<50){ lastW=w; requestAnimationFrame(attempt); } }
+          else if(tries++<50){ requestAnimationFrame(attempt); }
+        }
+        img.onload=function(){ natW=img.naturalWidth; natH=img.naturalHeight; attempt(); };
         img.src=src;
-        if(img.complete && img.naturalWidth){ natW=img.naturalWidth; natH=img.naturalHeight; fit(); }
-        requestAnimationFrame(fit); // dupa ce fereastra e vizibila (dimensiuni corecte)
+        if(img.complete && img.naturalWidth){ natW=img.naturalWidth; natH=img.naturalHeight; }
+        attempt();
+        setTimeout(function(){ if(natW && stage.clientWidth) fit(); }, 340); // re-centrare dupa animatie
         if(hint){ hint.style.opacity="1"; clearTimeout(openLb._h); openLb._h=setTimeout(function(){ hint.style.opacity="0"; },2800); }
       }
       function closeLb(){ lb.classList.remove("open"); document.body.style.overflow=""; }
