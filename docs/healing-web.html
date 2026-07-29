@@ -3018,8 +3018,8 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
           else fit();
         });
       });
-      stage.addEventListener("wheel",function(e){ e.preventDefault(); var r=stage.getBoundingClientRect(); zoomAt(e.clientX-r.left,e.clientY-r.top, e.deltaY<0?1.18:1/1.18); },{passive:false});
-      stage.addEventListener("dblclick",function(e){ var r=stage.getBoundingClientRect(); if(scale>minScale*1.3) fit(); else zoomAt(e.clientX-r.left,e.clientY-r.top,3); });
+      stage.addEventListener("wheel",function(e){ e.preventDefault(); zoomAt(stage.clientWidth/2, stage.clientHeight/2, e.deltaY<0?1.18:1/1.18); },{passive:false});
+      stage.addEventListener("dblclick",function(e){ if(scale>minScale*1.3) fit(); else zoomAt(stage.clientWidth/2, stage.clientHeight/2, 3); });
       var pts={}, lastDist=0, dragging=false, lastX=0, lastY=0;
       stage.addEventListener("pointerdown",function(e){
         stage.setPointerCapture(e.pointerId); pts[e.pointerId]={x:e.clientX,y:e.clientY};
@@ -3032,7 +3032,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         var ids=Object.keys(pts);
         if(ids.length===2){
           var a=pts[ids[0]],b=pts[ids[1]], dist=Math.hypot(a.x-b.x,a.y-b.y), r=stage.getBoundingClientRect();
-          if(lastDist) zoomAt((a.x+b.x)/2-r.left,(a.y+b.y)/2-r.top, dist/lastDist); lastDist=dist;
+          if(lastDist) zoomAt(stage.clientWidth/2, stage.clientHeight/2, dist/lastDist); lastDist=dist;
         } else if(dragging){ px+=e.clientX-lastX; py+=e.clientY-lastY; lastX=e.clientX; lastY=e.clientY; constrain(); apply(); }
       });
       function up(e){ delete pts[e.pointerId]; if(Object.keys(pts).length<2) lastDist=0; if(!Object.keys(pts).length){ dragging=false; stage.classList.remove("grabbing"); } }
