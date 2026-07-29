@@ -101,9 +101,9 @@
   /* Vizualizator cu zoom & pan */
   .lb{position:fixed;inset:0;background:rgba(8,16,11,.95);display:none;z-index:90;overflow:hidden}
   .lb.open{display:block}
-  .lb-stage{position:absolute;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+  .lb-stage{position:absolute;inset:0;overflow:hidden;cursor:grab;touch-action:none;display:flex;align-items:center;justify-content:center}
   .lb-stage.grabbing{cursor:grabbing}
-  .lb-stage img{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;user-select:none;-webkit-user-drag:none;border-radius:4px}
+  .lb-stage img{transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none;border-radius:4px;max-width:none;max-height:none;flex:0 0 auto}
   .lb-bar{position:absolute;top:14px;right:14px;z-index:2;display:flex;gap:8px;align-items:center}
   .lb-bar button{width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;backdrop-filter:blur(4px)}
   .lb-bar button:hover{background:rgba(255,255,255,.30)}
@@ -2964,12 +2964,8 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       if(!lb||!stage||!img) return;
       var scale=1, minScale=1, maxScale=1, px=0, py=0, natW=0, natH=0, rot=0;
       function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
-      // Transformare in jurul CENTRULUI: imaginea e mereu centrata (px=py=0);
-      // roteste si scaleaza pe centrul ei, iar px/py = deplasare la tragere.
-      function apply(){
-        var cx=stage.clientWidth/2, cy=stage.clientHeight/2;
-        img.style.transform="translate("+(cx+px)+"px,"+(cy+py)+"px) rotate("+rot+"deg) scale("+scale+") translate("+(-natW/2)+"px,"+(-natH/2)+"px)";
-      }
+      // Imaginea e centrata de FLEXBOX (.lb-stage). Transform doar scaleaza/roteste/muta.
+      function apply(){ img.style.transform="translate("+px+"px,"+py+"px) scale("+scale+") rotate("+rot+"deg)"; }
       function limitsFor(){
         var sw=stage.clientWidth, sh=stage.clientHeight, rotated=(rot%180)!==0;
         var effW=rotated?natH:natW, effH=rotated?natW:natH;
@@ -2990,10 +2986,9 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         if(!natW||!natH||!stage.clientWidth) return;
         var prev=scale; limitsFor(); scale=clamp(prev,minScale,maxScale); px=0; py=0; apply();
       }
-      function zoomAt(sx,sy,factor){ // zoom pastrand fix punctul de sub cursor
+      function zoomAt(sx,sy,factor){ // zoom pe centru; pan-ul scaleaza proportional
         var ns=clamp(scale*factor,minScale,maxScale); if(ns===scale) return;
-        var f=ns/scale, cx=stage.clientWidth/2, cy=stage.clientHeight/2;
-        px=sx+f*((cx+px)-sx)-cx; py=sy+f*((cy+py)-sy)-cy; scale=ns; constrain(); apply();
+        var f=ns/scale; px*=f; py*=f; scale=ns; constrain(); apply();
       }
       function openLb(src){
         rot=0; // pornim mereu neîntors
