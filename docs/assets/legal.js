@@ -166,7 +166,7 @@
           L("privacy-contact.html",T("l_privcontact"))+L("legal/gdpr-rights.html",T("l_gdpr"))+
           '<button class="linklike" data-ck-open>'+esc(T("l_ckpref"))+'</button>'+
           L("legal/privacy.html",T("l_privacy"))+
-          '<p style="margin-top:10px;font-size:13px;color:#9fb3a6">Email: suport@zelynta.com<br>Suport: suport@zelynta.com</p>'+
+          '<p style="margin-top:10px;font-size:13px;color:#9fb3a6">Contact: suport@zelynta.com</p>'+
         '</div>'+
       '</div>'+
       '<div class="ft-legal">'+
