@@ -6,9 +6,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
     ActivityIndicator,
     Animated,
+    BackHandler,
     Easing,
     Image,
     KeyboardAvoidingView,
@@ -271,6 +273,7 @@ export default function Index() {
   const [ingredientsAuto, setIngredientsAuto] = useState(false);
   const [ingredientsTranslating, setIngredientsTranslating] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
+  const insets = useSafeAreaInsets();
 
   const currentLang =
     languages.find((l) => l.code === i18n.language) ?? languages[1];
@@ -337,6 +340,15 @@ export default function Index() {
     setScannerOpen(false);
     setOcrMode(false);
   }
+
+  useEffect(() => {
+    if (!scannerOpen || Platform.OS !== "android") return;
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      closeScanner();
+      return true;
+    });
+    return () => sub.remove();
+  }, [scannerOpen]);
 
   function handleBarcodeScanned({ data }: { data: string }) {
     if (!scannerOpen || ocrLoading) return; // evită declanșarea multiplă
@@ -802,10 +814,10 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             >
               <Text style={styles.torchIcon}>{torchOn ? "🔦" : "💡"}</Text>
             </TouchableOpacity>
-            <View style={styles.scannerOverlay}>
-              <Text style={styles.scannerText}>
-                {ocrMode ? t("ocrAim") : t("scanInstructions")}
-              </Text>
+            <View style={[styles.scannerOverlay, { paddingBottom: 30 + insets.bottom }]}>
+              {ocrMode && (
+                <Text style={styles.scannerText}>{t("ocrAim")}</Text>
+              )}
               {ocrMode ? (
                 <View
                   style={[
