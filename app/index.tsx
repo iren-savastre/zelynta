@@ -49,6 +49,10 @@ import { extractAdditiveTags, extractIngredientsSegment, ocrImage } from "../uti
 import { analyzeProduct, stripAdditives, productDisplay } from "../utils/score";
 import { mixHex, PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
+// Placeholder pt produse scanate din poza (fara nume real) — se traduce live
+// la afisare, nu se salveaza tradus, ca sa reflecte mereu limba curenta.
+const OCR_TITLE_SENTINEL = "__ocr_title__";
+
 const languages = [
   { code: "ro", label: "Română", flag: "🇷🇴", cc: "ro" },
   { code: "en", label: "English", flag: "🇬🇧", cc: "gb" },
@@ -165,7 +169,6 @@ export default function Index() {
   const scanTop = pal.primaryDark;
   const scanBottom = pal.primary;
   const searchTop = pal.primary;
-  const searchBottom = mixHex(pal.primary, 0.62, "#000000");
 
   // drapel animat (sway) — ca pe landing page
   const flagWave = useRef(new Animated.Value(0)).current;
@@ -488,7 +491,7 @@ export default function Index() {
     } else {
       setProduct({
         code: `ocr-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
-        product_name: t("ocrTitle"),
+        product_name: OCR_TITLE_SENTINEL,
         brands: "",
         image_url: photoUri,
         ingredients_text: segment,
@@ -524,6 +527,7 @@ export default function Index() {
   const display = product
     ? productDisplay(product)
     : { title: "", subtitle: "" };
+  if (display.title === OCR_TITLE_SENTINEL) display.title = t("ocrTitle");
   const advice = product ? getProductAdvice(product, lang) : null;
   const palm = product && hasPalmOil(product) ? getPalmNote(lang) : null;
 
@@ -1269,7 +1273,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 <TouchableOpacity
                   onPress={() => openZoom(product.image_url)}
                   accessibilityRole="imagebutton"
-                  accessibilityLabel={product.product_name || t("unknownName")}
+                  accessibilityLabel={display.title || t("unknownName")}
                 >
                   <Image
                     source={{ uri: product.image_url }}
