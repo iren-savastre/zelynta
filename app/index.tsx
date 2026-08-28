@@ -1256,6 +1256,22 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 <Text style={styles.ocrFillButtonText}>📷 {t("readIngredients")}</Text>
               </TouchableOpacity>
             )}
+            {error === t("errorNotFound") && (
+              <TouchableOpacity
+                style={[styles.retryButton, { marginTop: 10 }]}
+                onPress={() =>
+                  Linking.openURL(
+                    barcode
+                      ? `https://world.openfoodfacts.org/product/${barcode}`
+                      : "https://world.openfoodfacts.org/"
+                  )
+                }
+                accessibilityRole="button"
+                accessibilityLabel={t("addToOffBtn")}
+              >
+                <Text style={styles.retryButtonText}>🌍 {t("addToOffBtn")}</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={styles.retryButton}
               onPress={() => (barcode ? fetchProduct() : openScanner())}

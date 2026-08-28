@@ -161,7 +161,7 @@
           L("legal/gdpr-rights.html",T("l_gdpr"))+L("legal/data-processing.html",T("l_dataproc"))+
           L("legal/acceptable-use.html",T("l_acceptable"))+'</div>'+
         '<div class="col"><h4>'+esc(T("col_support"))+'</h4>'+
-          L("support.html",T("l_support"))+L("contact.html",T("l_contact"))+L("report-problem.html",T("l_report"))+'</div>'+
+          L("support.html",T("l_support"))+L("contact.html",T("l_contact"))+L("report-problem.html",T("l_report"))+L("sources.html",T("l_sources"))+'</div>'+
         '<div class="col"><h4>'+esc(T("col_privacy"))+'</h4>'+
           L("privacy-contact.html",T("l_privcontact"))+L("legal/gdpr-rights.html",T("l_gdpr"))+
           '<button class="linklike" data-ck-open>'+esc(T("l_ckpref"))+'</button>'+
