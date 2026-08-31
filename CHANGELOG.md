@@ -17,7 +17,7 @@ versionare [SemVer](https://semver.org/).
 - ErrorBoundary global în aplicație (fallback prietenos + reload).
 - Anti-spam: cooldown client-side pe toate formularele publice.
 - Stare de încărcare premium (spinner + skeleton) la alternative.
-- Documentație: `DEPLOYMENT.md` (runbook), `.env.example`, `AUDIT TOTAL.md`.
+- Documentație: `.env.example` (restul documentelor interne sunt într-un repo privat separat).
 
 ### Reparat
 - 24 de chei i18n existau doar în RO+EN → adăugate în fr/it/es/de/ru/pl/nl (aplicația nu mai cade pe engleză).
@@ -35,4 +35,4 @@ versionare [SemVer](https://semver.org/).
 
 ---
 
-> Pentru detalii complete și starea curentă, vezi `AUDIT TOTAL.md` și `AUDIT FINAL.md`.
+> Pentru detalii complete și starea curentă, vezi documentele interne (repo privat).
