@@ -38,6 +38,15 @@ yarn-error.*
 # date private locale (coduri, chei) — NU se urca niciodata pe git
 /private/
 
+# documente interne — traiesc in repo-ul privat zelynta-internal, NU aici
+AUDIT FINAL.md
+AUDIT TOTAL.md
+DEPLOYMENT.md
+GHID_DEPLOY_IRINA.md
+GHID_PLAY_STORE.md
+MARKETING.md
+STORE_LISTING.md
+
 # typescript
 *.tsbuildinfo
 
