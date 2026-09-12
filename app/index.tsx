@@ -36,7 +36,7 @@ import WaveText from "../components/WaveText";
 import { getProductAdvice } from "../utils/advice";
 import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
 import { persistAppLanguage } from "../i18n/i18n";
-import { fetchProductByBarcode } from "../utils/apiClient";
+import { lookupProductByBarcode, type LookupErrorKind } from "../utils/apiClient";
 import { useBasket } from "../utils/basket";
 import { saveToHistory } from "../utils/history";
 import { getPalmNote, hasPalmOil } from "../utils/palm";
@@ -259,6 +259,10 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [error, setError] = useState("");
+  // De ce a esuat cautarea. Textul erorii nu e suficient: butoanele „citeste
+  // ingredientele" si „adauga pe Open Food Facts" au sens DOAR daca produsul
+  // chiar lipseste din baza, nu cand utilizatorul e offline.
+  const [errorKind, setErrorKind] = useState<LookupErrorKind | "EMPTY_INPUT" | null>(null);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [selectedAdditive, setSelectedAdditive] = useState<any>(null);
@@ -295,24 +299,38 @@ export default function Index() {
     const seq = ++fetchSeqRef.current;
     setLoading(true);
     setError("");
+    setErrorKind(null);
     setProduct(null);
     setSelectedAdditive(null);
     setScannerOpen(false);
     setLangMenuOpen(false);
 
     try {
-      // Caută pe rând în 3 baze: alimente, cosmetice, produse generale
-      const found = await fetchProductByBarcode(code);
+      // Caută pe rând în cele 4 baze: alimente, cosmetice, produse generale, hrană animale
+      const result = await lookupProductByBarcode(code);
       if (seq !== fetchSeqRef.current) return; // a pornit alta cautare intre timp
-      if (found) {
-        setProduct(found);
+      if (result.ok) {
+        setProduct(result.product);
         setLoading(false);
         return; // produs găsit, ne oprim
       }
-      // dacă am terminat toate bazele fără rezultat
-      setError(t("errorNotFound"));
-    } catch (e) {
+
+      // Fiecare motiv are alt mesaj SI alt set de butoane (vezi cardul de eroare).
+      setErrorKind(result.kind);
+      setError(
+        result.kind === "PRODUCT_NOT_FOUND"
+          ? t("errorNotFound")
+          : result.kind === "RATE_LIMITED"
+            ? t("errorRateLimited")
+            : result.kind === "UPSTREAM_ERROR"
+              ? t("errorUpstream")
+              : t("errorConnection")
+      );
+    } catch {
+      // lookupProductByBarcode nu arunca, dar daca s-ar schimba vreodata,
+      // tratam ca problema de retea — nu ca „produsul nu exista".
       if (seq !== fetchSeqRef.current) return;
+      setErrorKind("NETWORK_ERROR");
       setError(t("errorConnection"));
     } finally {
       if (seq === fetchSeqRef.current) setLoading(false);
@@ -321,6 +339,7 @@ export default function Index() {
 
   function fetchProduct() {
     if (!barcode) {
+      setErrorKind("EMPTY_INPUT");
       setError(t("errorEmpty"));
       return;
     }
@@ -414,6 +433,7 @@ export default function Index() {
       }
       if (alive) {
         closeScanner();
+        setErrorKind(null);
         setError(t("ocrNoText"));
       }
     })();
@@ -463,6 +483,7 @@ export default function Index() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     }
     closeScanner();
+    setErrorKind(null);
     setError("");
     // Aditivii ii cautam in TOT textul (etichetele multilingve repeta lista —
     // prindem orice cod E indiferent de limba); pentru afisare pastram doar
@@ -624,12 +645,26 @@ useEffect(() => {
       scannedAt: Date.now(),
     });
     setShowBreakdown(false);
-    // Caută alternative mai bune
+    // Caută alternative mai bune.
+    //
+    // Cautarea dureaza secunde bune. Daca utilizatorul scaneaza produsul A si
+    // imediat produsul B, raspunsul lent al lui A ar ajunge DUPA ce pe ecran e
+    // deja B — si i-ar afisa alternativele produsului A. `cancelled` inchide
+    // acest efect cand produsul se schimba: React ruleaza functia de curatare
+    // inainte de urmatoarea rulare a efectului.
+    let cancelled = false;
     setAlternatives([]);
     setAltLoading(true);
     getBetterAlternatives(product, score, lang)
-      .then(setAlternatives)
-      .finally(() => setAltLoading(false));
+      .then((alts) => {
+        if (!cancelled) setAlternatives(alts);
+      })
+      .finally(() => {
+        if (!cancelled) setAltLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [product]);
 
   function currentHistoryItem() {
@@ -779,6 +814,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               onBarcodeScanned={ocrMode || ocrLoading ? undefined : handleBarcodeScanned}
               onMountError={(e: any) => {
                 console.warn("Camera mount error:", e?.message ?? e);
+                setErrorKind(null);
                 setError(t("cameraBlockedHelp"));
                 setScannerOpen(false);
               }}
@@ -1237,16 +1273,30 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
         {!loading && error !== "" && (
           <View style={[styles.errorCard, isWeb && glassStrong]}>
-            <Text style={styles.errorIcon}>😕</Text>
+            {/* Offline arata un semn de conexiune, nu o fata trista: problema
+                nu e produsul, ci legatura la internet. */}
+            <Text style={styles.errorIcon}>
+              {errorKind === "NETWORK_ERROR" ? "📡" : errorKind === "RATE_LIMITED" ? "⏳" : "😕"}
+            </Text>
             <Text style={styles.errorTitle}>{error}</Text>
-            {error === t("errorNotFound") && (
+
+            {errorKind === "PRODUCT_NOT_FOUND" && (
               <Text style={styles.errorHint}>{t("notFoundHint")}</Text>
             )}
-            {error === t("errorNotFound") && (
+            {/* Fara conexiune nu stim daca produsul exista. Spunem exact asta,
+                in loc sa lasam utilizatorul sa creada ca lipseste din baza. */}
+            {errorKind === "NETWORK_ERROR" && (
+              <Text style={styles.errorHint}>{t("offlineHint")}</Text>
+            )}
+
+            {/* OCR-ul citeste eticheta de pe ambalaj, local, fara internet —
+                deci ajuta si cand produsul lipseste, si cand esti offline. */}
+            {(errorKind === "PRODUCT_NOT_FOUND" || errorKind === "NETWORK_ERROR") && (
               <TouchableOpacity
                 style={styles.ocrFillButton}
                 onPress={() => {
                   setError("");
+                  setErrorKind(null);
                   setOcrMode(true);
                   openScanner();
                 }}
@@ -1256,7 +1306,11 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 <Text style={styles.ocrFillButtonText}>📷 {t("readIngredients")}</Text>
               </TouchableOpacity>
             )}
-            {error === t("errorNotFound") && (
+
+            {/* Trimitem pe Open Food Facts DOAR cand stim sigur ca produsul
+                lipseste. Offline, linkul ar esua oricum si ar cere utilizatorului
+                sa adauge un produs care poate exista deja. */}
+            {errorKind === "PRODUCT_NOT_FOUND" && (
               <TouchableOpacity
                 style={[styles.retryButton, { marginTop: 10 }]}
                 onPress={() =>
