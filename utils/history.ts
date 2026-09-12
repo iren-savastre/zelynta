@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const KEY = "zelynta_history";
-const MAX_ITEMS = 100;
 
 export type HistoryItem = {
   barcode: string;
@@ -40,16 +39,40 @@ export async function getHistory(): Promise<HistoryItem[]> {
   }
 }
 
+/**
+ * Salveaza o scanare.
+ *
+ * Istoricul NU se plafoneaza: produsele scanate raman pana cand utilizatorul
+ * le sterge sau dezinstaleaza aplicatia. (Inainte se pastrau doar ultimele
+ * 100, iar cele mai vechi dispareau fara ca nimeni sa fie anuntat.)
+ *
+ * Rescanarea aceluiasi produs nu creeaza o a doua intrare: cea veche e
+ * inlocuita, deci data se actualizeaza si produsul urca in capul listei.
+ */
 export async function saveToHistory(item: HistoryItem): Promise<void> {
+  let updated: HistoryItem[];
   try {
     const history = await getHistory();
     // Scoate orice intrare veche a aceluiasi produs (dupa cod SAU nume+marca)
     const filtered = history.filter((h) => !sameProduct(h, item));
     // Adaugă noua intrare în față
-    const updated = dedupe([item, ...filtered]).slice(0, MAX_ITEMS);
-    await AsyncStorage.setItem(KEY, JSON.stringify(updated));
+    updated = dedupe([item, ...filtered]);
   } catch {
-    // ignoră erorile de stocare
+    updated = [item];
+  }
+
+  // Fara plafon, stocarea telefonului se poate umple candva. Daca scrierea
+  // esueaza, nu pierdem noua scanare in tacere: renuntam la jumatate din cele
+  // mai vechi intrari si reincercam. Mai bine un istoric scurtat decat un
+  // produs scanat care nu se salveaza deloc.
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      await AsyncStorage.setItem(KEY, JSON.stringify(updated));
+      return;
+    } catch {
+      if (updated.length <= 1) return;
+      updated = updated.slice(0, Math.max(1, Math.floor(updated.length / 2)));
+    }
   }
 }
 

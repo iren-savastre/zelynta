@@ -68,14 +68,13 @@ export default function History() {
     router.push({ pathname: "/", params: { barcode } });
   }
 
+  // Data se compune manual, nu prin toLocaleDateString: pe unele telefoane
+  // Android suportul pentru formatarea localizata e partial, iar anul putea
+  // sa lipseasca din ce vedea utilizatorul. Asa aratam mereu zi.luna.an, ora.
   function formatDate(ts: number) {
-    return new Date(ts).toLocaleDateString(i18n.language, {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const d = new Date(ts);
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}, ${p(d.getHours())}:${p(d.getMinutes())}`;
   }
 
   const TABS: { key: Tab; icon: any; label: string }[] = [
