@@ -63,11 +63,15 @@ const SOCIAL: { ic: any; url: string }[] = [
   { ic: "logo-instagram", url: SITE },
 ];
 
-// Butoane de store (sub social). URL-urile pot fi schimbate aici sau din CMS (landing).
-const STORE_URL = "https://github.com/iren-savastre/zelynta/releases/latest";
+// Butoane de store (sub social).
+//
+// Insigna App Store a fost scoasa: aplicatia nu exista pe iOS, iar apasarea ei
+// ducea la aceeasi pagina goala de GitHub ca si cea de Google Play. O insigna
+// care nu duce nicaieri il face pe utilizator sa creada ca a gresit el ceva.
+// In locul ei aratam textul „in curand", exact ca pe site (cheia `iosSoon`).
+const STORE_URL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
 const STORES: { img: any; url: string; label: string }[] = [
   { img: require("../assets/images/google-play.png"), url: STORE_URL, label: "Google Play" },
-  { img: require("../assets/images/app-store.png"), url: STORE_URL, label: "App Store" },
 ];
 
 // Linkuri externe pentru coloana „Susține".
@@ -188,6 +192,7 @@ export default function AppFooter({
                     <Image source={s.img} style={styles.storeImg} resizeMode="contain" />
                   </TouchableOpacity>
                 ))}
+                <Text style={styles.storeSoon}>{t("iosSoon")}</Text>
               </View>
             </View>
 
@@ -247,6 +252,16 @@ const styles = StyleSheet.create({
   stores: { flexDirection: "column", alignItems: "flex-start", gap: 10, marginTop: 14 },
   storeBtn: { borderRadius: 9, overflow: "hidden" },
   storeImg: { height: 44, width: 150 },
+  // Textul care tine locul insignei App Store. Aceeasi latime ca insigna, ca
+  // sa se alinieze sub ea, si discret — e o informatie, nu un buton.
+  storeSoon: {
+    width: 150,
+    color: "#9fc4ab",
+    fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center",
+    paddingVertical: 6,
+  },
   soc: {
     width: 40,
     height: 40,
