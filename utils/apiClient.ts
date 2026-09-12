@@ -14,7 +14,7 @@ const DATABASES = [
 // Limbile aplicatiei. Textul de ingrediente e functia centrala a Zelynta, deci
 // cerem varianta din fiecare limba — altfel un utilizator polonez ar primi
 // produsul fara compozitie doar pentru ca am cerut numai `ingredients_text_ro`.
-const APP_LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el"];
+export const APP_LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el"];
 
 // Campurile cerute de la API. Fara `fields`, OpenFoodFacts trimite produsul
 // intreg (adesea peste 100 KB: istoric de modificari, toate limbile, toate

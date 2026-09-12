@@ -39,6 +39,10 @@ function StackNav() {
           name="advice"
           options={{ animation: "slide_from_right", animationDuration: 320 }}
         />
+        <Stack.Screen
+          name="contribute"
+          options={{ animation: "slide_from_bottom", animationDuration: 320 }}
+        />
       </Stack>
       <BasketBar />
       <CookieBanner />
