@@ -1,0 +1,35 @@
+name: CodeQL
+
+# Analiza statica de securitate pe codul JS/TS (aplicatie + site).
+# Ruleaza la push pe main, la PR-uri si saptamanal — ultima parte conteaza,
+# fiindca reguli noi apar dupa ce codul a fost deja scris.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * 1" # luni, 04:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analiza JavaScript/TypeScript
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # necesar pentru a publica rezultatele in tab-ul Security
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"

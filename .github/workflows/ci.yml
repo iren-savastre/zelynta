@@ -7,6 +7,12 @@ on:
     branches: [main]
   workflow_dispatch: {}
 
+# Token-ul primit de job-uri poate doar sa citeasca codul. CI-ul nu scrie nimic
+# in repo, deci nu are nevoie de mai mult — daca o dependenta compromisa ar rula
+# in timpul build-ului, nu ar putea modifica repo-ul.
+permissions:
+  contents: read
+
 jobs:
   quality:
     name: Typecheck & Lint

@@ -1,0 +1,34 @@
+version: 2
+
+# Dependabot deschide PR-uri cand apar versiuni noi. Nu folosim Renovate:
+# Dependabot e integrat in GitHub, nu cere configurare suplimentara si acopera
+# nevoia reala a unui proiect intretinut de o singura persoana.
+updates:
+  # Pachetele npm ale aplicatiei.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    # Actualizarile de securitate vin oricum, separat si imediat.
+    groups:
+      # Un singur PR pentru actualizarile marunte, ca sa nu se umple lista.
+      dependente-minore:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      # Expo si React Native se actualizeaza impreuna, prin `expo install`
+      # si upgrade-ul oficial de SDK — nu pachet cu pachet.
+      - dependency-name: "expo"
+      - dependency-name: "expo-*"
+      - dependency-name: "react-native"
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+
+  # Actiunile folosite in workflow-uri (actions/checkout, setup-node etc.).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3

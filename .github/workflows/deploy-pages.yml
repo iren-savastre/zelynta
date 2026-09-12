@@ -9,6 +9,12 @@ on:
     paths:
       - "docs/**"
       - ".github/workflows/deploy-pages.yml"
+      # Build-ul e produs de scriptul de optimizare: daca el se schimba
+      # (sau dependintele lui), site-ul publicat trebuie regenerat. Fara
+      # liniile astea, o imbunatatire din scripts/ nu ajungea niciodata live.
+      - "scripts/**"
+      - "package.json"
+      - "package-lock.json"
   workflow_dispatch:
 
 permissions:
