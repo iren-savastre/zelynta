@@ -77,7 +77,9 @@ const STORES: { img: any; url: string; label: string }[] = [
 // Linkuri externe pentru coloana „Susține".
 const REVIEW_URL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
 const DONATE_URL = "https://www.buymeacoffee.com/zelynta"; // creeaza contul cu username "zelynta"
-const PARTNERS_URL = "mailto:suport@zelynta.com?subject=Parteneriat%20Zelynta";
+// Creditul catre MediaExpert Solution, care a ajutat la proiect. Acelasi link
+// pe care il are si site-ul, in footer.
+const PARTNER_URL = "https://mediaexpertsolution.com/";
 
 // head/label sunt CHEI i18n (traduse cu t() la randare).
 // route = navigare în app (fără 404); url = link extern (Linking.openURL).
@@ -117,7 +119,10 @@ const COLS: { head: string; headIc: any; items: Item[] }[] = [
     items: [
       { label: "footerReviews", url: REVIEW_URL, ic: "star-outline" },
       { label: "footerDonate", url: DONATE_URL, ic: "cafe-outline" },
-      { label: "footerPartners", url: PARTNERS_URL, ic: "briefcase-outline" },
+      // „Parteneri" a fost scos de aici: eticheta promitea ca vezi partenerii,
+      // dar deschidea clientul de email — comportament de buton de contact,
+      // care exista oricum in coloana Suport. Creditul catre partener e acum
+      // jos in footer, ca pe site.
     ],
   },
 ];
@@ -219,6 +224,23 @@ export default function AppFooter({
           </View>
 
           <View style={styles.hr} />
+
+          {/* Creditul catre cel care a ajutat la proiect — acelasi pe care il
+              are si site-ul, cu aceeasi formulare si acelasi logo. */}
+          <TouchableOpacity
+            style={styles.creditRow}
+            onPress={() => open(PARTNER_URL)}
+            accessibilityRole="link"
+            accessibilityLabel="MediaExpert Solution"
+          >
+            <Image
+              source={require("../assets/images/mediaexpert-logo.webp")}
+              style={styles.creditLogo}
+              resizeMode="contain"
+            />
+            <Text style={styles.credit}>{t("footerCreditBy")}</Text>
+          </TouchableOpacity>
+
           <Text style={styles.copy}>
             © {year} {t("footerRights")} · {t("footerDisclaimer")}
           </Text>
@@ -296,4 +318,7 @@ const styles = StyleSheet.create({
   link: { color: "#b6c7bb", fontSize: 14 },
   hr: { height: 1, backgroundColor: "rgba(255,255,255,0.1)", marginVertical: 22 },
   copy: { color: "#7f948a", fontSize: 12.5, lineHeight: 18 },
+  creditRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 14 },
+  creditLogo: { width: 20, height: 20, borderRadius: 5 },
+  credit: { color: "#9fc4ab", fontSize: 12.5, lineHeight: 18, flex: 1 },
 });
