@@ -36,7 +36,8 @@ import WaveText from "../components/WaveText";
 import { getProductAdvice } from "../utils/advice";
 import { getBetterAlternatives, type Alternative } from "../utils/alternatives";
 import { persistAppLanguage } from "../i18n/i18n";
-import { lookupProductByBarcode, type LookupErrorKind } from "../utils/apiClient";
+import { APP_LANGS, lookupProductByBarcode, type LookupErrorKind } from "../utils/apiClient";
+import { isContributionEnabled } from "../utils/offContribute";
 import { useBasket } from "../utils/basket";
 import { saveToHistory } from "../utils/history";
 import { getPalmNote, hasPalmOil } from "../utils/palm";
@@ -72,10 +73,14 @@ function flagUrl(cc: string, w: number) {
   return `https://flagcdn.com/w${w}/${cc}.png`;
 }
 
-// Etichete pentru traducerea automata a ingredientelor (in toate cele 11 limbi)
+// Etichete pentru traducerea automata a ingredientelor (in toate cele 11 limbi).
+// `original` se arata cand textul NU e in limba aleasa si nu a putut fi tradus —
+// mai bine spunem asta pe fata decat sa lasam utilizatorul sa creada ca
+// aplicatia i-a amestecat limbile.
 const autoLabels = {
-  translating: { ro: "Se traduce…", en: "Translating…", fr: "Traduction…", it: "Traduzione…", es: "Traduciendo…", de: "Wird übersetzt…", ru: "Перевод…", pl: "Tłumaczenie…", nl: "Vertalen…" } as Record<string, string>,
-  auto: { ro: "tradus automat", en: "auto-translated", fr: "traduit automatiquement", it: "tradotto automaticamente", es: "traducido automáticamente", de: "automatisch übersetzt", ru: "автоперевод", pl: "przetłumaczone automatycznie", nl: "automatisch vertaald" } as Record<string, string>,
+  translating: { ro: "Se traduce…", en: "Translating…", fr: "Traduction…", it: "Traduzione…", es: "Traduciendo…", de: "Wird übersetzt…", ru: "Перевод…", pl: "Tłumaczenie…", nl: "Vertalen…", bg: "Превежда се…", el: "Μετάφραση…" } as Record<string, string>,
+  auto: { ro: "tradus automat", en: "auto-translated", fr: "traduit automatiquement", it: "tradotto automaticamente", es: "traducido automáticamente", de: "automatisch übersetzt", ru: "автоперевод", pl: "przetłumaczone automatycznie", nl: "automatisch vertaald", bg: "автоматичен превод", el: "αυτόματη μετάφραση" } as Record<string, string>,
+  original: { ro: "text original de pe ambalaj — nu e disponibil în română", en: "original label text — not available in English", fr: "texte original de l'emballage — non disponible en français", it: "testo originale dell'etichetta — non disponibile in italiano", es: "texto original del envase — no disponible en español", de: "Originaltext der Verpackung — nicht auf Deutsch verfügbar", ru: "исходный текст с упаковки — недоступен на русском", pl: "oryginalny tekst z opakowania — niedostępny po polsku", nl: "originele tekst van de verpakking — niet in het Nederlands beschikbaar", bg: "оригинален текст от опаковката — не е наличен на български", el: "αρχικό κείμενο συσκευασίας — μη διαθέσιμο στα ελληνικά" } as Record<string, string>,
 };
 
 const levelColors: Record<string, string> = {
@@ -277,9 +282,17 @@ export default function Index() {
   const [alternatives, setAlternatives] = useState<Alternative[]>([]);
   const [altLoading, setAltLoading] = useState(false);
   const [ingredientsText, setIngredientsText] = useState("");
-  const [ingredientsAuto, setIngredientsAuto] = useState(false);
-  const [ingredientsTranslating, setIngredientsTranslating] = useState(false);
-  const [permission, requestPermission] = useCameraPermissions();
+  // Ce se intampla cu textul de ingrediente afisat:
+  //   null         — e chiar in limba aleasa, nimic de semnalat
+  //   "translating" — se traduce acum
+  //   "auto"        — tradus automat (calitate de masina)
+  //   "original"    — NU e in limba aleasa si nu a putut fi tradus
+  const [ingredientsNote, setIngredientsNote] = useState<
+    null | "translating" | "auto" | "original"
+  >(null);
+  // Al treilea element citeste starea curenta a permisiunii fara a cere nimic —
+  // exact ce ne trebuie ca sa nu mai intrebam cand accesul e deja acordat.
+  const [permission, requestPermission, getCameraPermission] = useCameraPermissions();
   const insets = useSafeAreaInsets();
 
   const currentLang =
@@ -350,11 +363,27 @@ export default function Index() {
     setTorchOn(false);
     // Deschidem camera direct — utilizatorul a apăsat, e clar că vrea camera.
     setScannerOpen(true);
-    // Dacă permisiunea nu e încă acordată, o cerem în fundal (dialogul
-    // de securitate al browserului/sistemului e obligatoriu, nu îl putem evita).
-    if (!permission?.granted) {
-      requestPermission().catch(() => {});
+
+    // De ce aparea dialogul de permisiune la FIECARE scanare:
+    // `useCameraPermissions()` intoarce `null` cat timp starea inca se
+    // incarca, nu un obiect cu granted=false. Vechiul cod scria
+    // `!permission?.granted`, iar `null` trecea de conditie — deci cerea
+    // permisiunea din nou, chiar daca utilizatorul o acordase demult.
+    //
+    // Acum, daca starea nu s-a incarcat inca, o citim intai si abia apoi
+    // decidem. Cerem doar cand chiar nu avem permisiunea.
+    let p = permission;
+    if (!p) {
+      try {
+        p = await getCameraPermission();
+      } catch {
+        p = null;
+      }
     }
+    if (p?.granted) return; // deja acordata — nu deranjam utilizatorul
+    if (p && !p.canAskAgain) return; // refuzata definitiv — ecranul dedicat explica ce are de facut
+
+    requestPermission().catch(() => {});
   }
 
   function closeScanner() {
@@ -556,43 +585,82 @@ export default function Index() {
   useEffect(() => {
     if (!product) {
       setIngredientsText("");
-      setIngredientsAuto(false);
-      setIngredientsTranslating(false);
+      setIngredientsNote(null);
       return;
     }
+    // 1) Textul exista chiar in limba aleasa — cazul ideal, fara traducere.
     const native = (product[`ingredients_text_${lang}`] || "").trim();
     if (native) {
       setIngredientsText(native);
-      setIngredientsAuto(false);
-      setIngredientsTranslating(false);
+      setIngredientsNote(null);
       return;
     }
+
     const enText = (product.ingredients_text_en || "").trim();
     const origText = (product.ingredients_text || "").trim();
-    if (lang === "en") {
-      setIngredientsText(enText || origText);
-      setIngredientsAuto(false);
-      return;
-    }
     const source = enText || origText;
-    const sourceLang = enText ? "en" : product.lang || "en";
     if (!source) {
       setIngredientsText("");
-      setIngredientsAuto(false);
+      setIngredientsNote(null);
       return;
     }
+    if (lang === "en") {
+      setIngredientsText(source);
+      setIngredientsNote(null);
+      return;
+    }
+
+    // 2) In ce limba e, de fapt, textul nesufixat?
+    //
+    // NU ne bazam pe `product.lang`: pe produsele romanesti reale din baza de
+    // date scrie "en", "de" sau "es", desi ingredientele sunt in romana. Cu o
+    // limba-sursa gresita, traducerea iese amestecata — exact reclamatia
+    // „traduce gresit desi am ales o limba".
+    //
+    // Open Food Facts pastreaza acelasi text si sub cheia limbii lui, deci il
+    // putem identifica prin potrivire exacta. E determinist si nu costa nimic.
+    let sourceLang: string | null = enText ? "en" : null;
+    if (!sourceLang) {
+      for (const l of APP_LANGS) {
+        if ((product[`ingredients_text_${l}`] || "").trim() === origText) {
+          sourceLang = l;
+          break;
+        }
+      }
+    }
+
+    // 3) Textul e deja in limba aleasa, doar ca fara sufix. Nu traducem nimic:
+    // traducerea „din spaniola in romana" a unui text deja romanesc l-ar strica.
+    if (sourceLang === lang) {
+      setIngredientsText(source);
+      setIngredientsNote(null);
+      return;
+    }
+
+    // 4) Nu stim in ce limba e. Il aratam asa cum e, SPUNAND ca e textul
+    // original — mai bine decat o traducere ghicita, si mai bine decat sa
+    // lasam utilizatorul sa creada ca aplicatia i-a amestecat limbile.
+    if (!sourceLang) {
+      setIngredientsText(source);
+      setIngredientsNote("original");
+      return;
+    }
+
+    // 5) Sursa e cunoscuta si diferita — traducem.
     let cancelled = false;
     setIngredientsText(source); // arata originalul cat se traduce
-    setIngredientsAuto(false);
-    setIngredientsTranslating(true);
+    setIngredientsNote("translating");
     translateText(source, sourceLang, lang)
       .then((tx) => {
         if (cancelled) return;
-        setIngredientsText(tx);
-        setIngredientsAuto(tx.trim() !== source.trim());
+        const changed = tx.trim() !== source.trim();
+        setIngredientsText(changed ? tx : source);
+        // Daca traducatorul a esuat si a intors acelasi text, NU tacem: inainte
+        // ramanea textul strain fara nicio eticheta, parand continut normal.
+        setIngredientsNote(changed ? "auto" : "original");
       })
-      .finally(() => {
-        if (!cancelled) setIngredientsTranslating(false);
+      .catch(() => {
+        if (!cancelled) setIngredientsNote("original");
       });
     return () => {
       cancelled = true;
@@ -1307,23 +1375,39 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               </TouchableOpacity>
             )}
 
-            {/* Trimitem pe Open Food Facts DOAR cand stim sigur ca produsul
-                lipseste. Offline, linkul ar esua oricum si ar cere utilizatorului
-                sa adauge un produs care poate exista deja. */}
+            {/* Adaugarea produsului are sens DOAR cand stim sigur ca lipseste.
+                Offline, am trimite utilizatorul sa adauge un produs care poate
+                exista deja — si nici nu ar ajunge nicaieri fara conexiune.
+
+                Cand contributia din aplicatie e activa (exista proxy-ul care
+                tine parola contului), deschidem formularul propriu. Altfel
+                pastram comportamentul vechi: deschidem Open Food Facts in
+                browser, ca utilizatorul sa aiba totusi o cale. */}
             {errorKind === "PRODUCT_NOT_FOUND" && (
               <TouchableOpacity
                 style={[styles.retryButton, { marginTop: 10 }]}
-                onPress={() =>
+                onPress={() => {
+                  if (isContributionEnabled()) {
+                    router.push({
+                      pathname: "/contribute",
+                      params: { barcode },
+                    });
+                    return;
+                  }
                   Linking.openURL(
                     barcode
                       ? `https://world.openfoodfacts.org/product/${barcode}`
                       : "https://world.openfoodfacts.org/"
-                  )
-                }
+                  );
+                }}
                 accessibilityRole="button"
-                accessibilityLabel={t("addToOffBtn")}
+                accessibilityLabel={
+                  isContributionEnabled() ? t("contribAdd") : t("addToOffBtn")
+                }
               >
-                <Text style={styles.retryButtonText}>🌍 {t("addToOffBtn")}</Text>
+                <Text style={styles.retryButtonText}>
+                  🌍 {isContributionEnabled() ? t("contribAdd") : t("addToOffBtn")}
+                </Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
@@ -1486,14 +1570,19 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             <Text style={styles.ingredients}>
               {ingredientsDisplay || t("noIngredients")}
             </Text>
-            {ingredientsTranslating && (
+            {ingredientsNote === "translating" && (
               <Text style={styles.ingredientsAuto}>
                 ⏳ {autoLabels.translating[lang] ?? autoLabels.translating.en}
               </Text>
             )}
-            {ingredientsAuto && !ingredientsTranslating && (
+            {ingredientsNote === "auto" && (
               <Text style={styles.ingredientsAuto}>
                 🌐 {autoLabels.auto[lang] ?? autoLabels.auto.en}
+              </Text>
+            )}
+            {ingredientsNote === "original" && (
+              <Text style={styles.ingredientsAuto}>
+                🏷️ {autoLabels.original[lang] ?? autoLabels.original.en}
               </Text>
             )}
             {/* Completeaza/actualizeaza ingredientele direct de pe eticheta:
