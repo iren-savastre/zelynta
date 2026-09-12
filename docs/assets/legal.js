@@ -12,40 +12,25 @@
   var LNAME = { ro:"Română", en:"English", fr:"Français", it:"Italiano", es:"Español", de:"Deutsch", ru:"Русский", pl:"Polski", nl:"Nederlands", bg:"Български", el:"Ελληνικά" };
   var RIGHTS = { ro:"toate drepturile rezervate.", en:"all rights reserved.", fr:"tous droits réservés.", it:"tutti i diritti riservati.", es:"todos los derechos reservados.", de:"alle Rechte vorbehalten.", ru:"все права защищены.", pl:"wszelkie prawa zastrzeżone.", nl:"alle rechten voorbehouden.", bg:"всички права запазени.", el:"με επιφύλαξη παντός δικαιώματος." };
   var TOOFAST = { ro:"Așteaptă câteva secunde înainte de a trimite din nou.", en:"Please wait a few seconds before sending again.", fr:"Veuillez patienter quelques secondes avant de renvoyer.", it:"Attendi qualche secondo prima di inviare di nuovo.", es:"Espera unos segundos antes de volver a enviar.", de:"Bitte warte ein paar Sekunden, bevor du erneut sendest.", ru:"Подождите несколько секунд перед повторной отправкой.", pl:"Odczekaj kilka sekund przed ponownym wysłaniem.", nl:"Wacht een paar seconden voordat je opnieuw verzendt.", bg:"Изчакайте няколко секунди, преди да изпратите отново.", el:"Περιμένετε λίγα δευτερόλεπτα πριν στείλετε ξανά." };
-  // țară (ISO-3166-1 alpha-2) -> limbă disponibilă; restul -> engleză
-  var CC2LANG = {
-    RO:"ro", MD:"ro",
-    GB:"en", US:"en", IE:"en", AU:"en", NZ:"en", ZA:"en", IN:"en", CA:"en", SG:"en", MT:"en", PH:"en", NG:"en",
-    FR:"fr", BE:"fr", LU:"fr", MC:"fr",
-    IT:"it", CH:"it", SM:"it", VA:"it",
-    ES:"es", MX:"es", AR:"es", CO:"es", CL:"es", PE:"es", VE:"es", EC:"es", GT:"es", CU:"es", BO:"es", DO:"es", HN:"es", PY:"es", SV:"es", NI:"es", CR:"es", PA:"es", UY:"es", PR:"es",
-    DE:"de", AT:"de", LI:"de",
-    RU:"ru", BY:"ru", KZ:"ru", KG:"ru", AM:"ru",
-    PL:"pl",
-    NL:"nl", SR:"nl", AW:"nl",
-    BG:"bg",
-    EL:"el", GR:"el", CY:"el"
-  };
-  // detectează limba după IP-ul dispozitivului (geojs.io, fără cheie). Fallback: null
-  function detectByIp(){
-    return new Promise(function(resolve){
-      var done=false, ctrl=null;
-      var t=setTimeout(function(){ done=true; try{ ctrl&&ctrl.abort(); }catch(e){} resolve(null); }, 1500);
-      try{ ctrl=new AbortController(); }catch(e){ ctrl=null; }
-      fetch("https://get.geojs.io/v1/ip/country.json", ctrl?{signal:ctrl.signal}:{})
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .then(function(d){ if(done) return; clearTimeout(t); var cc=(d&&d.country||"").toUpperCase(); resolve(cc ? (CC2LANG[cc]||"en") : "en"); })
-        .catch(function(){ if(done) return; clearTimeout(t); resolve(null); });
-    });
-  }
-  async function pickLang(){
+  // Limba: preferintele declarate de utilizator in browser, in ordinea lor.
+  // Inainte, paginile legale asteptau un raspuns de la geojs.io (pana la
+  // 1500 ms) INAINTE de a se afisa — `await pickLang()` bloca randarea.
+  // Acum detectia e sincrona: fara cerere de retea, fara IP trimis unui tert
+  // si fara intarziere. O alegere explicita salvata are in continuare
+  // prioritate asupra preferintelor browserului.
+  function pickLang(){
     var s=null; try{ s=localStorage.getItem("zelynta_lang"); }catch(e){}
     if(s && DICT[s]) return s;              // alegere explicită salvată -> o respectăm
-    var ip=await detectByIp();              // prima vizită -> automat după IP
-    if(ip && DICT[ip]){ try{ localStorage.setItem("zelynta_lang", ip); }catch(e){} return ip; }
+    var prefs = (navigator.languages && navigator.languages.length)
+      ? navigator.languages
+      : [navigator.language || "en"];
+    for (var i=0; i<prefs.length; i++){
+      var code = String(prefs[i]||"").slice(0,2).toLowerCase();
+      if (DICT[code]) return code;
+    }
     return "en";                            // implicit ENGLEZĂ când nu se poate determina
   }
-  var LANG = await pickLang();
+  var LANG = pickLang();
   document.documentElement.lang = LANG;
   function waveBrand(){ return '<span class="wave" aria-label="Zelynta">'+"Zelynta".split("").map(function(c){return "<span>"+c+"</span>";}).join("")+'</span>'; }
   function T(k){

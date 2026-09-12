@@ -4616,17 +4616,22 @@
     if(savedLang && I18N[savedLang]){
       applyLang(savedLang);
     } else {
-      // provizoriu (limba browserului sau engleză) ca să nu fie ecran gol, apoi rafinăm după IP
-      const bl=(navigator.language||"en").slice(0,2);
-      applyLang(I18N[bl]?bl:"en");
+      // Limba se ia din preferintele declarate de utilizator in browser, in
+      // ordinea lor. Nu mai intrebam un serviciu extern de geolocalizare:
+      //  - adresa IP nu spune ce limba vorbeste cineva (un roman aflat in
+      //    Italia primea italiana, peste preferinta lui explicita);
+      //  - trimiterea IP-ului catre un tert, inainte de orice consimtamant,
+      //    contrazice pozitia de confidentialitate a Zelynta;
+      //  - dispare o dependenta externa si o cerere de retea la fiecare vizita.
       (function(){
-        const CC2LANG={RO:"ro",MD:"ro",GB:"en",US:"en",IE:"en",AU:"en",NZ:"en",ZA:"en",IN:"en",CA:"en",SG:"en",MT:"en",PH:"en",NG:"en",FR:"fr",BE:"fr",LU:"fr",MC:"fr",IT:"it",CH:"it",SM:"it",VA:"it",ES:"es",MX:"es",AR:"es",CO:"es",CL:"es",PE:"es",VE:"es",EC:"es",GT:"es",CU:"es",BO:"es",DO:"es",HN:"es",PY:"es",SV:"es",NI:"es",CR:"es",PA:"es",UY:"es",PR:"es",DE:"de",AT:"de",LI:"de",RU:"ru",BY:"ru",KZ:"ru",KG:"ru",AM:"ru",PL:"pl",NL:"nl",SR:"nl",AW:"nl",BG:"bg",EL:"el",GR:"el",CY:"el"};
-        const ctrl=("AbortController" in window)?new AbortController():null;
-        const tm=setTimeout(function(){ try{ ctrl&&ctrl.abort(); }catch(e){} },1800);
-        fetch("https://get.geojs.io/v1/ip/country.json", ctrl?{signal:ctrl.signal}:{})
-          .then(function(r){ return r.ok?r.json():null; })
-          .then(function(d){ clearTimeout(tm); if(!d) return; const cc=String(d.country||"").toUpperCase(); const lang=cc?(CC2LANG[cc]||"en"):"en"; if(I18N[lang]) applyLang(lang); })
-          .catch(function(){ clearTimeout(tm); });
+        var prefs = (navigator.languages && navigator.languages.length)
+          ? navigator.languages
+          : [navigator.language || "en"];
+        for (var i = 0; i < prefs.length; i++) {
+          var code = String(prefs[i] || "").slice(0,2).toLowerCase();
+          if (I18N[code]) { applyLang(code); return; }
+        }
+        applyLang("en");
       })();
     }
 
