@@ -23,6 +23,19 @@ async function run() {
   fs.cpSync(SRC, OUT, { recursive: true });
   console.log("✓ copiat docs/ -> build/");
 
+  // 1b) niciun .md nu ajunge pe site. docs/ e rădăcina publică, iar un document
+  // intern lăsat din greșeală acolo ar fi servit la zelynta.com/<nume>.md.
+  // Documentele interne stau în docs-internal/; asta e plasa de siguranță.
+  let mdRemoved = 0;
+  (function stripMarkdown(dir) {
+    for (const f of fs.readdirSync(dir)) {
+      const p = path.join(dir, f);
+      if (fs.statSync(p).isDirectory()) stripMarkdown(p);
+      else if (f.toLowerCase().endsWith(".md")) { fs.rmSync(p); mdRemoved++; }
+    }
+  })(OUT);
+  if (mdRemoved) console.log(`✓ exclus din build: ${mdRemoved} fișier(e) .md`);
+
   // 2) WebP din icon.png
   const pngPath = path.join(OUT, "icon.png");
   let webpDone = false;

@@ -55,3 +55,10 @@ playwright-report/
 .playwright/
 build/
 irina.txt
+
+# Audit tehnic intern — contine vulnerabilitati (sectiunea 8). Repo-ul e public:
+# fisierul ramane pe disc, dar NU se comite niciodata.
+docs-internal/ZELYNTA_FULL_TECH_AUDIT.md
+
+# Rapoarte de acoperire a testelor (se genereaza local)
+coverage/
