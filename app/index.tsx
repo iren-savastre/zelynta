@@ -46,7 +46,12 @@ import { pickM } from "../i18n/methodology";
 import BodyDiagram from "../components/BodyDiagram";
 import { organsForAdditive, organName } from "../utils/bodyMap";
 import { localizeInci } from "../utils/inci";
-import { extractAdditiveTags, extractIngredientsSegment, ocrImage } from "../utils/ocr";
+import {
+  extractAdditiveTags,
+  extractIngredientsSegment,
+  ocrImage,
+  ocrSimilarity,
+} from "../utils/ocr";
 import { analyzeProduct, stripAdditives, productDisplay } from "../utils/score";
 import { mixHex, PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
@@ -441,17 +446,37 @@ export default function Index() {
     if (!ocrMode || !scannerOpen) return;
     let alive = true;
     (async () => {
-      // Lasam autofocusul sa se aseze dupa comutarea modului.
-      await new Promise((r) => setTimeout(r, 1200));
+      // Lasam autofocusul sa se aseze si utilizatorului timp sa incadreze
+      // eticheta dupa ce a apasat butonul.
+      await new Promise((r) => setTimeout(r, 2000));
+
+      // Nu mai acceptam prima citire de peste 25 de caractere. Greselile de
+      // citire sunt intamplatoare: daca doua fotografii ale aceleiasi etichete
+      // dau practic acelasi text, textul e real; daca dau altceva de fiecare
+      // data, camera nu apuca litere adevarate (prea departe, miscata, blur).
+      // Inainte, o citire complet gresita era acceptata instant si din ea se
+      // calcula si un scor — adica un verdict de sanatate pe text inventat.
+      let best: { text: string; photoUri: string } | null = null;
+      let prev: { text: string; photoUri: string } | null = null;
+
       for (let attempt = 0; alive && attempt < 12; attempt++) {
         try {
           setOcrLoading(true);
           const r = await snapAndRead();
           if (!alive) return;
-          // Sub ~25 de caractere e zgomot (colt de eticheta, blur) — reincercam.
+
           if (r && r.text.length >= 25) {
-            applyOcrResult(r.text, r.photoUri);
-            return;
+            // Pastram citirea cea mai bogata, ca rezerva.
+            if (!best || r.text.length > best.text.length) best = r;
+
+            if (prev && ocrSimilarity(prev.text, r.text) >= 0.7) {
+              // Doua citiri concordante — avem incredere. O luam pe cea mai
+              // completa dintre ele.
+              const winner = r.text.length >= prev.text.length ? r : prev;
+              applyOcrResult(winner.text, winner.photoUri);
+              return;
+            }
+            prev = r;
           }
         } catch {
           // eroare trecatoare (retea/captura) — reincercam
@@ -459,6 +484,13 @@ export default function Index() {
           if (alive) setOcrLoading(false);
         }
         await new Promise((r) => setTimeout(r, 800));
+      }
+
+      // Nicio pereche concordanta in 12 incercari. Daca am prins totusi ceva,
+      // il folosim — dar e semnul unei poze slabe.
+      if (alive && best) {
+        applyOcrResult(best.text, best.photoUri);
+        return;
       }
       if (alive) {
         closeScanner();

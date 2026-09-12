@@ -122,3 +122,30 @@ export function extractAdditiveTags(text: string): string[] {
   }
   return [...found];
 }
+
+/**
+ * Cat de mult seamana doua citiri OCR ale aceleiasi etichete (0 = deloc, 1 = identice).
+ *
+ * La ce foloseste: greselile de citire sunt intamplatoare. Daca fotografiezi
+ * de doua ori aceeasi eticheta si primesti practic acelasi text, textul e
+ * probabil corect. Daca primesti altceva de fiecare data, camera nu apuca
+ * litere adevarate — e prea departe, miscata sau nefocalizata.
+ *
+ * Comparam multimile de cuvinte (Jaccard), nu sirurile: ordinea si semnele de
+ * punctuatie nu conteaza, dar cuvintele inventate de OCR ies imediat la iveala.
+ */
+export function ocrSimilarity(a: string, b: string): number {
+  const words = (s: string) =>
+    new Set(
+      s
+        .toLowerCase()
+        .split(/[^\p{L}\p{N}]+/u)
+        .filter((w) => w.length >= 3)
+    );
+  const A = words(a);
+  const B = words(b);
+  if (A.size === 0 || B.size === 0) return 0;
+  let common = 0;
+  for (const w of A) if (B.has(w)) common++;
+  return common / (A.size + B.size - common);
+}
