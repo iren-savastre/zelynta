@@ -77,7 +77,7 @@ const STORES: { img: any; url: string; label: string }[] = [
 // Linkuri externe pentru coloana „Susține".
 const REVIEW_URL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
 const DONATE_URL = "https://www.buymeacoffee.com/zelynta"; // creeaza contul cu username "zelynta"
-// Creditul catre MediaExpert Solution, care a ajutat la proiect. Acelasi link
+// Creditul catre Media Expert Solution, care a ajutat la proiect. Acelasi link
 // pe care il are si site-ul, in footer.
 const PARTNER_URL = "https://mediaexpertsolution.com/";
 
@@ -231,7 +231,7 @@ export default function AppFooter({
             style={styles.creditRow}
             onPress={() => open(PARTNER_URL)}
             accessibilityRole="link"
-            accessibilityLabel="MediaExpert Solution"
+            accessibilityLabel="Media Expert Solution"
           >
             <Image
               source={require("../assets/images/mediaexpert-logo.webp")}
