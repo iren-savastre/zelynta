@@ -7,6 +7,7 @@ import Svg, {
 import { ORGANS, type OrganId } from "../utils/bodyMap";
 
 const AC = Animated.createAnimatedComponent(Circle);
+const AG = Animated.createAnimatedComponent(G);
 
 // --- ADN dublu-helix (precalculat) pe lateral, viewBox 100x220 ---
 const DNA_CX = 88, DNA_TOP = 40, DNA_BOT = 198, DNA_AMP = 7, DNA_K = (2 * Math.PI) / 42;
@@ -102,6 +103,29 @@ export default function BodyDiagram({
             </G>
           ))}
         </G>
+
+        {/* Pielea si sangele nu sunt organe intr-un punct anume: pielea e toata
+            suprafata corpului, sangele trece prin tot. Un simplu punct langa
+            sold arata ca o greseala de desen, asa ca le aratam ca atare —
+            conturul intreg, respectiv reteaua centrala, se aprind in culoarea
+            riscului. Punctul ramane, ca reper pentru eticheta de dedesubt. */}
+        {active.has("skin") && (
+          <AG opacity={glowOpacity as any}>
+            <G fill="none" stroke={color} strokeWidth={2.2} strokeLinejoin="round">
+              <BodyPaths />
+            </G>
+          </AG>
+        )}
+        {active.has("blood") && (
+          <AG opacity={glowOpacity as any}>
+            <Path
+              d="M50 30 L50 92 M50 52 L40 74 M50 52 L60 74 M50 74 L44 100 M50 74 L56 100"
+              stroke={color}
+              strokeWidth={1.4}
+              fill="none"
+            />
+          </AG>
+        )}
 
         {/* Aura pulsatoare + punct pe fiecare organ afectat */}
         {(Object.keys(ORGANS) as OrganId[]).map((id) => {

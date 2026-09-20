@@ -26,7 +26,7 @@ const isWeb = Platform.OS === "web";
 type Tab = "history" | "favorites";
 
 export default function History() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const router = useRouter();
   const { colors, palette } = useTheme();
   const { width } = useWindowDimensions();

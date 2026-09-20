@@ -37,11 +37,11 @@ export const ORGANS: Record<OrganId, Organ> = {
   stomach:    { id: "stomach",    cx: 56, cy: 76,  r: 10, name: { ro: "Stomac", en: "Stomach", fr: "Estomac", it: "Stomaco", es: "Estómago", de: "Magen", ru: "Желудок", pl: "Żołądek", nl: "Maag", bg: "Стомах", el: "Στομάχι" } },
   kidneys:    { id: "kidneys",    cx: 50, cy: 88,  r: 13, name: { ro: "Rinichi", en: "Kidneys", fr: "Reins", it: "Reni", es: "Riñones", de: "Nieren", ru: "Почки", pl: "Nerki", nl: "Nieren", bg: "Бъбреци", el: "Νεφρά" } },
   intestines: { id: "intestines", cx: 50, cy: 100, r: 13, name: { ro: "Intestine", en: "Intestines", fr: "Intestins", it: "Intestino", es: "Intestinos", de: "Darm", ru: "Кишечник", pl: "Jelita", nl: "Darmen", bg: "Черва", el: "Έντερα" } },
-  bladder:    { id: "bladder",    cx: 50, cy: 114, r: 7,  name: { ro: "Vezică urinară", en: "Bladder", fr: "Vessie", it: "Vescica", es: "Vejiga", de: "Blase", ru: "Мочевой пузырь", pl: "Pęcherz", nl: "Blaas", bg: "Пикочен мехур", el: "Ουροδόχος κύστη" } },
-  bones:      { id: "bones",      cx: 24, cy: 150, r: 9,  name: { ro: "Oase", en: "Bones", fr: "Os", it: "Ossa", es: "Huesos", de: "Knochen", ru: "Кости", pl: "Kości", nl: "Botten", bg: "Кости", el: "Οστά" } },
-  teeth:      { id: "teeth",      cx: 50, cy: 26,  r: 6,  name: { ro: "Dinți", en: "Teeth", fr: "Dents", it: "Denti", es: "Dientes", de: "Zähne", ru: "Зубы", pl: "Zęby", nl: "Tanden", bg: "Зъби", el: "Δόντια" } },
-  skin:       { id: "skin",       cx: 76, cy: 95,  r: 8,  name: { ro: "Piele", en: "Skin", fr: "Peau", it: "Pelle", es: "Piel", de: "Haut", ru: "Кожа", pl: "Skóra", nl: "Huid", bg: "Кожа", el: "Δέρμα" } },
-  blood:      { id: "blood",      cx: 30, cy: 66,  r: 7,  name: { ro: "Sânge", en: "Blood", fr: "Sang", it: "Sangue", es: "Sangre", de: "Blut", ru: "Кровь", pl: "Krew", nl: "Bloed", bg: "Кръв", el: "Αίμα" } },
+  bladder:    { id: "bladder",    cx: 50, cy: 103, r: 7,  name: { ro: "Vezică urinară", en: "Bladder", fr: "Vessie", it: "Vescica", es: "Vejiga", de: "Blase", ru: "Мочевой пузырь", pl: "Pęcherz", nl: "Blaas", bg: "Пикочен мехур", el: "Ουροδόχος κύστη" } },
+  bones:      { id: "bones",      cx: 45, cy: 150, r: 9,  name: { ro: "Oase", en: "Bones", fr: "Os", it: "Ossa", es: "Huesos", de: "Knochen", ru: "Кости", pl: "Kości", nl: "Botten", bg: "Кости", el: "Οστά" } },
+  teeth:      { id: "teeth",      cx: 50, cy: 20,  r: 5,  name: { ro: "Dinți", en: "Teeth", fr: "Dents", it: "Denti", es: "Dientes", de: "Zähne", ru: "Зубы", pl: "Zęby", nl: "Tanden", bg: "Зъби", el: "Δόντια" } },
+  skin:       { id: "skin",       cx: 74, cy: 84,  r: 7,  name: { ro: "Piele", en: "Skin", fr: "Peau", it: "Pelle", es: "Piel", de: "Haut", ru: "Кожа", pl: "Skóra", nl: "Huid", bg: "Кожа", el: "Δέρμα" } },
+  blood:      { id: "blood",      cx: 38, cy: 66,  r: 7,  name: { ro: "Sânge", en: "Blood", fr: "Sang", it: "Sangue", es: "Sangre", de: "Blut", ru: "Кровь", pl: "Krew", nl: "Bloed", bg: "Кръв", el: "Αίμα" } },
 };
 
 // Aditiv (cod E) -> organele afectate, dupa efectele documentate.
