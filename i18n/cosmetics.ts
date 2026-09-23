@@ -2,6 +2,7 @@
 // Niveluri: risk = interzis/foarte îngrijorător, caution = restricționat/alergen,
 //           moderate = permis cu discuții, safe = fără probleme cunoscute
 import { cosmeticsExtra } from "./cosmetics.extra";
+import { cosmeticsBgEl } from "./cosmetics.bgel";
 
 export const cosmeticsInfo = {
   "methylparaben": {
@@ -374,4 +375,16 @@ for (const code in cosmeticsExtra) {
   Object.assign(base.name, extra.name);
   Object.assign(base.use, extra.use);
   Object.assign(base.desc, extra.desc);
+}
+
+// Imbina bulgara (bg) + greaca (el) (din cosmetics.bgel.ts). Erau singurele
+// doua limbi fara cosmetice: pana acum un utilizator bulgar sau grec care scana
+// un sampon vedea substantele in engleza.
+for (const code in cosmeticsBgEl) {
+  const base = (cosmeticsInfo as any)[code];
+  const be = cosmeticsBgEl[code];
+  if (!base) continue;
+  Object.assign(base.name, be.name);
+  Object.assign(base.use, be.use);
+  Object.assign(base.desc, be.desc);
 }
