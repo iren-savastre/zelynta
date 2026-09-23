@@ -8,42 +8,17 @@ import { translations } from "./translations";
 const LANG_KEY = "zelynta_lang";
 const supportedLanguages = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el"];
 
-// Limba telefonului (ex: "fr", "ro"...) — semnal secundar.
-const deviceLanguage = getLocales()[0]?.languageCode ?? "en";
-const deviceFallback = supportedLanguages.includes(deviceLanguage) ? deviceLanguage : "en";
-
-// țară (ISO-3166-1 alpha-2) -> limbă disponibilă; restul -> engleză
-const CC2LANG: Record<string, string> = {
-  RO: "ro", MD: "ro",
-  GB: "en", US: "en", IE: "en", AU: "en", NZ: "en", ZA: "en", IN: "en", CA: "en", SG: "en", MT: "en", PH: "en", NG: "en",
-  FR: "fr", BE: "fr", LU: "fr", MC: "fr",
-  IT: "it", CH: "it", SM: "it", VA: "it",
-  ES: "es", MX: "es", AR: "es", CO: "es", CL: "es", PE: "es", VE: "es", EC: "es", GT: "es", CU: "es", BO: "es", DO: "es", HN: "es", PY: "es", SV: "es", NI: "es", CR: "es", PA: "es", UY: "es", PR: "es",
-  DE: "de", AT: "de", LI: "de",
-  RU: "ru", BY: "ru", KZ: "ru", KG: "ru", AM: "ru",
-  PL: "pl",
-  NL: "nl", SR: "nl", AW: "nl",
-  BG: "bg",
-  EL: "el", GR: "el", CY: "el",
-};
-
-// Detectează limba după IP-ul dispozitivului (geojs.io, fără cheie). Fallback: null.
-async function detectByIp(): Promise<string | null> {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 1800);
-    const res = await fetch("https://get.geojs.io/v1/ip/country.json", {
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-    if (!res.ok) return null;
-    const data = await res.json();
-    const cc = String(data?.country ?? "").toUpperCase();
-    return cc ? CC2LANG[cc] ?? "en" : "en";
-  } catch {
-    return null;
+// Limba se ia din preferintele telefonului, in ordinea lor. `getLocales()`
+// intoarce lista completa, nu doar prima: cineva cu telefonul pe engleza, dar
+// cu romana a doua, primeste romana daca engleza n-ar fi fost suportata.
+function pickDeviceLanguage(): string {
+  for (const loc of getLocales()) {
+    const code = (loc?.languageCode ?? "").toLowerCase();
+    if (supportedLanguages.includes(code)) return code;
   }
+  return "en";
 }
+const deviceFallback = pickDeviceLanguage();
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -73,9 +48,16 @@ export async function resolveAppLanguage(): Promise<void> {
       return;
     }
   } catch {}
-  // prima rulare -> detectare automată după IP
-  const byIp = await detectByIp();
-  const lang = byIp && supportedLanguages.includes(byIp) ? byIp : deviceFallback;
+  // Prima rulare: limba telefonului.
+  //
+  // Inainte, aplicatia intreba geojs.io tara utilizatorului dupa IP. Am scos
+  // asta din trei motive, aceleasi pentru care a disparut si de pe site:
+  //  - adresa IP nu spune ce limba vorbeste cineva (un roman aflat in Italia
+  //    primea italiana, peste setarea telefonului lui);
+  //  - IP-ul pleca la un tert la prima pornire, inainte de orice consimtamant,
+  //    desi aplicatia se lauda ca nu trimite nimic despre utilizator;
+  //  - dispare o cerere de retea si o dependenta externa la fiecare instalare.
+  const lang = deviceFallback;
   if (i18n.language !== lang) await i18n.changeLanguage(lang);
   try { await AsyncStorage.setItem(LANG_KEY, lang); } catch {}
 }
