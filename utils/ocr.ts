@@ -73,12 +73,17 @@ const ING_KEYWORDS: { lang: string; re: RegExp }[] = [
   { lang: "es", re: /ingredientes\s*[:;]/gi },
   { lang: "pl", re: /sk[łl]adniki\s*[:;]/gi },
   { lang: "ru", re: /состав\s*[:;]/gi },
+  // Fara bulgara si greaca, extragerea listei de ingrediente esua complet pe
+  // etichetele din Bulgaria si Grecia: nu gaseam cuvantul care marcheaza
+  // inceputul listei, desi aplicatia e tradusa in ambele limbi.
+  { lang: "bg", re: /съставки\s*[:;]/gi },
+  { lang: "el", re: /συστατικά\s*[:;]/gi },
 ];
 
 // Fraze care marcheaza sfarsitul listei (alergeni "poate contine", pastrare,
 // gramaj, producator) — in limbile uzuale de pe etichete.
 const ING_END_RE =
-  /(poate con[tț]ine|urme de|may contain|kan sporen|peut contenir|può contenere|puede contener|kann spuren|może zawierać|может содержать|a conserver|à conserver|conserver|bewaren|store in|p[aă]stra|netto|net weight|poids net|nettogewicht|mindestens haltbar|best before|[aà] consommer|da consumarsi|consumir antes|tegen warmte|ungeöffnet|hergestellt|fabricat|produced by|suggestion de)/i;
+  /(poate con[tț]ine|urme de|may contain|kan sporen|peut contenir|può contenere|puede contener|kann spuren|może zawierać|может содержать|a conserver|à conserver|conserver|bewaren|store in|p[aă]stra|netto|net weight|poids net|nettogewicht|mindestens haltbar|best before|[aà] consommer|da consumarsi|consumir antes|tegen warmte|ungeöffnet|hergestellt|fabricat|produced by|suggestion de|може да съдържа|следи от|срок на годност|да се съхранява|μπορεί να περιέχει|ίχνη από|ανάλωση κατά προτίμηση|διατηρείται)/i;
 
 export function extractIngredientsSegment(
   text: string,
