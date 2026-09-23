@@ -13,6 +13,8 @@ export type Advice = {
   children: L;
 };
 
+import { adviceLabelsBgElSq, adviceBgElSq } from "./advice.bgelsq";
+
 export const adviceLabels = {
   title: { ro: "Recomandări", en: "Tips & recommendations", fr: "Recommandations", it: "Consigli", es: "Recomendaciones", de: "Empfehlungen", ru: "Рекомендации", pl: "Zalecenia", nl: "Aanbevelingen" } as Record<string, string>,
   benefits: { ro: "Beneficii", en: "Benefits", fr: "Bienfaits", it: "Benefici", es: "Beneficios", de: "Vorteile", ru: "Польза", pl: "Korzyści", nl: "Voordelen" } as Record<string, string>,
@@ -227,3 +229,16 @@ export const adviceInfo: Record<string, Advice> = {
     children: { ro: "Pentru copii, preferă produse cât mai puțin procesate, cu mai puțin zahăr și sare.", en: "For children, prefer the least processed products, with less sugar and salt.", fr: "Pour les enfants, privilégiez les produits les moins transformés, avec moins de sucre et de sel.", it: "Per i bambini, preferisci i prodotti meno trasformati, con meno zucchero e sale.", es: "Para los niños, prefiere los productos menos procesados, con menos azúcar y sal.", de: "Für Kinder möglichst wenig verarbeitete Produkte mit weniger Zucker und Salz bevorzugen.", ru: "Для детей выбирайте как можно менее обработанные продукты, с меньшим содержанием сахара и соли.", pl: "Dla dzieci wybieraj produkty jak najmniej przetworzone, z mniejszą ilością cukru i soli.", nl: "Kies voor kinderen zo min mogelijk bewerkte producten, met minder suiker en zout." },
   },
 };
+
+// Imbina bulgara, greaca si albaneza. Fisierul de mai sus a ramas pe 9 limbi,
+// deci utilizatorii bg/el vedeau recomandarile in engleza.
+for (const key in adviceLabelsBgElSq) {
+  if ((adviceLabels as any)[key]) Object.assign((adviceLabels as any)[key], adviceLabelsBgElSq[key]);
+}
+for (const cat in adviceBgElSq) {
+  const base = (adviceInfo as any)[cat];
+  if (!base) continue;
+  for (const field in adviceBgElSq[cat]) {
+    if (base[field]) Object.assign(base[field], adviceBgElSq[cat][field]);
+  }
+}

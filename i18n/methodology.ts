@@ -2,6 +2,8 @@
 // în cele 9 limbi ale aplicației. Sursele/autoritățile sunt reale (EFSA,
 // IARC/OMS, regulamentele UE); nu inventăm afilieri sau procente.
 
+import { methodologyBgElSq } from "./methodology.bgelsq";
+
 export const methodology: Record<string, Record<string, string>> = {
   title: {
     ro: "Cum se calculează scorul",
@@ -180,6 +182,12 @@ export const methodology: Record<string, Record<string, string>> = {
     nl: "Wetenschappelijke bronnen",
   },
 };
+
+// Imbina bulgara, greaca si albaneza. Fisierul principal a ramas pe 9 limbi,
+// deci utilizatorii bg/el vedeau pagina de metodologie in engleza.
+for (const key in methodologyBgElSq) {
+  if ((methodology as any)[key]) Object.assign((methodology as any)[key], methodologyBgElSq[key]);
+}
 
 export function pickM(key: string, lang: string): string {
   const field = methodology[key];
