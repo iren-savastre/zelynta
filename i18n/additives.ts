@@ -1,6 +1,8 @@
 import { additivesExtra } from "./additives.extra";
 import { additiveStories } from "./additives.stories";
 import { additivesBgEl } from "./additives.bgel";
+import { additivesSq } from "./additives.sq";
+import { additiveStoriesSq } from "./additives.stories.sq";
 
 export const additivesInfo = {
   e160b: {
@@ -1115,8 +1117,26 @@ for (const code in additivesBgEl) {
   if (be.desc) Object.assign(base.desc, be.desc);
 }
 
+// Imbina albaneza (din additives.sq.ts). Pentru aditivii cu poveste,
+// descrierea vine mai jos, din additives.stories.ts.
+for (const code in additivesSq) {
+  const base = (additivesInfo as any)[code];
+  const sq = additivesSq[code];
+  if (!base) continue;
+  Object.assign(base.name, sq.name);
+  Object.assign(base.use, sq.use);
+  if (sq.desc) Object.assign(base.desc, sq.desc);
+}
+
 // Suprascrie desc-ul cu descrierile "poveste" (risk/caution), in toate limbile.
 for (const code in additiveStories) {
   const base = (additivesInfo as any)[code];
   if (base) base.desc = additiveStories[code];
+}
+
+// Albaneza pentru descrierile "poveste". Se aplica DUPA merge-ul povestilor,
+// fiindca acela inlocuieste tot obiectul desc.
+for (const code in additiveStoriesSq) {
+  const base = (additivesInfo as any)[code];
+  if (base) base.desc.sq = additiveStoriesSq[code];
 }
