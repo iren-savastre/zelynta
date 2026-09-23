@@ -1,7 +1,7 @@
 import { cosmeticsInfo } from "../../i18n/cosmetics";
 
 // Cele 11 limbi ale aplicatiei.
-const LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el"] as const;
+const LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el", "sq"] as const;
 const FIELDS = ["name", "use", "desc"] as const;
 
 const entries = Object.entries(cosmeticsInfo as Record<string, any>);

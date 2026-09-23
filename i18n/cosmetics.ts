@@ -3,6 +3,7 @@
 //           moderate = permis cu discuții, safe = fără probleme cunoscute
 import { cosmeticsExtra } from "./cosmetics.extra";
 import { cosmeticsBgEl } from "./cosmetics.bgel";
+import { cosmeticsSq } from "./cosmetics.sq";
 
 export const cosmeticsInfo = {
   "methylparaben": {
@@ -387,4 +388,14 @@ for (const code in cosmeticsBgEl) {
   Object.assign(base.name, be.name);
   Object.assign(base.use, be.use);
   Object.assign(base.desc, be.desc);
+}
+
+// Imbina albaneza (din cosmetics.sq.ts).
+for (const code in cosmeticsSq) {
+  const base = (cosmeticsInfo as any)[code];
+  const sq = cosmeticsSq[code];
+  if (!base) continue;
+  Object.assign(base.name, sq.name);
+  Object.assign(base.use, sq.use);
+  Object.assign(base.desc, sq.desc);
 }
