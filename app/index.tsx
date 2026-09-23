@@ -53,7 +53,7 @@ import {
   ocrSimilarity,
 } from "../utils/ocr";
 import { analyzeProduct, stripAdditives, productDisplay } from "../utils/score";
-import { mixHex, PALETTES, useTheme, type ThemeColors } from "../utils/theme";
+import { PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
 // Placeholder pt produse scanate din poza (fara nume real) — se traduce live
 // la afisare, nu se salveaza tradus, ca sa reflecte mereu limba curenta.
@@ -71,6 +71,7 @@ const languages = [
   { code: "nl", label: "Nederlands", flag: "🇳🇱", cc: "nl" },
   { code: "bg", label: "Български", flag: "🇧🇬", cc: "bg" },
   { code: "el", label: "Ελληνικά", flag: "🇬🇷", cc: "gr" },
+  { code: "sq", label: "Shqip", flag: "🇦🇱", cc: "al" },
 ];
 
 // Pe Windows/web emoji-urile de drapel nu se randează → folosim imagini reale

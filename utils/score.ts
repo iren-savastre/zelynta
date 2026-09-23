@@ -119,22 +119,6 @@ export function stripAdditives(text: string, lang: string): string {
   return kept.join(", ");
 }
 
-// Adaugă codul E după denumirea aditivului, dacă acesta nu apare deja în text.
-export function annotateIngredients(text: string, lang: string): string {
-  if (!text || text.length > 4000) return text;
-  const { re, byName } = buildAnnIndex(lang);
-  const upper = text.toUpperCase();
-  const used = new Set<string>();
-  re.lastIndex = 0;
-  return text.replace(re, (m, pre, nm) => {
-    const code = byName.get(String(nm).toLowerCase());
-    if (!code) return m;
-    if (used.has(code) || upper.includes(code)) return m; // o dată / deja scris de producător
-    used.add(code);
-    return pre + nm + " (" + code + ")";
-  });
-}
-
 // Text de rezerva cand un cod E este valid dar nu-l avem inca in dictionar,
 // ca sa nu apara un rand gol (ex. aditivi noi sau rar intalniti).
 const UNKNOWN_ADDITIVE_DESC: Record<string, string> = {

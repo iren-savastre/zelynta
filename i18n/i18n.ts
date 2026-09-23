@@ -6,7 +6,7 @@ import { translations } from "./translations";
 
 // Cheia de limbă — aceeași ca pe web (landing + pagini legale), pentru consecvență.
 const LANG_KEY = "zelynta_lang";
-const supportedLanguages = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el"];
+const supportedLanguages = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el", "sq"];
 
 // Limba se ia din preferintele telefonului, in ordinea lor. `getLocales()`
 // intoarce lista completa, nu doar prima: cineva cu telefonul pe engleza, dar
@@ -33,13 +33,14 @@ i18n.use(initReactI18next).init({
     nl: { translation: translations.nl },
     bg: { translation: translations.bg },
     el: { translation: translations.el },
+    sq: { translation: translations.sq },
   },
   lng: deviceFallback, // provizoriu — se rezolvă mai jos (instant, fără ecran gol)
   fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
 
-// Rezolvă limba: alegere salvată -> respectă; altfel IP; altfel device; altfel engleză.
+// Rezolvă limba: alegere salvată -> respectă; altfel limba telefonului; altfel engleză.
 export async function resolveAppLanguage(): Promise<void> {
   try {
     const stored = await AsyncStorage.getItem(LANG_KEY);
