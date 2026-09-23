@@ -83,9 +83,9 @@ function flagUrl(cc: string, w: number) {
 // mai bine spunem asta pe fata decat sa lasam utilizatorul sa creada ca
 // aplicatia i-a amestecat limbile.
 const autoLabels = {
-  translating: { ro: "Se traduce…", en: "Translating…", fr: "Traduction…", it: "Traduzione…", es: "Traduciendo…", de: "Wird übersetzt…", ru: "Перевод…", pl: "Tłumaczenie…", nl: "Vertalen…", bg: "Превежда се…", el: "Μετάφραση…" } as Record<string, string>,
-  auto: { ro: "tradus automat", en: "auto-translated", fr: "traduit automatiquement", it: "tradotto automaticamente", es: "traducido automáticamente", de: "automatisch übersetzt", ru: "автоперевод", pl: "przetłumaczone automatycznie", nl: "automatisch vertaald", bg: "автоматичен превод", el: "αυτόματη μετάφραση" } as Record<string, string>,
-  original: { ro: "text original de pe ambalaj — nu e disponibil în română", en: "original label text — not available in English", fr: "texte original de l'emballage — non disponible en français", it: "testo originale dell'etichetta — non disponibile in italiano", es: "texto original del envase — no disponible en español", de: "Originaltext der Verpackung — nicht auf Deutsch verfügbar", ru: "исходный текст с упаковки — недоступен на русском", pl: "oryginalny tekst z opakowania — niedostępny po polsku", nl: "originele tekst van de verpakking — niet in het Nederlands beschikbaar", bg: "оригинален текст от опаковката — не е наличен на български", el: "αρχικό κείμενο συσκευασίας — μη διαθέσιμο στα ελληνικά" } as Record<string, string>,
+  translating: { ro: "Se traduce…", en: "Translating…", fr: "Traduction…", it: "Traduzione…", es: "Traduciendo…", de: "Wird übersetzt…", ru: "Перевод…", pl: "Tłumaczenie…", nl: "Vertalen…", bg: "Превежда се…", el: "Μετάφραση…", sq: "Po përkthehet…" } as Record<string, string>,
+  auto: { ro: "tradus automat", en: "auto-translated", fr: "traduit automatiquement", it: "tradotto automaticamente", es: "traducido automáticamente", de: "automatisch übersetzt", ru: "автоперевод", pl: "przetłumaczone automatycznie", nl: "automatisch vertaald", bg: "автоматичен превод", el: "αυτόματη μετάφραση", sq: "përkthim automatik" } as Record<string, string>,
+  original: { ro: "text original de pe ambalaj — nu e disponibil în română", en: "original label text — not available in English", fr: "texte original de l'emballage — non disponible en français", it: "testo originale dell'etichetta — non disponibile in italiano", es: "texto original del envase — no disponible en español", de: "Originaltext der Verpackung — nicht auf Deutsch verfügbar", ru: "исходный текст с упаковки — недоступен на русском", pl: "oryginalny tekst z opakowania — niedostępny po polsku", nl: "originele tekst van de verpakking — niet in het Nederlands beschikbaar", bg: "оригинален текст от опаковката — не е наличен на български", el: "αρχικό κείμενο συσκευασίας — μη διαθέσιμο στα ελληνικά", sq: "teksti origjinal nga paketimi — nuk ofrohet në shqip" } as Record<string, string>,
 };
 
 const levelColors: Record<string, string> = {
@@ -108,6 +108,7 @@ const bodyTitle: Record<string, string> = {
   nl: "Wat het in het lichaam kan beïnvloeden",
   bg: "На какво може да въздейства в тялото",
   el: "Τι μπορεί να επηρεάσει στο σώμα",
+  sq: "Çfarë mund të prekë në trup",
 };
 
 const isWeb = Platform.OS === "web";

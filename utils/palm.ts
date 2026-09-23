@@ -15,6 +15,7 @@ const PALM_LABEL: Record<string, string> = {
   nl: "Palmolie",
   bg: "Палмово масло",
   el: "Φοινικέλαιο",
+  sq: "Vaj palme",
 };
 
 const PALM_NOTE: Record<string, string> = {
@@ -29,6 +30,7 @@ const PALM_NOTE: Record<string, string> = {
   nl: "Bevat palmolie — rijk aan verzadigde vetten. Bij raffinage kunnen verontreinigingen (glycidylesters) ontstaan die de EFSA als mogelijk kankerverwekkend beschouwt. Met mate consumeren.",
   bg: "Съдържа палмово масло — богато на наситени мазнини. При рафиниране може да образува замърсители (глицидилови естери), които EFSA счита за възможно канцерогенни. Консумирайте умерено.",
   el: "Περιέχει φοινικέλαιο — πλούσιο σε κορεσμένα λιπαρά. Κατά τη διύλιση μπορεί να σχηματίσει προσμείξεις (γλυκιδυλεστέρες) που η EFSA θεωρεί πιθανώς καρκινογόνες. Καταναλώστε με μέτρο.",
+  sq: "Përmban vaj palme — i pasur me yndyrna të ngopura. Gjatë rafinimit mund të formojë ndotës (estere glicidilike) që EFSA i konsideron mundësisht kancerogjenë. Konsumo me masë.",
 };
 
 function pick(field: Record<string, string>, lang: string) {

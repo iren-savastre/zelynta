@@ -149,6 +149,7 @@ const UNKNOWN_ADDITIVE_DESC: Record<string, string> = {
   nl: "In de EU toegelaten levensmiddelenadditief. We hebben er nog geen uitgebreide beschrijving voor in de app.",
   bg: "Хранителна добавка, разрешена в ЕС. Все още нямаме подробно описание за нея в приложението.",
   el: "Πρόσθετο τροφίμων εγκεκριμένο στην ΕΕ. Δεν έχουμε ακόμη αναλυτική περιγραφή γι' αυτό στην εφαρμογή.",
+  sq: "Aditiv ushqimor i autorizuar në BE. Ende nuk kemi një përshkrim të hollësishëm për të në aplikacion.",
 };
 
 export function getAdditives(product: any, lang: string): AnalyzedAdditive[] {
