@@ -1303,7 +1303,10 @@
         <div class="body-fig">
           <model-viewer id="organ3d" camera-controls auto-rotate interaction-prompt="none" shadow-intensity="0.5" exposure="1.05" loading="lazy" style="display:none;width:100%;max-width:340px;height:360px;margin:0 auto"></model-viewer>
           <div id="organTabs" style="display:none;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px"></div>
-          <p id="organ3dCap" class="muted" style="display:none;font-size:11px;margin:6px 0 0"><span id="organ3dName"></span> · <a href="https://github.com/yihalem123/Human-Organ3D" target="_blank" rel="noopener">3D: Human-Organ3D (MIT)</a></p>
+          <!-- Creditul se completeaza din JS, per model: fiecare organ are alt
+               autor si alta licenta Creative Commons, iar CC-BY cere numele
+               autorului, linkul la original si linkul la licenta. -->
+          <p id="organ3dCap" class="muted" style="display:none;font-size:11px;margin:6px 0 0"><span id="organ3dName"></span> · <span id="organ3dCredit"></span></p>
           <div id="bodySvgWrap">
           <svg viewBox="0 0 100 220" width="200" aria-hidden="true">
             <defs>
@@ -5159,10 +5162,27 @@
           if(bodySvgWrap) bodySvgWrap.style.display="none";
           organ3d.style.display="block"; if(organ3dCap) organ3dCap.style.display="block";
           var lg=lang();
+          // Atribuirea reala a fiecarui model, citita din fisierele .glb.
+          // Repo-ul de unde au fost luate e MIT doar pentru COD; modelele sunt
+          // ale unor autori de pe Sketchfab, sub licente Creative Commons
+          // diferite — doua dintre ele necomerciale.
+          var MODEL_CREDITS={
+            heart:{t:"Realistic Human Heart",a:"neshallads",au:"https://sketchfab.com/neshallads",l:"CC BY 4.0",lu:"https://creativecommons.org/licenses/by/4.0/",s:"https://sketchfab.com/3d-models/realistic-human-heart-3f8072336ce94d18b3d0d055a1ece089"},
+            lung:{t:"Realistic Human Lungs",a:"neshallads",au:"https://sketchfab.com/neshallads",l:"CC BY 4.0",lu:"https://creativecommons.org/licenses/by/4.0/",s:"https://sketchfab.com/3d-models/realistic-human-lungs-ce09f4099a68467880f46e61eb9a3531"},
+            liver:{t:"Human liver and gallbladder",a:"ElliotSS",au:"https://sketchfab.com/ElliotSS",l:"CC BY 4.0",lu:"https://creativecommons.org/licenses/by/4.0/",s:"https://sketchfab.com/3d-models/human-liver-and-gallbladder-6c4e9bd0d49f4828b804259330c0c6c4"},
+            kidney:{t:"Kidney",a:"lissiecowley",au:"https://sketchfab.com/lissiecowley",l:"CC BY-NC 4.0",lu:"https://creativecommons.org/licenses/by-nc/4.0/",s:"https://sketchfab.com/3d-models/kidney-3aef2741ea754fb486451292b87e159a"},
+            stomach:{t:"Realistic Human Stomach",a:"neshallads",au:"https://sketchfab.com/neshallads",l:"CC BY-NC 4.0",lu:"https://creativecommons.org/licenses/by-nc/4.0/",s:"https://sketchfab.com/3d-models/realistic-human-stomach-e0f1952de7204654ba469c3e887a029b"}
+          };
           function showOrgan(id){
             var m=ORGAN_MODEL[id];
             if(organ3d.getAttribute("src")!=="models/"+m+".glb") organ3d.setAttribute("src","models/"+m+".glb");
             if(organ3dName) organ3dName.textContent=(ON[id]&&(ON[id][lg]||ON[id].en))||id;
+            var cr=MODEL_CREDITS[m], el=document.getElementById("organ3dCredit");
+            if(el&&cr){
+              el.innerHTML='3D: <a href="'+cr.s+'" target="_blank" rel="noopener">'+cr.t+'</a> · '+
+                '<a href="'+cr.au+'" target="_blank" rel="noopener">'+cr.a+'</a> · '+
+                '<a href="'+cr.lu+'" target="_blank" rel="noopener">'+cr.l+'</a>';
+            }
             if(organTabs) Array.prototype.forEach.call(organTabs.children,function(b){ b.classList.toggle("active", b.getAttribute("data-o")===id); });
           }
           if(organTabs){
