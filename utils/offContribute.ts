@@ -1,5 +1,6 @@
 import { fetchWithTimeout } from "./net";
 import { getAppUuid } from "./appIdentity";
+import { APP_NAME, APP_VERSION, OFF_USER_AGENT } from "./userAgent";
 
 /**
  * Trimiterea unui produs nou catre Open Food Facts.
@@ -25,9 +26,6 @@ import { getAppUuid } from "./appIdentity";
 const PROXY_URL =
   (typeof process !== "undefined" && process.env?.EXPO_PUBLIC_CONTRIB_URL) || "";
 
-const APP_NAME = "Zelynta";
-const APP_VERSION =
-  (typeof process !== "undefined" && process.env?.EXPO_PUBLIC_APP_VERSION) || "1.0.0";
 
 /** Contributia e disponibila doar daca proxy-ul a fost configurat. */
 export function isContributionEnabled(): boolean {
@@ -106,7 +104,7 @@ export async function contributeProduct(
         headers: {
           "Content-Type": "application/json",
           // Formatul cerut de OFF: NumeAplicatie/Versiune (contact).
-          "User-Agent": `${APP_NAME}/${APP_VERSION} (https://zelynta.com/)`,
+          "User-Agent": OFF_USER_AGENT,
         },
         body: JSON.stringify(payload),
       },

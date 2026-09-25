@@ -1,6 +1,7 @@
 import { fetchWithTimeout } from "./net";
 import { analyzeProduct, productDisplay } from "./score";
 import { cacheGet, cacheSet } from "./cache";
+import { OFF_USER_AGENT } from "./userAgent";
 
 export type Alternative = {
   barcode: string;
@@ -41,7 +42,7 @@ async function searchCategory(category: string, lang: string): Promise<any[]> {
     `&page_size=${PAGE_SIZE}&sort_by=unique_scans_n`;
 
   const res = await fetchWithTimeout(url, {
-    headers: { "User-Agent": "Zelynta/1.0 (https://zelynta.com/)" },
+    headers: { "User-Agent": OFF_USER_AGENT },
   });
   if (!res.ok) return []; // 429/503 — endpoint-ul de cautare OFF cade des
   const data = await res.json();

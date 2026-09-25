@@ -1,5 +1,6 @@
 import { fetchWithTimeout } from "./net";
 import { getCachedProduct, setCachedProduct } from "./productCache";
+import { OFF_USER_AGENT } from "./userAgent";
 
 // Bazele OpenFoodFacts încercate pe rând: alimente, cosmetice, produse generale,
 // hrană pentru animale. `db` marcheaza sursa, ca scorul sa stie ca un produs din
@@ -95,7 +96,7 @@ export async function lookupProductByBarcode(code: string): Promise<LookupResult
     try {
       res = await fetchWithTimeout(
         `${base}/api/v2/product/${code}.json?fields=${encodeURIComponent(PRODUCT_FIELDS)}`,
-        { headers: { "User-Agent": "Zelynta/1.0 (https://zelynta.com/)" } }
+        { headers: { "User-Agent": OFF_USER_AGENT } }
       );
     } catch {
       // Fara raspuns: offline, DNS cazut, sau timeout (AbortError). Pentru
