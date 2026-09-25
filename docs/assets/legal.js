@@ -3,15 +3,15 @@
   "use strict";
   var ROOT = location.pathname.indexOf("/legal/") !== -1 ? "../" : "./";
   var YEAR = new Date().getFullYear();
-  var DL = "https://github.com/iren-savastre/zelynta/releases/latest";
+  var DL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
 
   /* ---------- i18n ---------- */
   var DICT = window.ZLEGAL_CHROME || { ro:{}, en:{} };
   var PAGES = window.ZLEGAL_PAGES || {}; // dicționare de conținut per pagină (opțional)
-  var LANGS = [["ro","ro"],["en","gb"],["fr","fr"],["it","it"],["es","es"],["de","de"],["ru","ru"],["pl","pl"],["nl","nl"],["bg","bg"],["el","gr"]];
-  var LNAME = { ro:"Română", en:"English", fr:"Français", it:"Italiano", es:"Español", de:"Deutsch", ru:"Русский", pl:"Polski", nl:"Nederlands", bg:"Български", el:"Ελληνικά" };
-  var RIGHTS = { ro:"toate drepturile rezervate.", en:"all rights reserved.", fr:"tous droits réservés.", it:"tutti i diritti riservati.", es:"todos los derechos reservados.", de:"alle Rechte vorbehalten.", ru:"все права защищены.", pl:"wszelkie prawa zastrzeżone.", nl:"alle rechten voorbehouden.", bg:"всички права запазени.", el:"με επιφύλαξη παντός δικαιώματος." };
-  var TOOFAST = { ro:"Așteaptă câteva secunde înainte de a trimite din nou.", en:"Please wait a few seconds before sending again.", fr:"Veuillez patienter quelques secondes avant de renvoyer.", it:"Attendi qualche secondo prima di inviare di nuovo.", es:"Espera unos segundos antes de volver a enviar.", de:"Bitte warte ein paar Sekunden, bevor du erneut sendest.", ru:"Подождите несколько секунд перед повторной отправкой.", pl:"Odczekaj kilka sekund przed ponownym wysłaniem.", nl:"Wacht een paar seconden voordat je opnieuw verzendt.", bg:"Изчакайте няколко секунди, преди да изпратите отново.", el:"Περιμένετε λίγα δευτερόλεπτα πριν στείλετε ξανά." };
+  var LANGS = [["ro","ro"],["en","gb"],["fr","fr"],["it","it"],["es","es"],["de","de"],["ru","ru"],["pl","pl"],["nl","nl"],["bg","bg"],["el","gr"],["sq","al"]];
+  var LNAME = { ro:"Română", en:"English", fr:"Français", it:"Italiano", es:"Español", de:"Deutsch", ru:"Русский", pl:"Polski", nl:"Nederlands", bg:"Български", el:"Ελληνικά", sq:"Shqip" };
+  var RIGHTS = { ro:"toate drepturile rezervate.", en:"all rights reserved.", fr:"tous droits réservés.", it:"tutti i diritti riservati.", es:"todos los derechos reservados.", de:"alle Rechte vorbehalten.", ru:"все права защищены.", pl:"wszelkie prawa zastrzeżone.", nl:"alle rechten voorbehouden.", bg:"всички права запазени.", el:"με επιφύλαξη παντός δικαιώματος.", sq:"të gjitha të drejtat e rezervuara." };
+  var TOOFAST = { ro:"Așteaptă câteva secunde înainte de a trimite din nou.", en:"Please wait a few seconds before sending again.", fr:"Veuillez patienter quelques secondes avant de renvoyer.", it:"Attendi qualche secondo prima di inviare di nuovo.", es:"Espera unos segundos antes de volver a enviar.", de:"Bitte warte ein paar Sekunden, bevor du erneut sendest.", ru:"Подождите несколько секунд перед повторной отправкой.", pl:"Odczekaj kilka sekund przed ponownym wysłaniem.", nl:"Wacht een paar seconden voordat je opnieuw verzendt.", bg:"Изчакайте няколко секунди, преди да изпратите отново.", el:"Περιμένετε λίγα δευτερόλεπτα πριν στείλετε ξανά.", sq:"Prit disa sekonda përpara se të dërgosh sërish." };
   // Limba: preferintele declarate de utilizator in browser, in ordinea lor.
   // Inainte, paginile legale asteptau un raspuns de la geojs.io (pana la
   // 1500 ms) INAINTE de a se afisa — `await pickLang()` bloca randarea.
@@ -299,37 +299,6 @@
   applyI18n(document);
   injectIcons(document);
 
-  /* ---------- butoane „Descarcă": mesaj „în curând" în loc de link mort ---------- */
-  (function(){
-    var MSG={
-      ro:"📲 În curând pe Google Play! Aplicația este în verificare finală.",
-      en:"📲 Coming soon on Google Play! The app is in final review.",
-      fr:"📲 Bientôt sur Google Play ! L'application est en cours de validation finale.",
-      it:"📲 Presto su Google Play! L'app è in revisione finale.",
-      es:"📲 ¡Muy pronto en Google Play! La app está en revisión final.",
-      de:"📲 Bald bei Google Play! Die App ist in der Endprüfung.",
-      ru:"📲 Скоро в Google Play! Приложение проходит финальную проверку.",
-      pl:"📲 Wkrótce w Google Play! Aplikacja jest w końcowej weryfikacji.",
-      nl:"📲 Binnenkort in Google Play! De app is in de laatste beoordeling.",
-      bg:"📲 Скоро в Google Play! Приложението е в окончателна проверка.",
-      el:"📲 Σύντομα στο Google Play! Η εφαρμογή βρίσκεται σε τελικό έλεγχο."
-    };
-    function toast(){
-      var m=MSG[LANG]||MSG.en;
-      var t=document.getElementById("zSoonToast");
-      if(!t){ t=document.createElement("div"); t.id="zSoonToast";
-        t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);"+
-        "background:#14301f;color:#fff;padding:14px 20px;border-radius:14px;font-size:14px;font-weight:600;"+
-        "max-width:90vw;text-align:center;box-shadow:0 12px 34px rgba(0,0,0,.35);z-index:99999;opacity:0;"+
-        "transition:opacity .25s;";
-        document.body.appendChild(t); }
-      t.textContent=m; t.style.opacity="1";
-      clearTimeout(toast._h); toast._h=setTimeout(function(){ t.style.opacity="0"; },3200);
-    }
-    document.querySelectorAll('a[href*="releases/latest"]').forEach(function(a){
-      a.addEventListener("click",function(e){ e.preventDefault(); toast(); });
-    });
-  })();
 
   /* ---------- reveal la scroll (respectă reduced-motion) ---------- */
   var reduceMo = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
