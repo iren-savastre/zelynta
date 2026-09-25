@@ -357,6 +357,16 @@ export function scoreColor(score: number) {
 // doar un descriptor gen „Original Taste"). Regula:
 //  - dacă product_name e chiar o marcă din listă → îl folosim ca titlu (Nutella)
 //  - altfel folosim prima marcă (Coca-Cola), iar product_name devine subtitlu
+//  - excepție: `brands` conține uneori persoana juridică, nu marca de raft
+//    („COCA-COLA SERVICES SA/NV”). Ca titlu arată rupt, așa că atunci preferăm
+//    product_name și lăsăm firma în subtitlu.
+const LEGAL_ENTITY_RE =
+  /(^|[\s.,(])(s\.?a\.?\/?n\.?v\.?|s\.?r\.?l\.?|s\.?p\.?a\.?|gmbh|ltd\.?|limited|llc|inc\.?|corp\.?|plc|b\.?v\.?|n\.?v\.?|a\.?g\.?|a\/s|oy|oyj|kft|sp\.? ?z ?o\.?o\.?|d\.?o\.?o\.?|holding|group|company|services|international)([\s.,)]|$)/i;
+
+function looksLikeLegalEntity(name: string): boolean {
+  return LEGAL_ENTITY_RE.test(name);
+}
+
 export function productDisplay(product: any): { title: string; subtitle: string } {
   const brandList = String(product?.brands || "")
     .split(",")
@@ -374,11 +384,17 @@ export function productDisplay(product: any): { title: string; subtitle: string 
         brand0 && brand0.toLowerCase() !== pname.toLowerCase() ? brand0 : "",
     };
   }
-  if (brand0) {
+  // prima marcă care nu e nume de firmă; dacă toate sunt, rămâne prima
+  const brandTitle = brandList.find((b) => !looksLikeLegalEntity(b)) || "";
+  if (pname && !brandTitle && brand0) {
+    return { title: pname, subtitle: brand0 };
+  }
+  const chosen = brandTitle || brand0;
+  if (chosen) {
     return {
-      title: brand0,
+      title: chosen,
       subtitle:
-        pname && pname.toLowerCase() !== brand0.toLowerCase() ? pname : "",
+        pname && pname.toLowerCase() !== chosen.toLowerCase() ? pname : "",
     };
   }
   return { title: pname, subtitle: "" };

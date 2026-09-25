@@ -66,3 +66,36 @@ describe("productDisplay", () => {
     expect(d).toHaveProperty("subtitle");
   });
 });
+
+describe("productDisplay (brands = persoană juridică)", () => {
+  it("nu pune firma ca titlu când există un nume de produs", () => {
+    // cazul real 5449000000996: brands = „COCA-COLA SERVICES SA/NV”
+    const d = productDisplay({
+      product_name: "Coca-Cola",
+      brands: "COCA-COLA SERVICES SA/NV",
+    });
+    expect(d.title).toBe("Coca-Cola");
+    expect(d.subtitle).toBe("COCA-COLA SERVICES SA/NV");
+  });
+
+  it("alege marca de raft când lista începe cu firma", () => {
+    const d = productDisplay({
+      product_name: "Original Taste",
+      brands: "The Coca-Cola Company, Coca-Cola",
+    });
+    expect(d.title).toBe("Coca-Cola");
+    expect(d.subtitle).toBe("Original Taste");
+  });
+
+  it("păstrează firma drept titlu dacă nu există altceva", () => {
+    const d = productDisplay({ product_name: "", brands: "Ferrero SpA" });
+    expect(d.title).toBe("Ferrero SpA");
+  });
+
+  it("nu confundă o marcă obișnuită cu o firmă", () => {
+    for (const b of ["Nutella", "Milka", "Danone", "Lay's", "Coca-Cola"]) {
+      const d = productDisplay({ product_name: "Original Taste", brands: b });
+      expect(d.title).toBe(b);
+    }
+  });
+});
