@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { resetAppUuid } from "./appIdentity";
 
 const KEY = "zelynta_history";
 
@@ -91,8 +92,13 @@ export async function clearHistory(): Promise<void> {
 }
 
 // GDPR / control utilizator: șterge toate datele de conținut de pe dispozitiv
-// (istoric, favorite, coș, cache traduceri). Preferințele UI (temă, limbă, paletă)
-// rămân, pentru a nu reseta experiența.
+// (istoric, favorite, coș, cache traduceri, cache produse și categorii).
+// Preferințele UI (temă, limbă, paletă) rămân, pentru a nu reseta experiența.
+//
+// Cache-ul de produse (`zelynta_product_`) ține 14 zile numele, ingredientele,
+// imaginea și valorile nutriționale ale fiecărui produs scanat. Dacă nu l-am
+// șterge aici, „Șterge toate datele" ar lăsa pe dispozitiv exact lucrurile pe
+// care utilizatorul tocmai a cerut să le uităm.
 export async function clearAllData(): Promise<void> {
   try {
     const keys = await AsyncStorage.getAllKeys();
@@ -102,8 +108,12 @@ export async function clearAllData(): Promise<void> {
         k === "zelynta_favorites" ||
         k === "zelynta_basket" ||
         k === "zelynta_cookie_consent" ||
-        k.startsWith("xlate:")
+        k.startsWith("xlate:") ||
+        k.startsWith("zelynta_product_") ||
+        k.startsWith("zelynta_cat_")
     );
     if (toRemove.length) await AsyncStorage.multiRemove(toRemove);
   } catch {}
+  // Pseudonimul de contribuție trăiește în modulul care îl cunoaște.
+  await resetAppUuid();
 }

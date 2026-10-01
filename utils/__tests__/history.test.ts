@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getHistory, saveToHistory, type HistoryItem } from "../history";
+import { clearAllData, getHistory, saveToHistory, type HistoryItem } from "../history";
 
 const item = (over: Partial<HistoryItem> = {}): HistoryItem => ({
   barcode: "5449000000996",
@@ -90,5 +90,34 @@ describe("cand stocarea telefonului e plina", () => {
     const h = await getHistory();
     expect(h.some((x) => x.barcode === "999")).toBe(true);
     expect(h.length).toBeLessThan(21); // s-a taiat din cele vechi
+  });
+});
+
+describe("stergerea tuturor datelor", () => {
+  it("sterge si cache-ul de produse si pe cel de categorii", async () => {
+    await saveToHistory(item());
+    await AsyncStorage.setItem("zelynta_favorites", "[]");
+    await AsyncStorage.setItem("zelynta_basket", "[]");
+    await AsyncStorage.setItem("xlate:ro:test", "ceva");
+    await AsyncStorage.setItem("zelynta_product_5449000000996", "{}");
+    await AsyncStorage.setItem("zelynta_cat_ro_en:sodas", "{}");
+    await AsyncStorage.setItem("zelynta_app_uuid", "11112222333344445555666677778888");
+
+    await clearAllData();
+
+    const ramase = await AsyncStorage.getAllKeys();
+    expect(ramase).toEqual([]);
+  });
+
+  it("nu atinge preferintele de interfata", async () => {
+    await AsyncStorage.setItem("zelynta_theme", "dark");
+    await AsyncStorage.setItem("zelynta_lang", "sq");
+    await saveToHistory(item());
+
+    await clearAllData();
+
+    expect(await AsyncStorage.getItem("zelynta_theme")).toBe("dark");
+    expect(await AsyncStorage.getItem("zelynta_lang")).toBe("sq");
+    expect(await getHistory()).toEqual([]);
   });
 });
