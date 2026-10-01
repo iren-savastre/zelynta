@@ -17,8 +17,13 @@ import {
 } from "react-native";
 import ThemeFx from "../components/ThemeFx";
 import ZoomableImage from "../components/ZoomableImage";
-import { getFavorites } from "../utils/favorites";
-import { clearAllData, getHistory, HistoryItem } from "../utils/history";
+import { getFavorites, removeFavorite } from "../utils/favorites";
+import {
+  clearAllData,
+  getHistory,
+  HistoryItem,
+  removeFromHistory,
+} from "../utils/history";
 import { scoreColor } from "../utils/score";
 import { PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
@@ -51,21 +56,39 @@ export default function History() {
 
   const items = tab === "history" ? history : favorites;
 
-  function onClearAll() {
-    Alert.alert(t("clearAllData"), t("clearAllConfirm"), [
+  // React Native Web nu implementează Alert.alert — pe web nu apărea nimic și
+  // butoanele de ștergere păreau moarte. Pe telefon rămâne dialogul nativ.
+  function confirmThen(title: string, message: string, ok: string, run: () => void) {
+    if (isWeb) {
+      if (typeof window !== "undefined" && window.confirm(`${title}\n\n${message}`)) run();
+      return;
+    }
+    Alert.alert(title, message, [
       { text: t("cancel"), style: "cancel" },
-      {
-        text: t("clearAllData"),
-        style: "destructive",
-        onPress: () => {
-          clearAllData().then(load);
-        },
-      },
+      { text: ok, style: "destructive", onPress: run },
     ]);
+  }
+
+  function onClearAll() {
+    confirmThen(t("clearAllData"), t("clearAllConfirm"), t("clearAllData"), () => {
+      clearAllData().then(load);
+    });
   }
 
   function openProduct(barcode: string) {
     router.push({ pathname: "/", params: { barcode } });
+  }
+
+  // Șterge exact produsul atins, din lista pe care o are omul în față —
+  // din istoric dacă e pe tabul Istoric, de la favorite dacă e pe Favorite.
+  function onRemoveOne(item: HistoryItem) {
+    confirmThen(item.name, t("removeOneConfirm"), t("removeOne"), () => {
+      const done =
+        tab === "history"
+          ? removeFromHistory(item.barcode)
+          : removeFavorite(item.barcode);
+      done.then(load);
+    });
   }
 
   // Data se compune manual, nu prin toLocaleDateString: pe unele telefoane
@@ -189,6 +212,15 @@ export default function History() {
               <View style={[styles.scoreBadge, { backgroundColor: scoreColor(item.score) }]}>
                 <Text style={styles.scoreText}>{item.score}</Text>
               </View>
+              <TouchableOpacity
+                style={styles.removeBtn}
+                onPress={() => onRemoveOne(item)}
+                accessibilityRole="button"
+                accessibilityLabel={`${t("removeOne")} — ${item.name}`}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="close" size={18} color={colors.textMuted} />
+              </TouchableOpacity>
             </TouchableOpacity>
           )}
         />
@@ -337,4 +369,13 @@ const makeStyles = (c: ThemeColors) =>
         : { elevation: 3 }),
     },
     scoreText: { fontSize: 18, fontWeight: "900", color: "#fff" },
+    // Discret lângă scor: se vede, dar nu concurează cu produsul în sine.
+    removeBtn: {
+      width: 34,
+      height: 34,
+      marginLeft: 6,
+      borderRadius: 17,
+      alignItems: "center",
+      justifyContent: "center",
+    },
   });

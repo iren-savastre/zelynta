@@ -1,5 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { clearAllData, getHistory, saveToHistory, type HistoryItem } from "../history";
+import {
+  clearAllData,
+  getHistory,
+  removeFromHistory,
+  saveToHistory,
+  type HistoryItem,
+} from "../history";
 
 const item = (over: Partial<HistoryItem> = {}): HistoryItem => ({
   barcode: "5449000000996",
@@ -119,5 +125,24 @@ describe("stergerea tuturor datelor", () => {
     expect(await AsyncStorage.getItem("zelynta_theme")).toBe("dark");
     expect(await AsyncStorage.getItem("zelynta_lang")).toBe("sq");
     expect(await getHistory()).toEqual([]);
+  });
+});
+
+describe("stergerea unui singur produs", () => {
+  it("scoate doar produsul cerut, restul raman", async () => {
+    await saveToHistory(item({ barcode: "111", name: "Unu" }));
+    await saveToHistory(item({ barcode: "222", name: "Doi" }));
+    await saveToHistory(item({ barcode: "333", name: "Trei" }));
+
+    await removeFromHistory("222");
+
+    const ramase = (await getHistory()).map((h) => h.barcode);
+    expect(ramase).toEqual(["333", "111"]);
+  });
+
+  it("nu se supara pe un cod care nu exista", async () => {
+    await saveToHistory(item({ barcode: "111" }));
+    await removeFromHistory("nuexista");
+    expect(await getHistory()).toHaveLength(1);
   });
 });

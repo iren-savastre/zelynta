@@ -15,9 +15,15 @@ export async function getFavorites(): Promise<FavoriteItem[]> {
   }
 }
 
-export async function isFavorite(barcode: string): Promise<boolean> {
-  const favs = await getFavorites();
-  return favs.some((f) => f.barcode === barcode);
+// Scoate un singur produs de la favorite, fără să le atingă pe celelalte.
+export async function removeFavorite(barcode: string): Promise<void> {
+  try {
+    const favs = await getFavorites();
+    await AsyncStorage.setItem(
+      KEY,
+      JSON.stringify(favs.filter((f) => f.barcode !== barcode))
+    );
+  } catch {}
 }
 
 // Adaugă fără să scoată dacă există deja (spre deosebire de toggle)
@@ -32,19 +38,3 @@ export async function addFavorite(item: FavoriteItem): Promise<void> {
   } catch {}
 }
 
-export async function toggleFavorite(item: FavoriteItem): Promise<boolean> {
-  try {
-    const favs = await getFavorites();
-    const exists = favs.some((f) => f.barcode === item.barcode);
-    let updated: FavoriteItem[];
-    if (exists) {
-      updated = favs.filter((f) => f.barcode !== item.barcode);
-    } else {
-      updated = [item, ...favs].slice(0, MAX_ITEMS);
-    }
-    await AsyncStorage.setItem(KEY, JSON.stringify(updated));
-    return !exists; // noua stare (true = acum favorit)
-  } catch {
-    return false;
-  }
-}
