@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getLocales } from "expo-localization";
 import i18n from "i18next";
+import { Platform } from "react-native";
 import { initReactI18next } from "react-i18next";
 import { translations } from "./translations";
 
@@ -20,6 +21,22 @@ function pickDeviceLanguage(): string {
 }
 const deviceFallback = pickDeviceLanguage();
 
+// Pe web, paginile sunt generate ÎNAINTE de a ști cine le va citi: `expo export`
+// rulează pe calculatorul care face publicarea, iar `getLocales()` întoarce acolo
+// limba ACELUI calculator. Așa am ajuns să publicăm HTML în franceză, fiindcă de
+// pe un Windows pe franceză s-a construit.
+//
+// Două stricăciuni din asta:
+//  - orice vizitator vedea o clipă limba greșită, până se încărca aplicația;
+//  - textul din HTML nu se potrivea cu ce randa browserul, iar React arunca
+//    eroarea de hidratare #418.
+//
+// Deci pe web pornim mereu de la aceeași limbă — româna, ca `<html lang="ro">` —
+// și o schimbăm pe cea adevărată abia după montare, din `_layout.tsx`. Pe telefon
+// nu există randare pe server, deci pornim direct cu limba lui, fără pâlpâire.
+const WEB_FIRST_RENDER_LANG = "ro";
+const initialLanguage = Platform.OS === "web" ? WEB_FIRST_RENDER_LANG : deviceFallback;
+
 i18n.use(initReactI18next).init({
   resources: {
     ro: { translation: translations.ro },
@@ -35,7 +52,7 @@ i18n.use(initReactI18next).init({
     el: { translation: translations.el },
     sq: { translation: translations.sq },
   },
-  lng: deviceFallback, // provizoriu — se rezolvă mai jos (instant, fără ecran gol)
+  lng: initialLanguage, // vezi nota de mai sus; se rezolvă după montare
   fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
@@ -68,7 +85,8 @@ export async function persistAppLanguage(code: string): Promise<void> {
   try { await AsyncStorage.setItem(LANG_KEY, code); } catch {}
 }
 
-// pornește rezolvarea limbii (fără a bloca randarea)
-resolveAppLanguage();
+// `resolveAppLanguage()` NU se mai cheamă aici. Pe web ar schimba limba în
+// timp ce React încă potrivește HTML-ul primit de la server cu ce randează el.
+// Se cheamă din `_layout.tsx`, după montare — un singur loc, ambele platforme.
 
 export default i18n;

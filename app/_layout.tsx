@@ -1,6 +1,8 @@
 import { Stack } from "expo-router";
 import Head from "expo-router/head";
+import { useEffect } from "react";
 import "../i18n/i18n";
+import { resolveAppLanguage } from "../i18n/i18n";
 import { ThemeProvider, useTheme } from "../utils/theme";
 import { BasketProvider } from "../utils/basket";
 import BasketBar from "../components/BasketBar";
@@ -52,6 +54,13 @@ function StackNav() {
 }
 
 export default function RootLayout() {
+  // Limba se stabilește DUPĂ montare, nu la import. Pe web, prima randare
+  // trebuie să fie identică cu HTML-ul venit de la server (vezi i18n.ts);
+  // dacă am schimba limba mai devreme, React ar găsi alt text decât aștepta.
+  useEffect(() => {
+    resolveAppLanguage();
+  }, []);
+
   return (
     <ErrorBoundary>
       {/* Titlul paginii pentru versiunea web. Trebuie pus aici, prin Head-ul
