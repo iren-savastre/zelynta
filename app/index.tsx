@@ -1643,7 +1643,15 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
             <Text style={styles.scoreLabel}>{t("additivesLabel")}</Text>
             {additives.length === 0 ? (
-              <Text style={styles.scoreUnknown}>{t("noAdditives")}</Text>
+              // „Niciun aditiv detectat" are voie să apară DOAR când chiar am
+              // avut ce citi. Dacă baza nu are lista de ingrediente, atunci nu
+              // știm nimic despre aditivi — iar a spune că nu există e o
+              // minciună pe care omul o ia drept verdict. (Pastă de dinți
+              // Jordan Kids, cod 7070866038342: baza are produsul și poza, dar
+              // nu și compoziția; Yuka o are din baza lor proprie.)
+              <Text style={styles.scoreUnknown}>
+                {ingredientsText.trim() ? t("noAdditives") : t("additivesUnknown")}
+              </Text>
             ) : (
               additives.map((add, idx) => (
                 <TouchableOpacity
