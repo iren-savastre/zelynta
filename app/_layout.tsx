@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
 import Head from "expo-router/head";
 import { useEffect } from "react";
-import "../i18n/i18n";
 import { resolveAppLanguage } from "../i18n/i18n";
 import { ThemeProvider, useTheme } from "../utils/theme";
 import { BasketProvider } from "../utils/basket";
