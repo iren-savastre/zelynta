@@ -1,6 +1,11 @@
 import { ScrollViewStyleReset } from "expo-router/html";
 import { type PropsWithChildren } from "react";
 
+// Aplicația web e servită dintr-un subfolder (zelynta.com/app), iar în dezvoltare
+// din rădăcină. `EXPO_BASE_URL` vine din `experiments.baseUrl` și e gol în dev,
+// deci aceleași legături merg în amândouă locurile — fără cale scrisă de mână.
+const BASE = process.env.EXPO_BASE_URL ?? "";
+
 // Documentul HTML root pentru versiunea web (randare statică).
 // Aici fixăm viewport-ul ca aplicația să se încadreze corect pe telefon.
 export default function Root({ children }: PropsWithChildren) {
@@ -15,10 +20,15 @@ export default function Root({ children }: PropsWithChildren) {
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
         <meta name="theme-color" content="#2E7D32" />
+        <title>Zelynta — scanează produse, înțelege etichetele</title>
+        <meta
+          name="description"
+          content="Scanezi un produs și afli scorul de sănătate, aditivii explicați, avertismentele și alternative mai bune. Fără cont, datele rămân la tine."
+        />
         {/* PWA: instalabilă + funcțională offline */}
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
-        <link rel="icon" type="image/png" href="/icon-192.png" />
+        <link rel="manifest" href={`${BASE}/manifest.json`} />
+        <link rel="apple-touch-icon" href={`${BASE}/icon-192.png`} />
+        <link rel="icon" type="image/png" href={`${BASE}/icon-192.png`} />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -37,7 +47,7 @@ export default function Root({ children }: PropsWithChildren) {
 const swRegister = `
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/sw.js').catch(function () {});
+    navigator.serviceWorker.register('${BASE}/sw.js').catch(function () {});
   });
 }
 `;

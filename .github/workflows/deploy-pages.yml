@@ -15,6 +15,15 @@ on:
       - "scripts/**"
       - "package.json"
       - "package-lock.json"
+      # Aplicatia web (PWA) se construieste aici, la publicare, ca sa nu tinem
+      # 9 MB de bundle in repo. Deci orice schimbare in codul aplicatiei
+      # trebuie sa regenereze si site-ul.
+      - "app/**"
+      - "utils/**"
+      - "i18n/**"
+      - "components/**"
+      - "public/**"
+      - "app.json"
   workflow_dispatch:
 
 permissions:
@@ -41,6 +50,14 @@ jobs:
       - run: npm ci
       - name: Optimizează (WebP + minify) docs/ -> build/
         run: npm run optimize
+      - name: Construiește aplicația web (PWA) -> build/app
+        # `experiments.baseUrl` din app.json o face sa functioneze sub /app.
+        # Rulat DUPA optimize, ca minificatorul de HTML sa nu atinga bundle-ul
+        # Expo (e deja minificat de Metro).
+        run: |
+          npx expo export -p web --output-dir dist-web
+          mkdir -p build/app
+          cp -r dist-web/. build/app/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -62,3 +62,6 @@ docs-internal/ZELYNTA_FULL_TECH_AUDIT.md
 
 # Rapoarte de acoperire a testelor (se genereaza local)
 coverage/
+
+# export temporar al aplicatiei web (se construieste la publicare)
+dist-web/
