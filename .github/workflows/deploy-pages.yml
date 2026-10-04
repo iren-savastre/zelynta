@@ -59,7 +59,7 @@ jobs:
           mkdir -p build/app
           cp -r dist-web/. build/app/
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: build
       - id: deploy
