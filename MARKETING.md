@@ -28,13 +28,14 @@
 - Scanează. Înțelege.
 - Alege mai sănătos.
 - E-urile, explicate.
+- Vezi unde ajunge, în corp.
 
 **În alte limbi (deja în aplicație):**
 - 🇬🇧 Scan. Understand. Choose healthier.
-- 🇫🇷 Scannez. Comprenez. Choisissez mieux.
+- 🇫🇷 Scannez. Comprenez. Choisissez plus sain.
 - 🇩🇪 Scannen. Verstehen. Gesünder wählen.
-- 🇪🇸 Escanea. Entiende. Elige mejor.
-- 🇮🇹 Scansiona. Capisci. Scegli meglio.
+- 🇪🇸 Escanea. Entiende. Elige más sano.
+- 🇮🇹 Scansiona. Capisci. Scegli più sano.
 
 ---
 
@@ -47,7 +48,7 @@
 > Listele de ingrediente sunt lungi, codurile E par un cifru, iar informația e împrăștiată. Zelynta rezolvă asta: scanezi produsul (aliment, cosmetic sau produs general) și primești un scor de sănătate transparent, vezi exact DE CE (zahăr, sare, grăsimi, aditivi), afli ce înseamnă fiecare E, primești avertismente (ulei de palmier, aditivi de risc) și alternative mai bune. Totul pe baza unor baze de date deschise, fără cont și fără urmărire — datele tale rămân pe telefon.
 
 **Pitch de prezentare (30 sec):**
-> Cumperi în magazin, te uiți la etichetă și... nu înțelegi nimic. Zelynta scanează codul de bare sau citește ingredientele dintr-o poză și-ți spune pe loc: scor de la 0 la 100, de ce e așa, ce înseamnă fiecare aditiv, dacă are ulei de palmier și ce alternative mai bune există. Funcționează pentru alimente, cosmetice și produse generale, în 11 limbi, fără cont și fără reclame. Practic, e un nutriționist de buzunar care-ți traduce eticheta.
+> Cumperi în magazin, te uiți la etichetă și... nu înțelegi nimic. Zelynta scanează codul de bare sau citește ingredientele dintr-o poză și-ți spune pe loc: scor de la 0 la 100, de ce e așa, ce înseamnă fiecare aditiv, dacă are ulei de palmier și ce alternative mai bune există. Funcționează pentru alimente, cosmetice și produse generale, în 12 limbi, fără cont și fără reclame. Practic, e un nutriționist de buzunar care-ți traduce eticheta.
 
 ---
 
@@ -57,7 +58,7 @@
 |---|---|---|
 | 👩 **Părintele atent** | „E bun pentru copilul meu?" | Avertismente pentru copii + scor clar |
 | 🏋️ **Cel care ține la formă** | Zahăr, grăsimi, calorii | Vezi exact ce conține, instant |
-| 🌿 **Consumatorul conștient** | Aditivi, ulei de palmier, etică | E-urile explicate + alternative |
+| 🌿 **Consumatorul conștient** | Aditivi, ulei de palmier, etică | E-urile explicate + organele afectate + alternative |
 | 🧴 **Atent la cosmetice** | Ingrediente dubioase pe piele | Funcționează și pentru cosmetice |
 | 🛒 **Cumpărătorul ocupat** | Decizie rapidă în magazin | 3 secunde, un scor, gata |
 | 🔒 **Cel preocupat de intimitate** | Fără tracking | Fără cont, date pe telefon |
@@ -70,7 +71,7 @@
 - **Scanare cod de bare** cu camera (cu lanternă pentru rafturi întunecate).
 - **Introducere manuală** a codului, când camera nu poate.
 - **Citire ingrediente din poză (OCR)** — recunoaștere de text rapidă, locală (ML Kit), cu rezervă în cloud.
-- **3 baze de date** căutate automat: alimente, cosmetice, produse generale (Open Food Facts).
+- **4 baze de date** căutate automat: alimente, cosmetice, produse generale și hrană pentru animale (Open Food / Beauty / Products / Pet Food Facts).
 
 ### 🟢 Scorul de sănătate (transparent)
 - **Scor de la 0 la 100**, cu verdict colorat:
@@ -84,20 +85,21 @@
 - **E-urile explicate**: nume, la ce se folosesc, nivel de risc (moderat / atenție / risc).
 - **Detecție ulei de palmier** + notă educativă (de ce să-l moderezi), fără panică.
 - **Avertismente pentru cosmetice**: ingrediente cu risc, semnalate.
+- **🫀 Ce organ poate afecta fiecare aditiv** — la fiecare aditiv cu risc, o siluetă de corp arată exact ce organe pot fi afectate (ficat, rinichi, sânge, stomac, piele, oase, dinți…), pe înțelesul tuturor, pe baza evaluărilor EFSA și IARC. **Niciun concurent nu face asta.**
 
 ### ⚖️ Decizii mai bune
 - **Compară 2 produse** unul lângă altul (scor, ingrediente, aditivi).
-- **Alternative mai sănătoase**: top 3 produse din aceeași categorie, cu scor semnificativ mai bun.
-- **Sfaturi pe categorie** (24 de categorii: lactate, carne, dulciuri, băuturi, pâine, ulei etc.) — beneficii, când să consumi, cum să prepari, atenționări pentru copii.
+- **Alternative mai sănătoase**: până la 8 produse din aceeași categorie, cu scor semnificativ mai bun.
+- **Sfaturi pe categorie** (25 de categorii: lactate, carne, dulciuri, băuturi, pâine, ulei etc.) — beneficii, când să consumi, cum să prepari, atenționări pentru copii.
 
 ### 🗂️ Organizare personală
-- **Istoric** al produselor scanate (până la 100).
-- **Favorite** (până la 200).
+- **Istoric** al produselor scanate — **nelimitat**, rămâne până îl șterge utilizatorul.
+- **Favorite** (până la 200). Din ambele liste se poate șterge **un singur produs**, nu doar tot.
 - **Coș** rapid (până la 20) — salvează tot la favorite sau compară primele 2 cu un tap.
 
 ### 🌍 Personalizare & limbi
-- **11 limbi**: română, engleză, franceză, italiană, spaniolă, germană, rusă, poloneză, neerlandeză, bulgară, greacă.
-- **Detectare automată a limbii** după IP (cu rezervă pe limba telefonului, apoi engleză).
+- **12 limbi**: română, engleză, franceză, italiană, spaniolă, germană, rusă, poloneză, neerlandeză, bulgară, greacă, albaneză.
+- **Detectare automată a limbii** din preferințele telefonului (lista întreagă, nu doar prima), cu rezervă pe engleză. **Nu** trimitem adresa IP nicăieri — detecția după IP a fost scoasă în septembrie 2026, tocmai din motive de intimitate.
 - **Temă light/dark** + **15 palete de culoare** (de la verde clasic la rodie).
 - Animații fine, design „premium", responsive pe telefon și tabletă.
 
@@ -105,19 +107,20 @@
 - **Fără cont, fără reclame, fără urmărire.**
 - Datele (istoric, favorite, coș, preferințe) rămân **pe telefon**.
 - **Buton „Șterge toate datele"** (GDPR).
-- **PWA instalabilă** + **funcționează offline** (se încarcă și navighează fără internet).
+- **Versiune web la [zelynta.com/app](https://zelynta.com/app)** — PWA instalabilă, **funcționează offline** (se încarcă și navighează fără internet).
 
 ---
 
 ## 6. DE CE ZELYNTA (diferențiatori)
 
+✅ **Vezi efectul pe corp** — silueta care arată ce organ poate fi afectat de fiecare aditiv. Unic.
 ✅ **Transparent** — îți arată DE CE, nu doar o notă.
 ✅ **3-în-1** — alimente + cosmetice + produse generale.
 ✅ **E-urile pe înțelesul tău** — nu doar coduri.
 ✅ **Alternative concrete** — nu te lasă doar cu „e rău".
 ✅ **Privat din construcție** — fără cont, fără tracking.
-✅ **11 limbi + detectare automată.**
-✅ **Offline & instalabilă** (PWA).
+✅ **12 limbi + detectare automată, fără să trimitem nimic nimănui.**
+✅ **Offline & instalabilă** (PWA, la zelynta.com/app).
 ✅ **Gratuit.**
 
 ---
@@ -163,14 +166,15 @@
 ### Beneficii (bullets pentru pliant)
 > ✔ Alimente, cosmetice și produse generale
 > ✔ E-urile explicate pe înțelesul tău
+> ✔ Vezi pe o siluetă ce organ poate fi afectat
 > ✔ Avertisment ulei de palmier
 > ✔ Comparație între 2 produse
-> ✔ 11 limbi · funcționează offline
+> ✔ 12 limbi · funcționează offline
 > ✔ Fără cont · fără reclame · datele rămân pe telefon
 
 ### Subsol (call to action)
 > **Descarcă gratuit Zelynta** și scanează primul produs.
-> 📲 [link Google Play] · 🌐 [site] · [QR code]
+> 📲 play.google.com/store/apps/details?id=com.savastre.zelynta · 🌐 zelynta.com · [QR code]
 
 ---
 
@@ -200,7 +204,7 @@
 **De unde vin datele despre produse?** Din baze de date deschise (Open Food Facts) — alimente, cosmetice, produse generale.
 **Cât de exact e scorul?** E orientativ și educativ, calculat pe nutrienți și aditivi. Nu înlocuiește un medic/nutriționist.
 **Funcționează offline?** Aplicația se încarcă și navighează offline; scanarea unui produs nou are nevoie de internet (pentru datele lui).
-**În ce limbi e?** 11 limbi, cu detectare automată.
+**În ce limbi e?** 12 limbi, cu detectare automată după limba telefonului.
 
 ---
 
@@ -208,9 +212,10 @@
 
 1. **„Eticheta, pe înțelesul tău."** (tagline)
 2. **„Scor + DE CE"** — transparența e marca noastră.
-3. **„Fără cont, fără reclame, fără urmărire."** — încredere.
-4. **„Alimente, cosmetice și produse generale."** — 3-în-1.
-5. **„Gratuit."**
+3. **„Vezi ce organ e afectat"** — singurul lucru pe care nu-l are nimeni altcineva.
+4. **„Fără cont, fără reclame, fără urmărire."** — încredere.
+5. **„Alimente, cosmetice și produse generale."** — 3-în-1.
+6. **„Gratuit."**
 
 ---
 
@@ -226,9 +231,11 @@
 
 ## 13. CHECKLIST LANSARE MARKETING
 
-- [ ] Completează `[link Google Play]`, `[site]`, conturile social cu date REALE
+- [x] Link Google Play: `play.google.com/store/apps/details?id=com.savastre.zelynta`
+- [x] Site: `zelynta.com` · versiune web: `zelynta.com/app`
+- [ ] Completează conturile social cu date REALE
 - [ ] Generează QR code spre pagina de descărcare
-- [ ] Pregătește 3–5 screenshot-uri (scanare, scor, comparație, alternative)
+- [x] Capturi de ecran gata, în 5 limbi (folderul `zelynta-capturi` de pe Desktop): rezultat, aditivi, **siluetă cu organe**, ulei de palmier, istoric, acasă
 - [ ] Feature graphic 1024×500 (logo + slogan)
 - [ ] Iconiță 512×512
 - [ ] Pliant A5 față-verso (folosește secțiunea 8)
@@ -239,20 +246,20 @@
 
 ## 14. 💬 COPY AUTENTIC EXTRAS DIN APLICAȚIE & LANDING (reflectă realitatea)
 
-> Texte care **există deja** în aplicație și pe landing page (`docs/index.html`) — verificate în cod, în 11 limbi. Folosește-le ca atare; sunt deja „vocea" brandului.
+> Texte care **există deja** în aplicație și pe landing page (`docs/index.html`) — verificate în cod, în 12 limbi. Folosește-le ca atare; sunt deja „vocea" brandului.
 
 ### 🎯 Slogane rotative (din app — „prompter", lângă logo)
 Acestea derulează deja în aplicație și sunt slogane gata făcute:
 1. **Scanezi. Înțelegi. Alegi mai sănătos.** *(Scan. Understand. Choose healthier.)*
-2. **Codurile E, traduse pe înțelesul tău.** *(E-numbers, translated into plain words.)*
-3. **Ulei de palmier și aditivi de risc — semnalate instant.** *(Palm oil and risky additives — flagged instantly.)*
-4. **Fără cont. Datele rămân pe telefonul tău.** *(No account. Your data stays on your phone.)*
-5. **Un scor clar, în câteva secunde la raft.** *(A clear score, in seconds at the shelf.)*
+2. **Codurile E, pe înțelesul tău.**
+3. **Fără cont — datele rămân la tine.**
+4. **Un scor clar, în câteva secunde.**
+5. **Ulei de palmier? Îți spunem instant.**
 
 ### 🏷️ Titlu & subtitlu principal (din landing/hero)
 - **Titlu:** „Scanează produse. Înțelege etichetele. Alege mai sănătos."
 - **Subtitlu:** „Scanezi codul de bare sau fotografiezi lista de ingrediente, iar aplicația îți arată un scor de sănătate, aditivii explicați, avertismente și alternative mai bune — pe baza unor baze de date deschise."
-- **Notă (sub buton):** „Gratuit · fără cont · datele rămân pe dispozitivul tău · disponibilă în **11 limbi**."
+- **Notă (sub buton):** „Gratuit · fără cont · datele rămân pe dispozitivul tău · disponibilă în **12 limbi**."
 
 ### 😣 Problema (din landing — perfectă pentru reclamă „problemă → soluție")
 - **Intro:** „Listele de ingrediente sunt lungi, codurile E par un cifru, iar informația e împrăștiată. E greu să știi rapid dacă un produs e o alegere bună — mai ales pentru copii."
@@ -267,7 +274,7 @@ Acestea derulează deja în aplicație și sunt slogane gata făcute:
 - **Alternative mai bune și recomandări pe categorie**
 
 ### 🛡️ Insigne de încredere (din landing — perfecte ca pictograme pe pliant)
-`Scanare rapidă` · `Fără cont` · `Date pe dispozitiv` · `11 limbi` · `Surse deschise` · `GDPR-ready`
+`Scanare rapidă` · `Fără cont` · `Date pe dispozitiv` · `12 limbi` · `Surse deschise` · `GDPR-ready`
 
 ### 🔢 Cum funcționează (din landing — cei 5 pași, gata pentru infografic)
 1. **Scanează** — „Îndreaptă camera spre codul de bare sau fotografiază lista de ingrediente."
@@ -336,7 +343,7 @@ Acestea derulează deja în aplicație și sunt slogane gata făcute:
 |---|---|---|
 | **Iconiță** | **512 × 512 px**, PNG 32-bit, < 1 MB | din **martie 2026** colțurile se rotunjesc automat (30%) → ține elementele cheie în **15–18% padding interior** |
 | **Feature graphic** | **1024 × 500 px**, JPEG sau PNG 24-bit **fără alpha** | **obligatoriu** (nu poți publica fără el); focalizează central |
-| **Screenshot-uri telefon** | min. 320 / max. 3840 px pe latură, raport între **9:16 și 9:21** | minim **2**, până la **8**; recomand 1080 × 1920 |
+| **Screenshot-uri telefon** | min. 320 / max. 3840 px pe latură; Play Console scrie **„16:9 sau 9:16"** | minim **2**, până la **8**. În practică acceptă și 9:18 — am urcat 1080 × 2160 pe 26 sept 2026 și au intrat. |
 | Screenshot-uri tabletă | aceleași reguli | opțional, dar bun pentru calitate |
 
 ### 🌐 F. Bannere web / display (opțional, pentru reclame online)
@@ -372,7 +379,7 @@ Acestea derulează deja în aplicație și sunt slogane gata făcute:
 ### 📦 Lista de livrabile (cu dimensiuni, gata de brief către designer)
 - [ ] Iconiță **512×512** (PNG, safe zone 15%)
 - [ ] Feature graphic **1024×500** (logo + slogan, central)
-- [ ] 5 screenshot-uri **1080×1920** (scanare, scor, aditivi, comparație, alternative)
+- [x] Capturi **1080×2160**, acceptate de Play: rezultat, aditivi, **siluetă cu organe**, palmier, istoric, acasă
 - [ ] Pliant **A5** față-verso **1748×2480** @300 DPI, CMYK, +bleed
 - [ ] Roll-up **85×200 cm** @150 DPI (logo+slogan sus, jos liber)
 - [ ] 3 postări feed **1080×1350** + 2 story **1080×1920**
