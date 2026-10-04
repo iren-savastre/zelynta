@@ -20,11 +20,6 @@ export default function Root({ children }: PropsWithChildren) {
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
         <meta name="theme-color" content="#2E7D32" />
-        <title>Zelynta — scanează produse, înțelege etichetele</title>
-        <meta
-          name="description"
-          content="Scanezi un produs și afli scorul de sănătate, aditivii explicați, avertismentele și alternative mai bune. Fără cont, datele rămân la tine."
-        />
         {/* PWA: instalabilă + funcțională offline */}
         <link rel="manifest" href={`${BASE}/manifest.json`} />
         <link rel="apple-touch-icon" href={`${BASE}/icon-192.png`} />

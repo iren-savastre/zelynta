@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import Head from "expo-router/head";
 import "../i18n/i18n";
 import { ThemeProvider, useTheme } from "../utils/theme";
 import { BasketProvider } from "../utils/basket";
@@ -53,6 +54,16 @@ function StackNav() {
 export default function RootLayout() {
   return (
     <ErrorBoundary>
+      {/* Titlul paginii pentru versiunea web. Trebuie pus aici, prin Head-ul
+          expo-router: un <title> scris direct în +html.tsx rămâne al doilea în
+          document, iar browserul îl ia pe primul — cel gol, pus de router. */}
+      <Head>
+        <title>Zelynta — scanează produse, înțelege etichetele</title>
+        <meta
+          name="description"
+          content="Scanezi un produs și afli scorul de sănătate, aditivii explicați, avertismentele și alternative mai bune. Fără cont, datele rămân la tine."
+        />
+      </Head>
       <ThemeProvider>
         <BasketProvider>
           <StackNav />
