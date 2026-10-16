@@ -84,7 +84,7 @@ export default function Compare() {
     const [a, b] = await Promise.all([fetchProduct(selected[0]), fetchProduct(selected[1])]);
     if (!a || !b) {
       setProducts(null);
-      setCmpError(true); // cel puțin un produs nu a putut fi încărcat
+      setCmpError(true); // cel puțin un produs nu a putut fi încărcat // at least one product couldn't be loaded
     } else {
       setProducts([a, b]);
     }
@@ -95,6 +95,7 @@ export default function Compare() {
     return v == null ? "—" : Math.round(v * 10) / 10;
   }
   // ce parte e mai bună: 'a' | 'b' | null
+  // which side is better: 'a' | 'b' | null
   function best(va: any, vb: any, lowerBetter: boolean): "a" | "b" | null {
     if (va == null || vb == null || va === vb) return null;
     const aWins = lowerBetter ? va < vb : va > vb;

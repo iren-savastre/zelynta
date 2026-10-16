@@ -21,6 +21,26 @@ import { APP_NAME, APP_VERSION, OFF_USER_AGENT } from "./userAgent";
  * URL-ul proxy-ului NU e un secret (e doar o adresa), deci poate sta in
  * EXPO_PUBLIC_CONTRIB_URL. Cand nu e setat, functia de contributie e oprita
  * complet — vezi `isContributionEnabled()`.
+ *
+ * Submitting a new product to Open Food Facts.
+ *
+ * WHY WE DON'T TALK TO OPEN FOOD FACTS DIRECTLY
+ * ----------------------------------------------
+ * Writing to OFF requires `user_id` + `password` — Zelynta's global account
+ * credentials. Any value placed in the app ends up in the APK file:
+ * `EXPO_PUBLIC_*` is literally substituted into the bundle at build time, so
+ * anyone who unpacks the app can read it. With the password in hand, anyone
+ * could write to Open Food Facts ON Zelynta's BEHALF — and the consequence
+ * would be the account getting blocked, i.e. losing the ability to
+ * contribute for all users.
+ *
+ * That's why the app sends to our own proxy (Supabase Edge Function), which
+ * keeps the password server-side and adds `user_id`/`password` before
+ * forwarding the request. The proxy also applies a rate limit per `app_uuid`.
+ *
+ * The proxy URL is NOT a secret (it's just an address), so it can live in
+ * EXPO_PUBLIC_CONTRIB_URL. When it isn't set, the contribution feature is
+ * disabled entirely — see `isContributionEnabled()`.
  */
 
 const PROXY_URL =
@@ -28,6 +48,7 @@ const PROXY_URL =
 
 
 /** Contributia e disponibila doar daca proxy-ul a fost configurat. */
+/** Contribution is available only if the proxy has been configured. */
 export function isContributionEnabled(): boolean {
   return PROXY_URL.length > 0;
 }
@@ -35,28 +56,34 @@ export function isContributionEnabled(): boolean {
 export type ContributionDraft = {
   barcode: string;
   /** Numele produsului, asa cum apare pe ambalaj. */
+  /** The product's name, as it appears on the package. */
   productName: string;
   /** Marca. Optional — multe produse locale nu au una clara. */
+  /** Brand. Optional — many local products don't have a clear one. */
   brands?: string;
   /** Lista de ingrediente, de obicei venita din OCR si confirmata de utilizator. */
+  /** Ingredients list, usually coming from OCR and confirmed by the user. */
   ingredientsText?: string;
   /** Categorii, text liber separat prin virgula. Optional. */
+  /** Categories, free text separated by commas. Optional. */
   categories?: string;
   /** Limba in care sunt scrise textele de mai sus (cod din 2 litere). */
+  /** The language the texts above are written in (2-letter code). */
   lang: string;
 };
 
 export type ContributeErrorKind =
-  | "NOT_CONFIGURED" // proxy-ul nu e setat — functia e oprita
-  | "INVALID_INPUT" // cod de bare sau nume lipsa
-  | "NETWORK_ERROR" // fara conexiune
-  | "RATE_LIMITED" // prea multe trimiteri
-  | "REJECTED" // OFF a refuzat (produs blocat, date invalide)
-  | "UPSTREAM_ERROR"; // eroare la proxy sau la OFF
+  | "NOT_CONFIGURED" // proxy-ul nu e setat — functia e oprita // the proxy isn't set — the feature is disabled
+  | "INVALID_INPUT" // cod de bare sau nume lipsa // missing barcode or name
+  | "NETWORK_ERROR" // fara conexiune // no connection
+  | "RATE_LIMITED" // prea multe trimiteri // too many submissions
+  | "REJECTED" // OFF a refuzat (produs blocat, date invalide) // OFF rejected it (blocked product, invalid data)
+  | "UPSTREAM_ERROR"; // eroare la proxy sau la OFF // error at the proxy or at OFF
 
 export type ContributeResult = { ok: true } | { ok: false; kind: ContributeErrorKind };
 
 /** Codurile EAN/UPC au 8, 12, 13 sau 14 cifre. Filtram gresellile evidente. */
+/** EAN/UPC codes have 8, 12, 13 or 14 digits. We filter out obvious mistakes. */
 export function isPlausibleBarcode(code: string): boolean {
   return /^[0-9]{8}$|^[0-9]{12,14}$/.test(String(code || "").trim());
 }
@@ -64,6 +91,9 @@ export function isPlausibleBarcode(code: string): boolean {
 /**
  * Trimite un produs nou. Nu arunca niciodata — intoarce motivul, la fel ca
  * `lookupProductByBarcode`, ca interfata sa poata reactiona diferit.
+ *
+ * Submits a new product. Never throws — returns the reason instead, just
+ * like `lookupProductByBarcode`, so the UI can react differently.
  */
 export async function contributeProduct(
   draft: ContributionDraft
@@ -81,6 +111,8 @@ export async function contributeProduct(
 
   // Campurile merg cu sufix de limba: OFF stocheaza separat textul fiecarei
   // limbi, deci `product_name_ro` nu suprascrie versiunea franceza a altcuiva.
+  // Fields get a language suffix: OFF stores each language's text separately,
+  // so `product_name_ro` doesn't overwrite someone else's French version.
   const payload: Record<string, string> = {
     code: barcode,
     app_name: APP_NAME,
@@ -104,11 +136,12 @@ export async function contributeProduct(
         headers: {
           "Content-Type": "application/json",
           // Formatul cerut de OFF: NumeAplicatie/Versiune (contact).
+          // The format OFF requires: AppName/Version (contact).
           "User-Agent": OFF_USER_AGENT,
         },
         body: JSON.stringify(payload),
       },
-      20000 // trimiterea poate include si o poza; lasam mai mult timp
+      20000 // trimiterea poate include si o poza; lasam mai mult timp // the submission may include a photo; we allow more time
     );
   } catch {
     return { ok: false, kind: "NETWORK_ERROR" };
@@ -119,6 +152,7 @@ export async function contributeProduct(
   if (!res.ok) return { ok: false, kind: "UPSTREAM_ERROR" };
 
   // OFF raspunde cu status 1 la succes. Proxy-ul transmite raspunsul asa cum e.
+  // OFF responds with status 1 on success. The proxy forwards the response as-is.
   try {
     const data = await res.json();
     if (data?.status === 1 || data?.ok === true) return { ok: true };

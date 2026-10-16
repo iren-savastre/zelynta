@@ -1,4 +1,5 @@
 // fetch cu timeout (AbortController) — evită cererile blocate la infinit.
+// fetch with timeout (AbortController) — avoids requests hanging forever.
 export async function fetchWithTimeout(
   input: string,
   init: RequestInit = {},

@@ -6,12 +6,16 @@ import { initReactI18next } from "react-i18next";
 import { translations } from "./translations";
 
 // Cheia de limbă — aceeași ca pe web (landing + pagini legale), pentru consecvență.
+// The language key — the same as on the web (landing + legal pages), for consistency.
 const LANG_KEY = "zelynta_lang";
 const supportedLanguages = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el", "sq"];
 
 // Limba se ia din preferintele telefonului, in ordinea lor. `getLocales()`
 // intoarce lista completa, nu doar prima: cineva cu telefonul pe engleza, dar
 // cu romana a doua, primeste romana daca engleza n-ar fi fost suportata.
+// The language is taken from the phone's preferences, in their order.
+// `getLocales()` returns the full list, not just the first: someone with
+// their phone in English, but Romanian second, gets Romanian if English weren't supported.
 function pickDeviceLanguage(): string {
   for (const loc of getLocales()) {
     const code = (loc?.languageCode ?? "").toLowerCase();
@@ -34,6 +38,20 @@ const deviceFallback = pickDeviceLanguage();
 // Deci pe web pornim mereu de la aceeași limbă — româna, ca `<html lang="ro">` —
 // și o schimbăm pe cea adevărată abia după montare, din `_layout.tsx`. Pe telefon
 // nu există randare pe server, deci pornim direct cu limba lui, fără pâlpâire.
+// On web, pages are generated BEFORE knowing who will read them: `expo
+// export` runs on the machine doing the publishing, and `getLocales()`
+// returns that machine's language there. That's how we ended up publishing
+// HTML in French, because it was built from a Windows machine set to French.
+//
+// Two things broke because of this:
+//  - every visitor would briefly see the wrong language, until the app loaded;
+//  - the HTML's text didn't match what the browser rendered, and React threw
+//    hydration error #418.
+//
+// So on web we always start from the same language — Romanian, as in
+// `<html lang="ro">` — and switch to the real one only after mounting, from
+// `_layout.tsx`. On phone there's no server-side rendering, so we start
+// directly with its language, with no flicker.
 const WEB_FIRST_RENDER_LANG = "ro";
 const initialLanguage = Platform.OS === "web" ? WEB_FIRST_RENDER_LANG : deviceFallback;
 
@@ -52,12 +70,13 @@ i18n.use(initReactI18next).init({
     el: { translation: translations.el },
     sq: { translation: translations.sq },
   },
-  lng: initialLanguage, // vezi nota de mai sus; se rezolvă după montare
+  lng: initialLanguage, // vezi nota de mai sus; se rezolvă după montare // see the note above; resolved after mounting
   fallbackLng: "en",
   interpolation: { escapeValue: false },
 });
 
 // Rezolvă limba: alegere salvată -> respectă; altfel limba telefonului; altfel engleză.
+// Resolves the language: saved choice -> honor it; otherwise the phone's language; otherwise English.
 export async function resolveAppLanguage(): Promise<void> {
   try {
     const stored = await AsyncStorage.getItem(LANG_KEY);
@@ -75,12 +94,22 @@ export async function resolveAppLanguage(): Promise<void> {
   //  - IP-ul pleca la un tert la prima pornire, inainte de orice consimtamant,
   //    desi aplicatia se lauda ca nu trimite nimic despre utilizator;
   //  - dispare o cerere de retea si o dependenta externa la fiecare instalare.
+  // First run: the phone's language.
+  //
+  // Before, the app asked geojs.io for the user's country by IP. We removed
+  // that for three reasons, the same ones it disappeared from the site for:
+  //  - an IP address doesn't say what language someone speaks (a Romanian in
+  //    Italy would get Italian, overriding their phone's setting);
+  //  - the IP went out to a third party on first launch, before any
+  //    consent, even though the app claims to send nothing about the user;
+  //  - it removes a network request and an external dependency on every install.
   const lang = deviceFallback;
   if (i18n.language !== lang) await i18n.changeLanguage(lang);
   try { await AsyncStorage.setItem(LANG_KEY, lang); } catch {}
 }
 
 // Persistă alegerea manuală a utilizatorului (din selectorul de limbă).
+// Persists the user's manual choice (from the language picker).
 export async function persistAppLanguage(code: string): Promise<void> {
   try { await AsyncStorage.setItem(LANG_KEY, code); } catch {}
 }
@@ -88,5 +117,9 @@ export async function persistAppLanguage(code: string): Promise<void> {
 // `resolveAppLanguage()` NU se mai cheamă aici. Pe web ar schimba limba în
 // timp ce React încă potrivește HTML-ul primit de la server cu ce randează el.
 // Se cheamă din `_layout.tsx`, după montare — un singur loc, ambele platforme.
+// `resolveAppLanguage()` is NOT called here anymore. On web it would change
+// the language while React is still matching the HTML it got from the
+// server against what it renders. It's called from `_layout.tsx`, after
+// mounting — a single place, both platforms.
 
 export default i18n;

@@ -1,4 +1,5 @@
 /* ===== Zelynta — JS partajat: i18n, header, footer, cookie consent, forms, TOC ===== */
+/* ===== Zelynta — shared JS: i18n, header, footer, cookie consent, forms, TOC ===== */
 (async function(){
   "use strict";
   var ROOT = location.pathname.indexOf("/legal/") !== -1 ? "../" : "./";
@@ -7,7 +8,7 @@
 
   /* ---------- i18n ---------- */
   var DICT = window.ZLEGAL_CHROME || { ro:{}, en:{} };
-  var PAGES = window.ZLEGAL_PAGES || {}; // dicționare de conținut per pagină (opțional)
+  var PAGES = window.ZLEGAL_PAGES || {}; // dicționare de conținut per pagină (opțional) // per-page content dictionaries (optional)
   var LANGS = [["ro","ro"],["en","gb"],["fr","fr"],["it","it"],["es","es"],["de","de"],["ru","ru"],["pl","pl"],["nl","nl"],["bg","bg"],["el","gr"],["sq","al"]];
   var LNAME = { ro:"Română", en:"English", fr:"Français", it:"Italiano", es:"Español", de:"Deutsch", ru:"Русский", pl:"Polski", nl:"Nederlands", bg:"Български", el:"Ελληνικά", sq:"Shqip" };
   var RIGHTS = { ro:"toate drepturile rezervate.", en:"all rights reserved.", fr:"tous droits réservés.", it:"tutti i diritti riservati.", es:"todos los derechos reservados.", de:"alle Rechte vorbehalten.", ru:"все права защищены.", pl:"wszelkie prawa zastrzeżone.", nl:"alle rechten voorbehouden.", bg:"всички права запазени.", el:"με επιφύλαξη παντός δικαιώματος.", sq:"të gjitha të drejtat e rezervuara." };
@@ -18,9 +19,15 @@
   // Acum detectia e sincrona: fara cerere de retea, fara IP trimis unui tert
   // si fara intarziere. O alegere explicita salvata are in continuare
   // prioritate asupra preferintelor browserului.
+  // Language: the user's declared browser preferences, in their order.
+  // Before, the legal pages waited for a response from geojs.io (up to
+  // 1500 ms) BEFORE displaying — `await pickLang()` blocked rendering.
+  // Now detection is synchronous: no network request, no IP sent to a third
+  // party, no delay. An explicitly saved choice still takes priority over
+  // the browser's preferences.
   function pickLang(){
     var s=null; try{ s=localStorage.getItem("zelynta_lang"); }catch(e){}
-    if(s && DICT[s]) return s;              // alegere explicită salvată -> o respectăm
+    if(s && DICT[s]) return s;              // alegere explicită salvată -> o respectăm // an explicitly saved choice -> we honor it
     var prefs = (navigator.languages && navigator.languages.length)
       ? navigator.languages
       : [navigator.language || "en"];
@@ -28,7 +35,7 @@
       var code = String(prefs[i]||"").slice(0,2).toLowerCase();
       if (DICT[code]) return code;
     }
-    return "en";                            // implicit ENGLEZĂ când nu se poate determina
+    return "en";                            // implicit ENGLEZĂ când nu se poate determina // defaults to ENGLISH when it can't be determined
   }
   var LANG = pickLang();
   document.documentElement.lang = LANG;
@@ -42,6 +49,7 @@
   function setLang(l){ try{ localStorage.setItem("zelynta_lang", l); }catch(e){} location.reload(); }
 
   // aplică traducerile pe orice element marcat (folosit de corpul paginilor)
+  // applies the translations to any marked element (used by the pages' body)
   function applyI18n(scope){
     (scope||document).querySelectorAll("[data-i18n]").forEach(function(el){ el.textContent = T(el.getAttribute("data-i18n")); });
     (scope||document).querySelectorAll("[data-i18n-html]").forEach(function(el){ el.innerHTML = T(el.getAttribute("data-i18n-html")); });
@@ -71,6 +79,7 @@
   function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
 
   /* ---------- selector de limbă ---------- */
+/* ---------- language selector ---------- */
   function langSwitcher(){
     var opts = LANGS.map(function(p){
       var l=p[0], cc=p[1], act = l===LANG ? " aria-current=\"true\"" : "";
@@ -162,6 +171,7 @@
   }
 
   /* ---------- comutare limbă (delegat) ---------- */
+/* ---------- language switch (delegated) ---------- */
   document.addEventListener("click",function(e){
     var btn=e.target.closest(".lang-btn");
     if(btn){ var m=btn.parentNode.querySelector(".lang-menu"); var open=m.classList.toggle("show"); btn.setAttribute("aria-expanded", open?"true":"false"); return; }
@@ -172,6 +182,7 @@
   });
 
   /* ---------- cookie consent (cheie comună: zelynta_consent) ---------- */
+/* ---------- cookie consent (shared key: zelynta_consent) ---------- */
   var KEY="zelynta_consent";
   function getConsent(){ try{ return JSON.parse(localStorage.getItem(KEY)||"null"); }catch(e){ return null; } }
   function setConsent(c){ try{ localStorage.setItem(KEY, JSON.stringify(c)); }catch(e){} syncPanel(); }
@@ -247,6 +258,7 @@
   }
 
   /* ---------- formulare (mailto, fără trackere) ---------- */
+/* ---------- forms (mailto, no trackers) ---------- */
   document.querySelectorAll("form.lz-form").forEach(function(form){
     var status=form.querySelector(".form-status");
     var btn=form.querySelector("[type=submit]");
@@ -263,6 +275,7 @@
       if(!ok) return;
       if(priv && !priv.checked){ if(status){ status.className="form-status bad"; status.textContent=T("need_privacy"); } return; }
       // mitigare anti-spam: cooldown 15s între trimiteri (client-side)
+      // anti-spam mitigation: 15s cooldown between submissions (client-side)
       try{
         var lastTs=parseInt(localStorage.getItem("zelynta_form_ts")||"0",10);
         if(Date.now()-lastTs < 15000){ if(status){ status.className="form-status bad"; status.textContent=TOOFAST[LANG]||TOOFAST.en; } return; }
@@ -296,11 +309,13 @@
   }
 
   // aplică traducerile de conținut (data-i18n) + iconuri
+  // applies the content translations (data-i18n) + icons
   applyI18n(document);
   injectIcons(document);
 
 
   /* ---------- reveal la scroll (respectă reduced-motion) ---------- */
+/* ---------- reveal on scroll (respects reduced-motion) ---------- */
   var reduceMo = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(!reduceMo && "IntersectionObserver" in window){
     var els = document.querySelectorAll(".lcard,.rcard,.step3,.legal-body,.tbl-scroll,.callout,.lz-form,.ck-cat,.lz-faq,.badge");

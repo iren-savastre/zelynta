@@ -4,6 +4,8 @@ import { randomUuid } from "../appIdentity";
 
 // Modulul citeste EXPO_PUBLIC_CONTRIB_URL la incarcare, deci fiecare grup de
 // teste il seteaza INAINTE de a-l importa (jest.isolateModules).
+// The module reads EXPO_PUBLIC_CONTRIB_URL at load time, so each test group
+// sets it BEFORE importing it (jest.isolateModules).
 function loadModule(proxyUrl?: string) {
   let mod: typeof import("../offContribute");
   jest.isolateModules(() => {

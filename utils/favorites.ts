@@ -16,6 +16,7 @@ export async function getFavorites(): Promise<FavoriteItem[]> {
 }
 
 // Scoate un singur produs de la favorite, fără să le atingă pe celelalte.
+// Removes a single product from favorites, without touching the others.
 export async function removeFavorite(barcode: string): Promise<void> {
   try {
     const favs = await getFavorites();
@@ -27,6 +28,7 @@ export async function removeFavorite(barcode: string): Promise<void> {
 }
 
 // Adaugă fără să scoată dacă există deja (spre deosebire de toggle)
+// Adds without removing if it already exists (unlike toggle)
 export async function addFavorite(item: FavoriteItem): Promise<void> {
   try {
     const favs = await getFavorites();

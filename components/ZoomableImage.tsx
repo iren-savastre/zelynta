@@ -16,7 +16,7 @@ import {
 type Props = {
   uri?: string;
   style?: StyleProp<ImageStyle>;
-  placeholder?: string; // emoji de rezervă dacă nu există poză
+  placeholder?: string; // emoji de rezervă dacă nu există poză // fallback emoji if there's no photo
   accessibilityLabel?: string;
 };
 

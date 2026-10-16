@@ -1,4 +1,5 @@
 /* Zelynta Admin — SPA moderare + RBAC (securitate impusă de Supabase RLS) */
+/* Zelynta Admin — moderation SPA + RBAC (security enforced by Supabase RLS) */
 (function () {
   "use strict";
   var app = document.getElementById("app");
@@ -44,6 +45,7 @@
     image:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg>'
   };
   // iconițe pe categorie/valoare pentru grafice
+  // icons per category/value for charts
   var ANALYTICS_ICONS = {
     event_name:{landing_view:"eye",cta_click:"dl",review_form_open:"pencil",review_submit:"star",contact_submit:"mail",support_submit:"life",report_problem_submit:"bug","*":"chart"},
     device_type:{mobile:"phone",desktop:"monitor",tablet:"tablet","*":"phone"},
@@ -54,6 +56,7 @@
   function iconFor(cat,key){ var m=ANALYTICS_ICONS[cat]||{}; return m[key]||m["*"]||"chart"; }
   var CHART_COLORS=["#38bdf8","#f59e0b","#a78bfa","#fbbf24","#f472b6","#2dd4bf","#fb7185","#84cc16","#c084fc","#22d3ee"];
   // culori distincte per valoare (iconițe colorate)
+  // distinct colors per value (colored icons)
   var ANALYTICS_COLORS={
     event_name:{landing_view:"#38bdf8",cta_click:"#f59e0b",review_form_open:"#a78bfa",review_submit:"#fbbf24",contact_submit:"#f472b6",support_submit:"#2dd4bf",report_problem_submit:"#fb7185"},
     device_type:{mobile:"#38bdf8",desktop:"#a78bfa",tablet:"#2dd4bf"},
@@ -62,6 +65,7 @@
   };
   function colorFor(cat,key,i){ var m=ANALYTICS_COLORS[cat]||{}; return m[key]||CHART_COLORS[(i||0)%CHART_COLORS.length]; }
   // drapele pentru limbă/țară
+  // flags for language/country
   var LOCALE_CC={ro:"ro",en:"gb",fr:"fr",it:"it",es:"es",de:"de",ru:"ru",pl:"pl",nl:"nl"};
   function flagCC(cat,key){
     if(cat==="locale") return LOCALE_CC[(key||"").toLowerCase()]||null;
@@ -85,6 +89,7 @@
   }
 
   // ---- RBAC: ce secțiuni vede fiecare rol ----
+  // ---- RBAC: which sections each role sees ----
   var STAFF=["moderator","admin","super_admin"], CM=["content_manager","admin","super_admin"], ADM=["admin","super_admin"];
   var SECTIONS = [
     {id:"overview", label:"Overview", ic:"grid", color:"#38bdf8", roles:"*", group:"Principal", desc:"Privire de ansamblu și acțiuni în așteptare."},
@@ -108,12 +113,14 @@
   function can(sec){ return sec.roles==="*" || sec.roles.indexOf(role)>=0; }
 
   // ---- modal helpers ----
+  // ---- modal helpers ----
   function openModal(html){ modal.innerHTML=html; ovl.classList.add("show"); var f=modal.querySelector("button,input,textarea"); if(f)f.focus(); }
   function closeModal(){ ovl.classList.remove("show"); modal.innerHTML=""; }
   ovl.addEventListener("click",function(e){ if(e.target===ovl) closeModal(); });
   document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeModal(); });
 
   // ====== TEME (5, premium glass) ======
+  // ====== THEMES (5, premium glass) ======
   var THEMES=[
     {id:"emerald",label:"Emerald",g:"#059669",l:"#34d399"},
     {id:"sapphire",label:"Sapphire",g:"#3b82f6",l:"#22d3ee"},
@@ -137,6 +144,7 @@
   }
   applyTheme(currentTheme());
 
+  // ====== BOOT ======
   // ====== BOOT ======
   var DEMO = /[?&]demo=1/.test(location.search);
   if(DEMO && window.ZELYNTA_MOCK){
@@ -244,6 +252,7 @@
   }
 
   // ---- counts pentru badge-uri ----
+  // ---- counts for badges ----
   function count(table, col, val){
     var q=sb.from(table).select("*",{count:"exact",head:true});
     if(col) q=q.eq(col,val);
@@ -282,6 +291,7 @@
   function emptyBox(txt){ return '<div class="empty"><div class="e-ic">'+ic("grid")+'</div><p>'+esc(txt)+'</p></div>'; }
 
   // ====== OVERVIEW ======
+  // ====== OVERVIEW ======
   function secOverview(c){
     Promise.all([
       count("reviews","status","pending"), count("reviews","status","approved"),
@@ -313,6 +323,7 @@
     return '<tr style="cursor:pointer" data-go="'+go+'"><td style="width:48px">'+ic(icn)+'</td><td>'+esc(label)+'</td><td style="text-align:right"><span class="badge-s s-pending">'+n+'</span></td></tr>';
   }
 
+  // ====== generic moderation table (reviews / comments) ======
   // ====== generic moderation table (reviews / comments) ======
   function modSection(c, table, opts){
     var filter = "pending";
@@ -385,6 +396,7 @@
   }
 
   // ====== generic ticket table (support / reports / privacy) ======
+  // ====== generic ticket table (support / reports / privacy) ======
   function ticketSection(c, table, opts){
     var filter="all";
     function load(){
@@ -405,6 +417,9 @@
   }
   // GDPR — „dreptul de a fi uitat": șterge datele personale asociate unui e-mail
   // (tichete + raportări), apoi marchează cererea ca rezolvată (rămâne ca dovadă, auditată).
+  // GDPR — "the right to be forgotten": deletes the personal data associated
+  // with an email (tickets + reports), then marks the request as resolved
+  // (kept as audited proof).
   function gdprDelete(email, id, done){
     if(!email) return;
     if(!confirm("ȘTERGE definitiv datele personale asociate cu „"+email+"” (tichete de suport + raportări)?\nCererea va fi marcată rezolvată. Acțiune ireversibilă.")) return;
@@ -454,12 +469,14 @@
   }
 
   // ====== ANALYTICS (agregat, fără PII) ======
+  // ====== ANALYTICS (aggregate, no PII) ======
   function secAnalytics(c){
     sb.from("analytics_events").select("event_name,device_type,os,browser,country,locale,created_at").limit(5000).then(function(r){
       var rows=r.data||[];
       if(!rows.length){ c.innerHTML='<div class="note">Analytics agregat, privacy-aware (fără IP, doar cu consimțământ). Activează trimiterea evenimentelor pe site pentru a vedea date aici.</div>'+emptyBox("Niciun eveniment înregistrat încă."); return; }
       function agg(key){ var m={}; rows.forEach(function(x){ var k=x[key]||"necunoscut"; m[k]=(m[k]||0)+1; }); return Object.keys(m).map(function(k){return [k,m[k]];}).sort(function(a,b){return b[1]-a[1];}); }
       // agregare pe zile pentru graficul de activitate
+      // aggregation by day for the activity chart
       function dailySeries(){
         var m={}; rows.forEach(function(x){ var d=new Date(x.created_at); if(isNaN(d))return; var k=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); m[k]=(m[k]||0)+1; });
         return Object.keys(m).sort().map(function(k){ var p=k.split("-"); return [p[2]+"."+p[1], m[k]]; });
@@ -479,6 +496,7 @@
   }
 
   // ====== AUDIT ======
+  // ====== AUDIT ======
   function secAudit(c){
     sb.from("audit_logs").select("*").order("created_at",{ascending:false}).limit(200).then(function(r){
       var rows=r.data||[];
@@ -490,7 +508,9 @@
   }
 
   // ====== Chart toolkit (SVG, fără librărie) ======
+  // ====== Chart toolkit (SVG, no library) ======
   // grafic de activitate în timp (area + line, gradient)
+  // activity-over-time chart (area + line, gradient)
   function areaChart(points){
     var n=points.length; if(n<2) return '<div style="padding:18px">'+emptyBox("Date insuficiente pentru trend.")+'</div>';
     var W=620,H=190,pad=30, max=Math.max.apply(null,points.map(function(p){return p[1];}).concat([1]));
@@ -507,6 +527,7 @@
       grid+'<path d="'+area+'" fill="url(#zgrad)" class="area-fill"/><path class="area-line" d="'+line+'" fill="none" stroke="var(--lime)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 4px 8px color-mix(in srgb,var(--lime) 40%,transparent))"/>'+dots+labels+'</svg></div>';
   }
   // grafic de bare verticale (coloane) cu gradient — curat, dashboard-style
+  // vertical bar chart (columns) with gradient — clean, dashboard-style
   function barChartV(points){
     var n=points.length; if(!n) return '<div style="padding:18px">'+emptyBox("Fără date.")+'</div>';
     var max=Math.max.apply(null,points.map(function(p){return p[1];}).concat([1]));
@@ -559,6 +580,7 @@
   }
 
   // ====== SETTINGS (editabil) ======
+  // ====== SETTINGS (editable) ======
   function secSettings(c){
     var KEYS=[["company","Companie"],["support_email","E-mail suport"],["privacy_email","E-mail confidențialitate"],["address","Adresă"],["vat","CUI/TVA"],["default_locale","Limbă implicită"],["social_facebook","Facebook URL"],["social_tiktok","TikTok URL"],["social_instagram","Instagram URL"]];
     sb.from("settings").select("*").then(function(r){
@@ -584,6 +606,7 @@
   }
 
   // ====== BUTOANE STORE (footer site + aplicație) ======
+  // ====== STORE BUTTONS (site + app footer) ======
   function secAppStores(c){
     var DEF="https://github.com/iren-savastre/zelynta/releases/latest";
     sb.from("settings").select("*").then(function(r){
@@ -621,8 +644,11 @@
   }
 
   // ====== LANDING PAGE (CMS) ======
+  // ====== LANDING PAGE (CMS) ======
   // Curăță conținutul CMS la scriere (anti-XSS stocat): elimină tag-uri periculoase,
   // handlere de evenimente (on*) și URI-uri javascript:.
+  // Sanitizes CMS content on write (stored anti-XSS): strips dangerous tags,
+  // event handlers (on*), and javascript: URIs.
   function sanitizeCms(s){
     return String(s==null?"":s)
       .replace(/<\s*(script|iframe|object|embed|style)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi,"")
@@ -659,6 +685,7 @@
   }
 
   // ====== LEGAL PAGES (CMS) ======
+  // ====== LEGAL PAGES (CMS) ======
   function secLegal(c){
     var SLUGS=["legal","privacy","terms","cookies","cookie-preferences","gdpr-rights","data-processing","acceptable-use"];
     sb.from("legal_pages").select("*").limit(500).then(function(r){
@@ -678,6 +705,7 @@
   }
 
   // ====== COOKIE CONSENT MANAGER ======
+  // ====== COOKIE CONSENT MANAGER ======
   function secCookies(c){
     var inv=[
       ["zelynta_lang","Zelynta (first-party)","Reține limba aleasă","Funcțional","Persistent","Nu"],
@@ -695,12 +723,14 @@
   }
 
   // ====== APP / SCAN DATA ======
+  // ====== APP / SCAN DATA ======
   function secAppData(c){
     c.innerHTML='<div class="note">Aplicația scanează produse <b>local pe dispozitiv</b> (fără server propriu), folosind baze deschise (Open Food Facts etc.). Nu există date de scanare stocate pe server — deci nu există ce administra aici. Dacă în viitor adaugi telemetrie de scanare (consent-gated), apare aici.</div>'+
       emptyBox("Fără date de scanare pe server. Aplicația funcționează offline-first, fără cont.");
   }
 
   // ====== OPTIMIZARE IMAGINI (scanare + conversie WebP, 100% în browser) ======
+  // ====== IMAGE OPTIMIZATION (scan + WebP conversion, 100% in-browser) ======
   function fmtB(n){ if(n==null)return "—"; if(n<1024)return n+" B"; if(n<1048576)return (n/1024).toFixed(1)+" KB"; return (n/1048576).toFixed(2)+" MB"; }
   function webpName(n){ return String(n||"imagine").replace(/\.(png|jpe?g|jpeg)$/i,"")+".webp"; }
   function dlBlob(blob,name){ var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1500); }
@@ -733,6 +763,7 @@
       '</div>';
 
     // --- conversie ---
+    // --- conversion ---
     var Q=function(){ return (parseInt(document.getElementById("imgQ").value,10)||82)/100; };
     document.getElementById("imgQ").addEventListener("input",function(){ document.getElementById("imgQv").textContent=this.value; });
     var converted=[]; // {name, blob}
@@ -769,6 +800,7 @@
     dlAll.addEventListener("click",function(){ converted.forEach(function(it,i){ setTimeout(function(){ dlBlob(it.blob,it.name); }, i*300); }); });
 
     // --- scanare ---
+    // --- scan ---
     document.getElementById("imgScan").addEventListener("click",function(){
       var url=document.getElementById("imgUrl").value.trim(); var out=document.getElementById("imgScanRes");
       if(!url){ out.innerHTML=emptyBox("Pune o adresă (URL) a site-ului."); return; }
@@ -799,6 +831,7 @@
   }
 
   // ====== UTILIZATORI (staff) ======
+  // ====== USERS (staff) ======
   var ROLES=["super_admin","admin","moderator","support","content_manager","analyst","readonly"];
   function secUsers(c){
     sb.from("profiles").select("*").then(function(r){
@@ -821,6 +854,7 @@
   }
 
   // ====== E-MAIL / INBOX (tip Gmail) ======
+  // ====== EMAIL / INBOX (Gmail-style) ======
   function secInbox(c){
     var sel=null;
     sb.from("support_tickets").select("*").order("created_at",{ascending:false}).limit(200).then(function(r){

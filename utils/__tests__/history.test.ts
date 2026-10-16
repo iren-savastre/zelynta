@@ -26,6 +26,8 @@ describe("istoricul pastreaza produsele scanate", () => {
   it("nu mai plafoneaza la 100 — raman toate", async () => {
     // Inainte se pastrau doar ultimele 100, iar cele mai vechi dispareau
     // fara ca utilizatorul sa fie anuntat.
+    // Before, only the last 100 were kept, and the oldest ones disappeared
+    // without the user being told.
     for (let i = 0; i < 250; i++) {
       await saveToHistory(item({ barcode: String(1000 + i), name: "Produs " + i }));
     }
@@ -71,6 +73,8 @@ describe("rescanarea aceluiasi produs", () => {
   it("scanarile din poza (cod sintetic) se recunosc dupa nume+marca", async () => {
     // Produsele citite din poza primesc coduri interne diferite de fiecare
     // data, deci fara comparatia pe nume+marca s-ar aduna dubluri.
+    // Products read from a photo get different internal codes each time, so
+    // without the name+brand comparison, duplicates would pile up.
     await saveToHistory(item({ barcode: "ocr-1", name: "Ciocolata", brand: "Milka" }));
     await saveToHistory(item({ barcode: "ocr-2", name: "Ciocolata", brand: "Milka" }));
 
@@ -87,6 +91,9 @@ describe("cand stocarea telefonului e plina", () => {
     // Prima scriere esueaza (cota depasita); urmatoarele merg normal.
     // `mockImplementationOnce` inlocuieste DOAR primul apel — restul cad pe
     // implementarea reala, fara sa o reapelam noi (ceea ce ar recursa).
+    // The first write fails (quota exceeded); the next ones go through normally.
+    // `mockImplementationOnce` replaces ONLY the first call — the rest fall
+    // through to the real implementation, without us calling it again (which would recurse).
     jest.spyOn(AsyncStorage, "setItem").mockImplementationOnce(async () => {
       throw new Error("quota exceeded");
     });
@@ -95,7 +102,7 @@ describe("cand stocarea telefonului e plina", () => {
 
     const h = await getHistory();
     expect(h.some((x) => x.barcode === "999")).toBe(true);
-    expect(h.length).toBeLessThan(21); // s-a taiat din cele vechi
+    expect(h.length).toBeLessThan(21); // s-a taiat din cele vechi // it cut from the old ones
   });
 });
 

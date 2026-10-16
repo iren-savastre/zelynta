@@ -4,6 +4,9 @@ import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 /**
  * Prompter pentru navbar (doar desktop): motouri care curg orizontal,
  * cu un separator între ele. Pur decorativ.
+ *
+ * Navbar prompter (desktop only): taglines flowing horizontally,
+ * with a separator between them. Purely decorative.
  */
 export default function NavMarquee({
   phrases,

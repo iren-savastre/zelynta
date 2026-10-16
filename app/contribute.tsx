@@ -33,6 +33,14 @@ const isWeb = Platform.OS === "web";
  * in afara numelui: un produs cu nume si cod e deja util, iar restul poate fi
  * completat mai tarziu de oricine (imbogatire progresiva). Un formular cu 15
  * campuri obligatorii nu ar fi completat de nimeni.
+ *
+ * The screen where the user adds a product missing from Open Food Facts.
+ *
+ * Reached only after a failed scan, with the barcode already filled in —
+ * so the most tedious part is already done. The rest of the fields are
+ * optional besides the name: a product with a name and code is already
+ * useful, and the rest can be filled in later by anyone (progressive
+ * enrichment). A form with 15 required fields wouldn't be filled in by anyone.
  */
 export default function Contribute() {
   const { t, i18n } = useTranslation();
@@ -52,6 +60,8 @@ export default function Contribute() {
 
   // Numele si ingredientele pot veni pre-completate din OCR. Utilizatorul le
   // confirma sau le corecteaza — nu trimitem niciodata text nevazut de el.
+  // The name and ingredients may come pre-filled from OCR. The user confirms
+  // or corrects them — we never submit text they haven't seen.
   const [name, setName] = useState(String(params.name ?? ""));
   const [brand, setBrand] = useState("");
   const [ingredients, setIngredients] = useState(String(params.ingredients ?? ""));
@@ -82,6 +92,7 @@ export default function Contribute() {
   }
 
   /** Fiecare motiv de esec are alt mesaj — la fel ca la cautarea de produse. */
+  /** Each failure reason has a different message — same as in the product lookup. */
   function errorText(kind: ContributeErrorKind): string {
     switch (kind) {
       case "INVALID_INPUT":
@@ -127,6 +138,7 @@ export default function Contribute() {
         >
           {sent ? (
             // ---- Confirmare ----
+            // ---- Confirmation ----
             <View style={styles.okCard}>
               <Text style={styles.okIcon}>🌍</Text>
               <Text style={styles.okTitle}>{t("contribOk")}</Text>
@@ -150,6 +162,7 @@ export default function Contribute() {
               </View>
 
               {/* Codul de bare nu se editeaza: vine din scanare, e cheia produsului. */}
+              {/* The barcode isn't editable: it comes from the scan, it's the product's key. */}
               <View style={styles.field}>
                 <Text style={styles.label}>{t("contribBarcode")}</Text>
                 <View style={styles.readonlyBox}>

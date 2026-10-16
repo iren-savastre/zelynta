@@ -1,5 +1,7 @@
 /* Generează utils/legalContent.ts din paginile HTML existente (Legal + Suport).
    Parsează doar conținutul de articol (h1..h4, p, li) din <main>, ignorând formularele. */
+/* Generates utils/legalContent.ts from the existing HTML pages (Legal + Support).
+   Parses only the article content (h1..h4, p, li) inside <main>, ignoring forms. */
 const fs = require("fs");
 const vm = require("vm");
 
@@ -14,6 +16,7 @@ const PAGES = {
 };
 
 // dicționarul (11 limbi) din legal-i18n.js
+// the dictionary (11 languages) from legal-i18n.js
 const ctx = { window: {} };
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync("docs/assets/legal-i18n.js", "utf8"), ctx);
@@ -22,6 +25,7 @@ const CHROME = ctx.window.ZLEGAL_CHROME || {};
 const LANGS = Object.keys(PAGESDICT);
 
 // strip tags HTML -> text simplu (pentru valorile data-i18n-html)
+// strip HTML tags -> plain text (for data-i18n-html values)
 function strip(s) {
   return String(s)
     .replace(/<br\s*\/?>/gi, "\n")
@@ -33,6 +37,7 @@ function strip(s) {
 
 const TAG_RE = /<(h1|h2|h3|h4|p|li|b|small|div)\b[^>]*\bdata-i18n(-html)?="([a-z0-9_]+)"/gi;
 // normalizare tag -> tip de bloc redat nativ
+// tag normalization -> natively rendered block type
 const NORM = { b: "h3", small: "p", div: "p" };
 
 const blocks = {};
@@ -57,6 +62,7 @@ for (const [slug, file] of Object.entries(PAGES)) {
 }
 
 // dicționar redus la cheile folosite, pe 11 limbi, text simplu
+// dictionary reduced to the used keys, in 11 languages, plain text
 const dict = {};
 for (const L of LANGS) {
   const src = Object.assign({}, CHROME[L] || {}, PAGESDICT[L] || {});

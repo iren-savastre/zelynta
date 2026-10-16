@@ -2,6 +2,10 @@
 // "Aqua", "Sodium Fluoride"...) nu sunt traduse de serviciul de traducere
 // automata — sunt termeni tehnici. Le localizam noi pe cele frecvente, ca
 // utilizatorul sa citeasca "apă", nu "aqua", indiferent de limba aleasa.
+// INCI names (the Latin/English nomenclature mandatory on cosmetics:
+// "Aqua", "Sodium Fluoride"...) aren't translated by the automatic
+// translation service — they're technical terms. We localize the common
+// ones ourselves, so the user reads "apă", not "aqua", regardless of the chosen language.
 
 const INCI: Record<string, Record<string, string>> = {
   aqua: { ro: "apă", en: "water", fr: "eau", it: "acqua", es: "agua", de: "Wasser", ru: "вода", pl: "woda", nl: "water" },
@@ -28,6 +32,8 @@ function escapeRe(s: string): string {
 
 // Termenii mai lungi primii, ca "sodium lauryl sulfate" sa nu fie stricat de
 // inlocuiri partiale.
+// Longer terms first, so "sodium lauryl sulfate" doesn't get broken by
+// partial replacements.
 const TERMS = Object.keys(INCI).sort((a, b) => b.length - a.length);
 
 export function localizeInci(text: string, lang: string): string {

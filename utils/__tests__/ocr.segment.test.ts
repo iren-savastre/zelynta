@@ -3,6 +3,9 @@ import { extractIngredientsSegment } from "../ocr";
 // Pana pe 23 sept. 2026, lista de cuvinte-cheie avea doar 9 limbi. Pe o
 // eticheta bulgareasca sau greceasca, aplicatia nu gasea unde incepe lista de
 // ingrediente — desi interfata era tradusa in ambele limbi.
+// Until Sep 23, 2026, the keyword list only had 9 languages. On a Bulgarian
+// or Greek label, the app couldn't find where the ingredients list starts —
+// even though the interface was translated into both languages.
 describe("extragerea listei de ingrediente din textul citit", () => {
   it("bulgara: gaseste lista dupa „съставки:”", () => {
     const eticheta =

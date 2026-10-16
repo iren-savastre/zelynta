@@ -79,6 +79,7 @@
   <style>
     :root {
       /* Temă implicită — Verde clasic (rămâne prestabilită) */
+/* Default theme — Classic green (stays the preset) */
       --green: #2E7D32; --green-2: #3E9E3A; --green-dark: #14301f; --leaf: #038141; --lime: #85BB2F;
       --a1: 46,125,50; --a2: 133,187,47; --bg-soft: #eaf2e6;
       --ink: #14211a; --muted: #5a6b5e; --faint: #8a988d;
@@ -89,6 +90,7 @@
       --shadow-lg: 0 28px 70px rgba(20,48,31,0.16);
     }
     /* ===== Mod întunecat: suprascrie suprafețele/textul, păstrează accentul temei ===== */
+/* ===== Dark mode: overrides surfaces/text, keeps the theme's accent ===== */
     html[data-dark] {
       --ink:#e8efe9; --muted:#a6b6ab; --faint:#7d8c82;
       --surface:#141b17; --surface-2:#0d120f; --bg-soft:#10231a;
@@ -122,6 +124,7 @@
     [data-ztheme="blackberry"]{ --green:#6b21a8; --green-2:#9333ea; --green-dark:#3b1366; --leaf:#6b21a8; --lime:#d8b4fe; --a1:107,33,168; --a2:216,180,254; --bg-soft:#efe2fb; --surface-2:#f7f1fd; }
     [data-ztheme="pomegranate"]{ --green:#9f1239; --green-2:#be123c; --green-dark:#5c0f25; --leaf:#9f1239; --lime:#fb7185; --a1:159,18,57; --a2:251,113,133; --bg-soft:#fbe0e6; --surface-2:#fdf2f4; }
     /* ===== strat de animație ambientală (motive plutitoare) ===== */
+/* ===== ambient animation layer (floating motifs) ===== */
     #zfx{ position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
     .zfx-item{ position:absolute; line-height:1; opacity:.22; animation:zfloat ease-in-out infinite; will-change:transform; user-select:none; }
     @keyframes zfloat{ 0%{transform:translateY(8px) rotate(-6deg)} 50%{transform:translateY(-20px) rotate(8deg)} 100%{transform:translateY(8px) rotate(-6deg)} }
@@ -198,6 +201,7 @@
     .ztheme-menu::-webkit-scrollbar-track { background:transparent; }
     .ztheme-menu.show { display:flex; }
     /* ===== scrollbar brandat (identic cu aplicația / paginile legale; urmează tema) ===== */
+/* ===== branded scrollbar (identical to the app / legal pages; follows the theme) ===== */
     * { scrollbar-width:thin; scrollbar-color:var(--green) transparent; }
     ::-webkit-scrollbar { width:11px; height:11px; }
     ::-webkit-scrollbar-track { background:rgba(120,130,120,0.10); border-radius:999px; }
@@ -218,6 +222,7 @@
     .ztheme-backdrop { position:fixed; inset:0; background:rgba(10,20,14,0.34); z-index:115; opacity:0; pointer-events:none; transition:opacity .2s; }
     @media (prefers-reduced-motion: reduce){ .zrow .zsw-em{ animation:none; } }
     /* mobil: dropdown ca la limbi, cu înălțime limitată (nu acoperă pagina) */
+/* mobile: dropdown like the language one, with a limited height (doesn't cover the page) */
     @media (max-width:560px){
       .ztheme-menu { max-height:60vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
       .zrow { padding:11px 12px; font-size:15px; }
@@ -361,6 +366,7 @@
     .step:nth-child(4) .step-ic { background:linear-gradient(150deg,#fbbf24,#f59e0b); }
     .step:nth-child(5) .step-ic { background:linear-gradient(150deg,#a78bfa,#7c3aed); }
     /* flux: linie de legătură + punct luminos care călătorește între pași */
+/* flow: connecting line + glowing dot traveling between steps */
     .steps { gap:40px; }
     @media (min-width:901px){ .steps { grid-template-columns:repeat(5,1fr); } }
     .steps .step:not(:last-child)::after { content:""; position:absolute; top:48px; left:calc(100% + 2px); width:36px; height:3px; border-radius:3px;
@@ -380,6 +386,7 @@
     .check-list li { display:flex; align-items:center; gap:11px; font-size:15px; color:var(--ink); font-weight:500; }
     .check-list li::before { content:"✓"; flex:none; width:24px; height:24px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; font-weight:800; background:linear-gradient(150deg,var(--green-2),var(--green)); box-shadow:0 4px 10px rgba(var(--a1),0.3); }
     /* ===== Soluția — card premium cu inel de scor ===== */
+/* ===== The Solution — premium card with score ring ===== */
     .sol-card { position:relative; background:rgba(255,255,255,0.72); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.6); border-radius:26px; padding:26px; box-shadow:0 30px 70px rgba(20,48,31,0.18); overflow:hidden; }
     .sol-glow { position:absolute; top:-120px; right:-80px; width:320px; height:320px; background:radial-gradient(circle, rgba(var(--a1),0.28), transparent 70%); pointer-events:none; animation:solFloat 8s ease-in-out infinite; }
     @keyframes solFloat { 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(-22px,22px); } }
@@ -441,6 +448,7 @@
     .sec-shield { position:absolute; right:-26px; bottom:-44px; width:280px; height:280px; z-index:0; pointer-events:none; color:#6ee787; opacity:.07; animation:shieldPulse 5s ease-in-out infinite; }
     @keyframes shieldPulse { 0%,100%{ opacity:.05; transform:scale(1); } 50%{ opacity:.11; transform:scale(1.05); } }
     /* glow pulsator pe iconițe */
+/* pulsing glow on icons */
     .sec-card .sec-ic { animation:icGlow 3s ease-in-out infinite; }
     .sec-card:nth-child(2) .sec-ic { animation-delay:.6s; } .sec-card:nth-child(3) .sec-ic { animation-delay:1.2s; } .sec-card:nth-child(4) .sec-ic { animation-delay:1.8s; }
     @keyframes icGlow { 0%,100%{ box-shadow:0 10px 20px rgba(34,197,94,0.3), inset 0 1px 0 rgba(255,255,255,0.45); } 50%{ box-shadow:0 12px 28px rgba(52,211,153,0.55), 0 0 0 3px rgba(52,211,153,0.18), inset 0 1px 0 rgba(255,255,255,0.45); } }
@@ -560,6 +568,7 @@
     .ba-after  { transform:rotate(1.4deg); }
     .ba-col:hover { transform:rotate(0deg) translateY(-6px); box-shadow:0 28px 56px rgba(90,60,20,0.32), inset 0 0 60px rgba(120,80,30,0.12), inset 0 16px 14px -12px rgba(80,50,15,0.4), inset 0 -16px 14px -12px rgba(80,50,15,0.4); }
     /* rolele (sulurile) sus și jos — cilindri cu capete */
+/* the rollers (scrolls) top and bottom — cylinders with end caps */
     .ba-col::before, .ba-col::after { content:""; position:absolute; left:-16px; right:-16px; height:28px; z-index:4; border-radius:14px;
       background:
         radial-gradient(circle at 9px 50%, #6f5226 0 4px, rgba(111,82,38,0) 6px),
@@ -630,6 +639,7 @@
     /* ===== contact form ===== */
     .form-wrap { grid-template-columns:0.9fr 1.1fr; gap:40px; align-items:start; }
     /* mascotă contact */
+/* contact mascot */
     .masc-wrap { margin-top:26px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
     .mascot { width:168px; flex:none; position:relative; }
     .masc-svg { width:168px; height:182px; display:block; overflow:visible; }
@@ -710,6 +720,7 @@
     @media (prefers-reduced-motion:reduce){ .rv-mesh{animation:none} .stars label{transition:none} }
 
     /* ===== custom icon system (line-style, fără emoji) ===== */
+/* ===== custom icon system (line-style, no emoji) ===== */
     .ico { display:inline-flex; align-items:center; justify-content:center; }
     .ico svg { width:1em; height:1em; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
     .ic.ico { font-size:30px; color:var(--green); width:54px; height:54px; border-radius:15px;
@@ -771,6 +782,7 @@
     .m-card:nth-child(5) .mi.ico { background:linear-gradient(150deg,#22d3ee,#0891b2); }
     .m-card:nth-child(6) .mi.ico { background:linear-gradient(150deg,#fb7185,#e11d48); }
     /* ===== honeycomb (De ce să ai încredere) ===== */
+/* ===== honeycomb (Why trust us) ===== */
     .metrics { position:relative; overflow:hidden; }
     .metrics::before { content:""; position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
       background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 1 L55 17 L55 49 L28 65 L1 49 L1 17 Z' fill='none' stroke='%232E7D32' stroke-width='1.5'/%3E%3C/svg%3E") repeat; }
@@ -794,6 +806,7 @@
     }
     @media (prefers-reduced-motion: reduce){ .hex .hx-ic{ animation:none; } }
     /* ===== Problema — etichetă criptică + puncte ===== */
+/* ===== The Problem — cryptic label + dots ===== */
     .prob-split { display:grid; grid-template-columns:1fr 1fr; gap:46px; align-items:center; margin-top:40px; text-align:left; }
     .prob-vis { position:relative; padding:18px 10px 26px; }
     .prob-label { position:relative; background:#fff; border:1px solid var(--line); border-radius:20px; padding:22px 24px; box-shadow:0 30px 70px rgba(20,48,31,0.16); transform:rotate(-2.4deg); font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:13.5px; line-height:2; color:#5a6b5e; overflow:hidden; transition:transform .3s ease; }
@@ -860,6 +873,7 @@
     .orbit-node { cursor:pointer; }
     .orbit-node:focus-visible .on-em { outline:3px solid rgba(var(--a1),.5); outline-offset:3px; }
     /* ===== popover detalii (deasupra nodului, NU blochează pagina) ===== */
+/* ===== details popover (above the node, does NOT block the page) ===== */
     .upop { position:fixed; z-index:400; display:none; }
     .upop.show { display:block; }
     .upop-inner { position:relative; width:min(300px,calc(100vw - 24px)); background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:0 18px 16px; box-shadow:0 24px 54px rgba(10,22,15,0.3); transform-origin:bottom center; animation:upopIn .34s cubic-bezier(.34,1.45,.5,1); }
@@ -948,6 +962,7 @@
         radial-gradient(720px 440px at 85% 95%, rgba(var(--a2),0.14), transparent 62%),
         linear-gradient(180deg,#10231a 0%, #0c1a14 100%); }
     /* margine de sus organică (frunziș) */
+/* organic top edge (foliage) */
     .ft-divider { position:relative; width:100%; height:66px; line-height:0; margin-bottom:-1px; pointer-events:none; z-index:2; }
     .ft-divider svg { display:block; width:100%; height:100%; }
     .ft-divider .fol { fill:#10231a; }
@@ -957,12 +972,14 @@
     .ft-sprout.s1 { left:13%; } .ft-sprout.s2 { left:47%; bottom:46px; animation-delay:-1.6s; } .ft-sprout.s3 { left:82%; animation-delay:-3s; }
     @keyframes ftSway { 0%,100%{ transform:rotate(-6deg); } 50%{ transform:rotate(6deg); } }
     /* frunze plutitoare în footer */
+/* floating leaves in the footer */
     .ft-leaves { position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
     .ft-leaf { position:absolute; bottom:-30px; color:#6ee787; opacity:0; animation:ftLeafRise linear infinite; }
     .ft-leaf svg { width:100%; height:100%; display:block; }
     @keyframes ftLeafRise { 0%{ transform:translateY(0) rotate(0); opacity:0; } 12%{ opacity:.16; } 88%{ opacity:.16; } 100%{ transform:translateY(-340px) rotate(80deg); opacity:0; } }
     footer.ft .wrap { position:relative; z-index:1; }
     /* rețele sociale footer */
+/* footer social networks */
     .ft-social { display:flex; gap:10px; margin-top:20px; }
     /* butoane store: sub social, una sub alta */
     .ft-donate { display:inline-flex; align-items:center; gap:8px; margin-top:14px; padding:10px 16px; border-radius:12px; background:linear-gradient(180deg,#ffd36b,#f5a623); color:#3a2600; font-weight:800; font-size:14px; text-decoration:none; box-shadow:0 8px 20px rgba(245,166,35,0.35); transition:transform .15s, box-shadow .2s; }
@@ -983,6 +1000,7 @@
     .ft-cta::before { content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1px; background:linear-gradient(120deg,rgba(255,120,120,0.55),transparent 40%,transparent 60%,rgba(133,187,47,0.45)); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; opacity:.8; }
     .ft-cta h3 { color:#fff; font-size:20px; } .ft-cta p { color:#c7d4ca; font-size:14px; margin-top:3px; }
     /* buton de descărcare evidențiat (roșu, inovativ) */
+/* highlighted download button (red, bold) */
     .btn-dl { position:relative; overflow:hidden; background:linear-gradient(180deg,#ff5a5f,#e11d2a); color:#fff; border:1px solid rgba(255,255,255,0.20); font-weight:800; letter-spacing:.2px; box-shadow:0 14px 32px rgba(225,29,42,0.42), inset 0 1px 0 rgba(255,255,255,0.32); }
     .btn-dl:hover { transform:translateY(-2px); box-shadow:0 20px 44px rgba(225,29,42,0.52), inset 0 1px 0 rgba(255,255,255,0.36); }
     .btn-dl:active { transform:translateY(0); }
@@ -1000,6 +1018,7 @@
     .ft-cookie-btn { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#cfe7d4; border-radius:999px; padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer; }
 
     /* ===== reduced motion: oprește tot ===== */
+/* ===== reduced motion: stops everything ===== */
     @media (prefers-reduced-motion: reduce) {
       .hero-mesh, .phone3d, .glow, .scanline, .float-card, .logo { animation:none !important; }
       .reveal { opacity:1 !important; transform:none !important; transition:none !important; }
@@ -1026,6 +1045,8 @@
       .sec-wrap, .final { padding:32px 20px; }
       /* header incape pe telefon: la limba lasam doar steagul (fara textul limbii),
          spatii mai mici, ca meniul ≡ sa nu mai fie taiat in dreapta */
+      /* header fits on phone: for language we leave only the flag (no language
+         text), smaller gaps, so the ≡ menu doesn't get cut off on the right */
       .nav-inner { gap:8px; }
       .nav-right { gap:7px; }
       .lang-cur { padding:0 9px; gap:5px; }
@@ -1143,6 +1164,7 @@
   </section>
 
   <!-- ===== Bară derulantă (ticker) sub header: sloganul în 12 limbi ===== -->
+<!-- ===== Scrolling bar (ticker) under the header: the slogan in 12 languages ===== -->
   <div class="ticker-bar" role="marquee" aria-label="Zelynta în 12 limbi">
     <div class="ticker-track" id="tickerTrack"></div>
   </div>
@@ -1158,11 +1180,12 @@
         return '<span class="ticker-item">🍅 '+s+'</span><span class="ticker-sep">◆</span>';
       }).join("");
       var track=document.getElementById("tickerTrack");
-      if(track){ track.innerHTML=one+one; } // dublat pentru buclă continuă
+      if(track){ track.innerHTML=one+one; } // dublat pentru buclă continuă // doubled for a continuous loop
     })();
   </script>
 
   <!-- ===== Prompter (mesaje animate, identitatea aplicației) ===== -->
+<!-- ===== Prompter (animated messages, the app's identity) ===== -->
   <div class="trust">
     <div class="wrap">
       <div class="prompter" id="prompter" aria-live="polite">
@@ -1387,6 +1410,7 @@
   </section>
 
   <!-- ===== Reviews (premium, fără testimoniale false) + formular ===== -->
+<!-- ===== Reviews (premium, no fake testimonials) + form ===== -->
   <section id="reviews" class="rv-sec">
     <div class="rv-mesh" aria-hidden="true"></div>
     <div class="wrap">
@@ -1395,6 +1419,7 @@
         <p class="lead" data-i18n="rvSub">Recenziile sunt moderate și publicate doar după verificare. Nu afișăm conținut fals.</p></div>
 
       <!-- bară onestă (fără recenzii inventate) -->
+<!-- honest bar (no made-up reviews) -->
       <div class="rv-note">
         <span class="rv-note-badge"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 3.2l2.6 5.3 5.8.9-4.2 4.1 1 5.8L12 16.6l-5.2 2.7 1-5.8L3.6 9.4l5.8-.9L12 3.2Z"/></svg> 0 / 0</span>
         <span class="rv-note-txt" data-i18n="rvEmpty">Primele recenzii vor apărea aici după publicare și moderare.</span>
@@ -1468,6 +1493,7 @@
   </section>
 
   <!-- ===== Trust metrics (etichete neutre, fără cifre inventate) ===== -->
+<!-- ===== Trust metrics (neutral labels, no made-up numbers) ===== -->
   <section class="metrics">
     <div class="wrap">
       <div class="center"><span class="eyebrow"><svg class="eb-ic" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5.5c0 4.3 3 7.5 7 9 4-1.5 7-4.7 7-9V6l-7-3Z"/><path d="M9 12l2 2 4-4"/></svg><span data-i18n="mEyebrow">De ce să ai încredere</span></span>
@@ -1626,6 +1652,7 @@
   </section>
 
   <!-- ===== The Healing Web (teaser către pagina dedicată) ===== -->
+<!-- ===== The Healing Web (teaser to the dedicated page) ===== -->
   <style>
     .hw-card{display:grid;grid-template-columns:1.05fr 1fr;background:var(--surface,#fff);border:1px solid var(--line,rgba(20,48,31,.12));border-radius:24px;overflow:hidden;text-decoration:none;color:inherit;box-shadow:0 24px 60px rgba(20,48,31,.12);transition:transform .2s ease,box-shadow .25s ease}
     .hw-card:hover{transform:translateY(-4px);box-shadow:0 34px 72px rgba(20,48,31,.18)}
@@ -1809,6 +1836,7 @@
     document.getElementById("yr").textContent = new Date().getFullYear();
 
     /* ---------- analytics emitter (privacy-aware, doar cu consimțământ) ---------- */
+/* ---------- analytics emitter (privacy-aware, consent only) ---------- */
     function track(name, meta){
       try{
         var SB=window.ZELYNTA_SUPABASE; if(!SB||!SB.url||!SB.anonKey) return;
@@ -4334,6 +4362,7 @@
       };
 
     /* ---------- selector de teme landing (separat de limbă) ---------- */
+/* ---------- landing theme selector (separate from language) ---------- */
     const ZTHEMES=[
       {id:"", label:"Verde clasic", g:"#2E7D32", l:"#85BB2F", fx:"leaf"},
       {id:"mint", label:"Mentă", g:"#0d9488", l:"#5eead4", fx:"leaf"},
@@ -4464,6 +4493,7 @@
     })();
 
     /* ---------- prompter: mesaje animate (identitatea aplicației) ---------- */
+/* ---------- prompter: animated messages (the app's identity) ---------- */
     (function(){
       var pr=document.getElementById("prompter"); if(!pr) return;
       var lines=pr.querySelectorAll(".pr-line"); if(lines.length<2) return;
@@ -4482,10 +4512,12 @@
         cur=1-cur; idx++;
       }, 3400);
       // re-traduce instant mesajul afișat la schimbarea limbii
+      // instantly retranslates the displayed message when the language changes
       window.__refreshPrompter=function(){ lines[cur].textContent=txt(KEYS[shown]); };
     })();
 
     /* ---------- mascotă contact (reacționează la căsuțe) ---------- */
+/* ---------- contact mascot (reacts to the form fields) ---------- */
     (function(){
       var m=document.getElementById("mascot"); if(!m) return;
       var bubble=document.getElementById("mascBubble"); var bt=bubble.querySelector("span")||bubble;
@@ -4494,6 +4526,7 @@
       function dictNow(){ var l=document.documentElement.lang||"ro"; return I18N[l]||I18N.ro; }
       function setState(cls,key){ m.classList.remove("m-idle","m-think","m-happy","m-sad"); m.classList.add(cls); m.setAttribute("data-masckey",key); var d=dictNow(); bt.textContent=d[key]||""; bubble.classList.remove("pop"); void bubble.offsetWidth; bubble.classList.add("pop"); }
       // re-traduce bula mascotei la schimbarea limbii (păstrează starea curentă)
+      // retranslates the mascot's bubble when the language changes (keeps the current state)
       window.__refreshMascot=function(){ var k=m.getAttribute("data-masckey")||"mascHi"; bt.textContent=dictNow()[k]||""; };
       function allGood(){ return name.value.trim() && /\S+@\S+\.\S+/.test(email.value) && msg.value.trim(); }
       setState("m-idle","mascHi");
@@ -4505,6 +4538,7 @@
     })();
 
     /* ---------- rețele sociale + butoane store: editabile din admin (settings) ---------- */
+/* ---------- social networks + store buttons: editable from admin (settings) ---------- */
     (function(){
       var map={ social_facebook:"socFacebook", social_tiktok:"socTiktok", social_instagram:"socInstagram" };
       Object.keys(map).forEach(function(k){ var a=document.getElementById(map[k]); if(a) a.addEventListener("click",function(e){ if(!a.getAttribute("href")||a.getAttribute("href")==="#") e.preventDefault(); }); });
@@ -4518,6 +4552,7 @@
           (rows||[]).forEach(function(row){ var id=map[row.key]; var a=id&&document.getElementById(id); if(a&&row.value){ a.setAttribute("href",row.value); a.style.display=""; anySoc=true; } });
           var socBox=document.getElementById("ftSocial"); if(socBox) socBox.style.display=anySoc?"":"none";
           // butoane store: aplică URL + vizibilitate (gol/ascuns => display none)
+          // store buttons: applies URL + visibility (empty/hidden => display none)
           function store(id, urlKey, showKey){
             var a=document.getElementById(id); if(!a) return false;
             var url=s[urlKey], show=s[showKey];
@@ -4541,6 +4576,7 @@
     })();
 
     /* ---------- motto animat în tab (typewriter) — urmează limba aleasă ---------- */
+/* ---------- animated tagline in the tab (typewriter) — follows the chosen language ---------- */
     (function(){
       function dictNow(){ var l=document.documentElement.lang||"ro"; return I18N[l]||I18N.ro; }
       var KEYS=["pr1","pr2","pr3"];
@@ -4556,6 +4592,7 @@
       }
       tick();
       // la schimbarea limbii: reia animația cu textul în noua limbă
+      // on language change: replays the animation with the text in the new language
       window.__refreshTabTitle=function(){ list=phrases(); p=p%list.length; c=0; del=false; };
     })();
 
@@ -4570,6 +4607,7 @@
       const dict = I18N[code] || I18N.ro;
       document.documentElement.lang = code;
       // SEO meta dinamic per limbă (title/description/OG/Twitter)
+      // dynamic per-language SEO meta (title/description/OG/Twitter)
       (function(){
         function setMeta(sel,val){ var m=document.querySelector(sel); if(m&&val) m.setAttribute("content",val); }
         var ht = dict.heroTitle ? ("Zelynta — "+dict.heroTitle.replace(/\s*\.\s*$/,"")) : null;
@@ -4630,6 +4668,13 @@
       //  - trimiterea IP-ului catre un tert, inainte de orice consimtamant,
       //    contrazice pozitia de confidentialitate a Zelynta;
       //  - dispare o dependenta externa si o cerere de retea la fiecare vizita.
+      // The language is taken from the user's declared browser preferences,
+      // in their order. We no longer ask an external geolocation service:
+      //  - an IP address doesn't say what language someone speaks (a
+      //    Romanian in Italy would get Italian, overriding their explicit preference);
+      //  - sending the IP to a third party, before any consent, contradicts
+      //    Zelynta's privacy stance;
+      //  - it removes an external dependency and a network request on every visit.
       (function(){
         var prefs = (navigator.languages && navigator.languages.length)
           ? navigator.languages
@@ -4681,11 +4726,13 @@
     });
 
     /* ---------- mitigare anti-spam: cooldown 15s între trimiteri ---------- */
+/* ---------- anti-spam mitigation: 15s cooldown between submissions ---------- */
     const TOOFAST={ro:"Așteaptă câteva secunde înainte de a trimite din nou.",en:"Please wait a few seconds before sending again.",fr:"Veuillez patienter quelques secondes avant de renvoyer.",it:"Attendi qualche secondo prima di inviare di nuovo.",es:"Espera unos segundos antes de volver a enviar.",de:"Bitte warte ein paar Sekunden, bevor du erneut sendest.",ru:"Подождите несколько секунд перед повторной отправкой.",pl:"Odczekaj kilka sekund przed ponownym wysłaniem.",nl:"Wacht een paar seconden voordat je opnieuw verzendt."};
     window.tooFast=function(){ try{ var t=parseInt(localStorage.getItem("zelynta_form_ts")||"0",10); if(Date.now()-t<15000) return true; localStorage.setItem("zelynta_form_ts",String(Date.now())); }catch(e){} return false; };
     window.tooFastMsg=function(){ return TOOFAST[document.documentElement.lang]||TOOFAST.en; };
 
     /* ---------- contact form (mailto, fără trackere) ---------- */
+/* ---------- contact form (mailto, no trackers) ---------- */
     const form=document.getElementById("contactForm");
     const status=document.getElementById("cStatus");
     const submitBtn=document.getElementById("cSubmit");
@@ -4721,6 +4768,7 @@
     });
 
     /* ---------- iconuri custom (SVG line, fără emoji) ---------- */
+/* ---------- custom icons (SVG line, no emoji) ---------- */
     const ICONS = {
       scan:'<svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M20 8V5a1 1 0 0 0-1-1h-3M4 16v3a1 1 0 0 0 1 1h3M20 16v3a1 1 0 0 1-1 1h-3"/><path d="M8 9v6M11 9v6M14 9v6M17 9v6"/></svg>',
       text:'<svg viewBox="0 0 24 24"><path d="M7 4h7l4 4v11a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M13 4v4h4M9 13h6M9 16h4"/></svg>',
@@ -4805,17 +4853,25 @@
         if(!pub.checked){ status.className="form-status bad"; status.textContent=D().rvErrPublic; return; }
         if(tooFast()){ status.className="form-status bad"; status.textContent=tooFastMsg(); return; }
         btn.setAttribute("aria-busy","true");
-        function done(){ btn.removeAttribute("aria-busy"); status.className="form-status ok"; status.textContent=D().rvSuccess; f.reset(); avatarData=null; setAv(avBig,""); upCount(); sync(); loadApproved(); if(window.zTrack)window.zTrack("review_submit"); }
+        // mesajul reflecta ce chiar s-a intamplat: "trimis" doar cand ajunge direct in baza de
+        // date; pe calea de rezerva (mailto) spunem ca s-a deschis aplicatia de e-mail, nu ca
+        // recenzia a fost trimisa deja — altfel utilizatorul credea gresit ca a mers, chiar si
+        // atunci cand telefonul/browserul nu avea client de e-mail configurat.
+        // the message reflects what actually happened: "sent" only when it reaches the database
+        // directly; on the fallback path (mailto) we say the email app opened, not that the
+        // review was already sent — otherwise the user would wrongly believe it worked, even
+        // when the phone/browser had no email client configured.
+        function done(msg){ btn.removeAttribute("aria-busy"); status.className="form-status ok"; status.textContent=msg; f.reset(); avatarData=null; setAv(avBig,""); upCount(); sync(); loadApproved(); if(window.zTrack)window.zTrack("review_submit"); }
         var SB=window.ZELYNTA_SUPABASE;
         if(SB && SB.url && SB.anonKey){
           fetch(SB.url+"/rest/v1/reviews",{method:"POST",headers:{apikey:SB.anonKey,Authorization:"Bearer "+SB.anonKey,"Content-Type":"application/json",Prefer:"return=minimal"},
             body:JSON.stringify({name:name.value.trim(),nickname:nick.value.trim()||null,rating:rating(),title:titleI.value.trim()||null,body:text.value.trim(),locale:document.documentElement.lang||"ro",consent_privacy:true,consent_public_display:true,consent_marketing:document.getElementById("rvMkt").checked,source:"web"})})
-          .then(function(r){ if(!r.ok) throw 0; done(); })
+          .then(function(r){ if(!r.ok) throw 0; done(D().rvSuccess); })
           .catch(function(){ btn.removeAttribute("aria-busy"); status.className="form-status bad"; status.textContent=D().rvError; });
         } else {
           var subject=encodeURIComponent("[Zelynta] Recenzie "+rating()+"/5 - "+name.value.trim());
           var body=encodeURIComponent("Nume: "+name.value.trim()+"\nNickname: "+nick.value.trim()+"\nRating: "+rating()+"/5\nTitlu: "+titleI.value.trim()+"\n\n"+text.value.trim());
-          setTimeout(function(){ window.location.href="mailto:suport@zelynta.com?subject="+subject+"&body="+body; done(); },300);
+          setTimeout(function(){ window.location.href="mailto:suport@zelynta.com?subject="+subject+"&body="+body; done(D().ctOk); },300);
         }
       });
       function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
@@ -4839,6 +4895,7 @@
     })();
 
     /* ---------- reveal la scroll (respectă reduced-motion) ---------- */
+/* ---------- reveal on scroll (respects reduced-motion) ---------- */
     const reduceMo = matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(!reduceMo && "IntersectionObserver" in window){
       const els=document.querySelectorAll(".card,.step,.ba-col,.rev-card,.m-card,.panel,.qa,.sec-card,.trust-item,.show-side>*,.final");
@@ -4849,6 +4906,7 @@
   </script>
 
   <!-- Butoane derulare: autoscroll + sus (urmează paleta) -->
+<!-- Scroll buttons: autoscroll + top (follows the palette) -->
   <style>
     .scroll-fab{position:fixed;right:18px;bottom:22px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:60;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .25s ease,transform .25s ease}
     .scroll-fab.show{opacity:1;transform:none;pointer-events:auto}
@@ -4873,11 +4931,14 @@
       if(!fab||!toTop) return;
       toTop.addEventListener("click",function(){ window.scrollTo({top:0,behavior:"smooth"}); });
       // butonul apare doar dupa ce ai derulat putin
+      // the button only appears after you've scrolled a bit
       function onScroll(){
         // aproape de finalul paginii (footer) -> ascunde butoanele ca sa nu acopere textul
+        // near the end of the page (footer) -> hides the buttons so they don't cover the text
         var nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 160;
         if(window.scrollY>320 && !nearBottom) fab.classList.add("show"); else fab.classList.remove("show");
         // asistentul (stanga) e definit mai jos in pagina -> il cautam acum, cand exista sigur
+        // the assistant (left) is defined further down the page -> we look it up now, once it definitely exists
         var zbot=document.getElementById("zbotFab");
         if(zbot) zbot.classList.toggle("hidden", nearBottom);
       }
@@ -4888,6 +4949,7 @@
   </script>
 
   <!-- Asistent Zelynta (chatbot cu raspunsuri automate, urmeaza limba + paleta) -->
+  <!-- Zelynta Assistant (chatbot with automatic answers, follows the language + palette) -->
   <style>
     .zbot-fab{position:fixed;left:18px;bottom:22px;width:58px;height:58px;border-radius:50%;border:none;cursor:pointer;padding:0;z-index:61;background:linear-gradient(180deg,var(--green-2,#3E9E3A),var(--green,#2E7D32));box-shadow:0 12px 28px rgba(20,48,31,.30);display:flex;align-items:center;justify-content:center;transition:transform .18s ease,box-shadow .2s ease,opacity .28s ease;animation:zbotPulse 3.4s ease-in-out infinite}
     .zbot-fab.hidden{opacity:0;pointer-events:none;transform:translateY(18px)}
@@ -4952,12 +5014,14 @@
       closeBtn.addEventListener("click",function(){ setOpen(false); });
       document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&open) setOpen(false); });
       // re-traduce la schimbarea limbii
+      // retranslates when the language changes
       window.__refreshBot=function(){ built=false; if(open) build(); };
     })();
   </script>
 
 
   <!-- Buton mod întunecat (înlocuiește vechiul buton „Descarcă" din bară) -->
+<!-- Dark mode button (replaces the old "Download" button in the bar) -->
   <script>
     (function(){
       var btn=document.getElementById("darkBtn"); if(!btn) return;
@@ -4976,6 +5040,7 @@
   </script>
 
   <!-- Showcase siluetă: acordeon de aditivi, organele afectate se aprind -->
+<!-- Silhouette showcase: additives accordion, affected organs light up -->
   <script>
     (function(){
       var svgG=document.getElementById("bodyOrgans"), acc=document.getElementById("bodyAcc");

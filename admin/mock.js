@@ -1,4 +1,5 @@
 /* Zelynta Admin — adaptor DEMO în memorie (DOAR pentru testare locală).
+   Zelynta Admin — in-memory DEMO adapter (local testing ONLY).
    Imită surface-ul Supabase folosit de admin.js. Datele sunt fictive, etichetate DEMO,
    și NU apar niciodată în producție (se folosește doar cu ?demo=1, fără chei reale). */
 (function () {
@@ -80,6 +81,7 @@
       return p;
     }
     // restaurează sesiunea salvată pe dispozitiv (rămâi logat după refresh)
+    // restores the session saved on the device (stay logged in after a refresh)
     var session = loadSession();
     if (session && session.user) ensureProfile(session.user.email);
 
@@ -90,9 +92,9 @@
         if ((c.password || "") !== "demo") return Promise.resolve({ error: { message: "Parolă demo greșită (folosește: demo)" } });
         var email = (c.email || "demo@zelynta.com").trim();
         var p = ensureProfile(email);
-        p.role = roleFor(email); // în demo, rolul derivă din prefixul emailului
+        p.role = roleFor(email); // în demo, rolul derivă din prefixul emailului // in demo, the role derives from the email's prefix
         session = { user: { id: p.id, email: email } };
-        saveSession(session); // salvează pe dispozitiv
+        saveSession(session); // salvează pe dispozitiv // saves it on the device
         return Promise.resolve({ data: { user: session.user }, error: null });
       },
       signOut: function () { session = null; saveSession(null); return Promise.resolve({}); }

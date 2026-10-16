@@ -33,6 +33,7 @@ export default function LegalPage() {
     LEGAL_DICT[lang]?.[k] ?? LEGAL_DICT.en?.[k] ?? LEGAL_DICT.ro?.[k] ?? "";
 
   // titlul din primul h1 (pentru bara de sus)
+  // the title from the first h1 (for the top bar)
   const h1 = blocks.find((b) => b.tag === "h1");
   const headerTitle = h1 ? text(h1.key) : "Zelynta";
 
@@ -65,7 +66,7 @@ export default function LegalPage() {
           blocks.map((b, i) => {
             const val = text(b.key);
             if (!val) return null;
-            if (b.tag === "h1") return null; // deja în bara de sus
+            if (b.tag === "h1") return null; // deja în bara de sus // already in the top bar
             if (b.tag === "h2")
               return (
                 <Text key={i} style={styles.h2}>

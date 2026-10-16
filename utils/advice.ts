@@ -2,6 +2,8 @@ import { adviceInfo, adviceLabels } from "../i18n/advice";
 
 // Reguli de incadrare: prima potrivire castiga, deci ordinea conteaza
 // (cele mai specifice sus: mezeluri inainte de carne, suc carbogazos inainte de suc).
+// Matching rules: first match wins, so order matters
+// (most specific ones on top: cured meat before meat, soda before juice).
 const RULES: [string, RegExp][] = [
   ["salt", /\bsalt\b|sare|nigari|fleur de sel|sea-salt|sel\b/],
   ["water", /\bwater\b|waters|mineral-water|eaux?\b|\bapa\b|apă|spring-water/],
@@ -45,6 +47,7 @@ function buildHaystack(product: any): string {
 }
 
 // Detecteaza categoria produsului; intoarce "generic" daca nu se potriveste nimic.
+// Detects the product's category; returns "generic" if nothing matches.
 export function detectAdviceCategory(product: any): string {
   const hay = buildHaystack(product);
   for (const [key, re] of RULES) {
@@ -76,6 +79,7 @@ export type ProductAdvice = {
 };
 
 // Intoarce recomandarea pentru o categorie deja stiuta (folosit de pagina de recomandari).
+// Returns the advice for an already-known category (used by the advice page).
 export function getAdviceByCategory(category: string, lang: string): ProductAdvice {
   const key = adviceInfo[category] ? category : "generic";
   const a = adviceInfo[key] ?? adviceInfo.generic;
@@ -99,6 +103,7 @@ export function getAdviceByCategory(category: string, lang: string): ProductAdvi
 }
 
 // Intoarce recomandarea completa, deja tradusa in limba ceruta.
+// Returns the full advice, already translated into the requested language.
 export function getProductAdvice(product: any, lang: string): ProductAdvice {
   const category = detectAdviceCategory(product);
   const a = adviceInfo[category] ?? adviceInfo.generic;

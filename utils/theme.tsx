@@ -9,6 +9,7 @@ import {
 import { useColorScheme } from "react-native";
 
 // amestecă culoarea `hex` peste `base` în proporția `t` (0..1). Doar pentru tente de fundal.
+// blends color `hex` over `base` at ratio `t` (0..1). For background tints only.
 export function mixHex(hex: string, t: number, base: string): string {
   const p = (h: string) => {
     const s = h.replace("#", "");
@@ -75,6 +76,7 @@ const dark: ThemeColors = {
 export type ThemeMode = "system" | "light" | "dark";
 
 // Palete de culoare (identice cu landing page-ul) — schimbă doar accentul (primary).
+// Color palettes (identical to the landing page) — only change the accent (primary).
 export type Palette = { id: string; label: string; emoji: string; primary: string; primaryDark: string };
 export const PALETTES: Palette[] = [
   { id: "default", label: "Verde clasic", emoji: "🌱", primary: "#2E7D32", primaryDark: "#5BBD62" },
@@ -152,6 +154,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     colors = { ...base, primary: base.isDark ? pal.primaryDark : pal.primary };
   } else if (base.isDark) {
     // dark: tentă subtilă din paletă pe fundaluri + accent
+    // dark: subtle palette tint on backgrounds + accent
     const a = pal.primaryDark;
     colors = {
       ...base,
@@ -165,6 +168,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     };
   } else {
     // light: fundaluri tentate cu culoarea paletei (ca pe landing)
+    // light: backgrounds tinted with the palette color (like on the landing page)
     const a = pal.primary;
     colors = {
       ...base,
@@ -179,6 +183,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }
 
   // bara de scroll (web) urmează culoarea paletei
+  // scrollbar (web) follows the palette color
   useEffect(() => {
     if (typeof document !== "undefined" && document.documentElement) {
       const root = document.documentElement.style;

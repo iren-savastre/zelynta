@@ -3,10 +3,17 @@
 --  Rulează acest fișier în Supabase → SQL Editor (o singură dată).
 --  Securitatea e impusă de RLS la nivel de DB (nu pe client).
 -- =====================================================================
+-- =====================================================================
+--  Zelynta — Supabase schema (Postgres) with RBAC + Row-Level Security
+--  Run this file in Supabase → SQL Editor (once).
+--  Security is enforced by RLS at the DB level (not on the client).
+-- =====================================================================
 
 -- ---------- Extensii ----------
+-- ---------- Extensions ----------
 create extension if not exists "pgcrypto";
 
+-- ---------- Enums ----------
 -- ---------- Enums ----------
 do $$ begin
   create type app_role as enum ('super_admin','admin','moderator','support','content_manager','analyst','readonly');
@@ -29,6 +36,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- ---------- Profiluri & roluri (RBAC) ----------
+-- ---------- Profiles & roles (RBAC) ----------
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text,
@@ -38,6 +46,7 @@ create table if not exists public.profiles (
 );
 
 -- creează automat profil la înregistrarea unui user (rol implicit readonly)
+-- automatically creates a profile when a user signs up (default role readonly)
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -51,17 +60,20 @@ create trigger on_auth_user_created after insert on auth.users
   for each row execute function public.handle_new_user();
 
 -- helper: rolul userului curent
+-- helper: the current user's role
 create or replace function public.current_role()
 returns app_role language sql stable security definer set search_path = public as $$
   select role from public.profiles where id = auth.uid();
 $$;
 
 -- helper: are unul dintre rolurile permise?
+-- helper: does it have one of the allowed roles?
 create or replace function public.has_role(roles app_role[])
 returns boolean language sql stable security definer set search_path = public as $$
   select coalesce((select role from public.profiles where id = auth.uid()) = any(roles), false);
 $$;
 
+-- ---------- Reviews ----------
 -- ---------- Reviews ----------
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
@@ -83,6 +95,7 @@ create table if not exists public.reviews (
 );
 
 -- ---------- Comments (opțional, pregătit) ----------
+-- ---------- Comments (optional, prepared) ----------
 create table if not exists public.comments (
   id uuid primary key default gen_random_uuid(),
   author_name text not null,
@@ -100,6 +113,7 @@ create table if not exists public.comments (
 );
 
 -- ---------- Support tickets (contact + suport) ----------
+-- ---------- Support tickets (contact + support) ----------
 create table if not exists public.support_tickets (
   id uuid primary key default gen_random_uuid(),
   name text,
@@ -116,6 +130,7 @@ create table if not exists public.support_tickets (
   updated_at timestamptz not null default now()
 );
 
+-- ---------- Problem reports ----------
 -- ---------- Problem reports ----------
 create table if not exists public.problem_reports (
   id uuid primary key default gen_random_uuid(),
@@ -134,6 +149,7 @@ create table if not exists public.problem_reports (
 );
 
 -- ---------- Privacy requests (GDPR) ----------
+-- ---------- Privacy requests (GDPR) ----------
 create table if not exists public.privacy_requests (
   id uuid primary key default gen_random_uuid(),
   email text not null,
@@ -147,6 +163,7 @@ create table if not exists public.privacy_requests (
 );
 
 -- ---------- Analytics events (privacy-aware, agregat, fără IP) ----------
+-- ---------- Analytics events (privacy-aware, aggregated, no IP) ----------
 create table if not exists public.analytics_events (
   id bigint generated always as identity primary key,
   event_name text not null,
@@ -162,6 +179,7 @@ create table if not exists public.analytics_events (
 );
 
 -- ---------- Audit log ----------
+-- ---------- Audit log ----------
 create table if not exists public.audit_logs (
   id bigint generated always as identity primary key,
   actor_id uuid references auth.users(id),
@@ -173,12 +191,14 @@ create table if not exists public.audit_logs (
 );
 
 -- ---------- Settings ----------
+-- ---------- Settings ----------
 create table if not exists public.settings (
   key text primary key,
   value jsonb,
   updated_at timestamptz not null default now()
 );
 
+-- ---------- Landing content (CMS) ----------
 -- ---------- Landing content (CMS) ----------
 create table if not exists public.landing_content (
   id uuid primary key default gen_random_uuid(),
@@ -192,6 +212,7 @@ create table if not exists public.landing_content (
 );
 
 -- ---------- Legal pages (CMS) ----------
+-- ---------- Legal pages (CMS) ----------
 create table if not exists public.legal_pages (
   id uuid primary key default gen_random_uuid(),
   slug text not null,
@@ -203,6 +224,7 @@ create table if not exists public.legal_pages (
   unique (slug, locale)
 );
 
+-- ---------- updated_at trigger ----------
 -- ---------- updated_at trigger ----------
 create or replace function public.touch_updated_at()
 returns trigger language plpgsql as $$
@@ -226,6 +248,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- ---------- Audit trigger pentru moderare ----------
+-- ---------- Audit trigger for moderation ----------
 create or replace function public.audit_change()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -244,6 +267,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- ---------- Audit extins: tichete, raportări, cereri GDPR, CMS landing (status) ----------
+-- ---------- Extended audit: tickets, reports, GDPR requests, landing CMS (status) ----------
 do $$ begin
   create trigger a_tickets after update on public.support_tickets for each row when (old.status is distinct from new.status) execute function public.audit_change();
 exception when duplicate_object then null; end $$;
@@ -258,6 +282,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- ---------- Audit pentru schimbarea rolurilor (profiles) ----------
+-- ---------- Audit for role changes (profiles) ----------
 create or replace function public.audit_role_change()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -271,6 +296,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- ---------- Audit pentru setări (settings — PK pe key, fără id) ----------
+-- ---------- Audit for settings (settings — PK on key, no id) ----------
 create or replace function public.audit_settings()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -286,6 +312,9 @@ exception when duplicate_object then null; end $$;
 -- =====================================================================
 --  ROW-LEVEL SECURITY
 -- =====================================================================
+-- =====================================================================
+--  ROW-LEVEL SECURITY
+-- =====================================================================
 alter table public.profiles          enable row level security;
 alter table public.reviews           enable row level security;
 alter table public.comments          enable row level security;
@@ -297,28 +326,36 @@ alter table public.audit_logs        enable row level security;
 alter table public.settings          enable row level security;
 
 -- profiles: fiecare își vede profilul; adminii văd tot
+-- profiles: everyone sees their own profile; admins see everything
 create policy profiles_self on public.profiles for select using (id = auth.uid() or public.has_role(array['admin','super_admin']::app_role[]));
 create policy profiles_admin_upd on public.profiles for update using (public.has_role(array['super_admin']::app_role[]));
 
 -- REVIEWS
+-- REVIEWS
 -- public: poate citi DOAR recenzii aprobate
+-- public: can read ONLY approved reviews
 create policy reviews_public_read on public.reviews for select using (status = 'approved');
 -- public/anon: poate INSERA doar pending, cu consimțăminte obligatorii
+-- public/anon: can INSERT only pending, with mandatory consents
 create policy reviews_public_insert on public.reviews for insert with check (
   status = 'pending' and consent_privacy = true and consent_public_display = true
 );
 -- staff: citește tot
+-- staff: reads everything
 create policy reviews_staff_read on public.reviews for select using (public.has_role(array['moderator','admin','super_admin']::app_role[]));
 -- staff: moderare (update)
+-- staff: moderation (update)
 create policy reviews_staff_upd on public.reviews for update using (public.has_role(array['moderator','admin','super_admin']::app_role[]));
 
 -- COMMENTS (analog)
+-- COMMENTS (analogous)
 create policy comments_public_read on public.comments for select using (status = 'approved');
 create policy comments_public_insert on public.comments for insert with check (status = 'pending' and consent_public_display = true);
 create policy comments_staff_read on public.comments for select using (public.has_role(array['moderator','admin','super_admin']::app_role[]));
 create policy comments_staff_upd on public.comments for update using (public.has_role(array['moderator','admin','super_admin']::app_role[]));
 
 -- SUPPORT / REPORTS / PRIVACY: anon poate insera; doar staff poate citi/edita
+-- SUPPORT / REPORTS / PRIVACY: anon can insert; only staff can read/edit
 create policy tickets_insert on public.support_tickets for insert with check (true);
 create policy tickets_read on public.support_tickets for select using (public.has_role(array['support','admin','super_admin']::app_role[]));
 create policy tickets_upd on public.support_tickets for update using (public.has_role(array['support','admin','super_admin']::app_role[]));
@@ -332,6 +369,7 @@ create policy privacy_read on public.privacy_requests for select using (public.h
 create policy privacy_upd on public.privacy_requests for update using (public.has_role(array['admin','super_admin']::app_role[]));
 
 -- DELETE: doar admin/super_admin — necesar pentru „dreptul de a fi uitat" (GDPR) executat din dashboard
+-- DELETE: admin/super_admin only — needed for the "right to be forgotten" (GDPR) executed from the dashboard
 do $$ begin
   create policy tickets_del on public.support_tickets for delete using (public.has_role(array['admin','super_admin']::app_role[]));
 exception when duplicate_object then null; end $$;
@@ -343,34 +381,43 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- ANALYTICS: anon poate insera (consimțământ verificat pe client); doar analyst+ citește
+-- ANALYTICS: anon can insert (consent checked client-side); only analyst+ reads
 create policy analytics_insert on public.analytics_events for insert with check (true);
 create policy analytics_read on public.analytics_events for select using (public.has_role(array['analyst','admin','super_admin']::app_role[]));
 
 -- AUDIT: doar admin+ citește
+-- AUDIT: admin+ only reads
 create policy audit_read on public.audit_logs for select using (public.has_role(array['admin','super_admin']::app_role[]));
 
 -- SETTINGS: public poate citi cheile publice; doar admin scrie
 -- Public (anon) poate citi DOAR cheile publice (social + limba implicită).
 -- Cheile interne (adresă, CUI/TVA, e-mailuri, companie) NU sunt expuse public.
+-- SETTINGS: public can read the public keys; only admin writes
+-- Public (anon) can read ONLY the public keys (social + default language).
+-- Internal keys (address, tax ID/VAT, emails, company) are NOT exposed publicly.
 create policy settings_read_public on public.settings for select
   using (key in ('social_facebook','social_tiktok','social_instagram','default_locale',
                  'store_android_url','store_ios_url','store_android_show','store_ios_show'));
 -- Staff autentificat (orice rol) poate citi toate setările.
+-- Authenticated staff (any role) can read all settings.
 create policy settings_read_staff on public.settings for select
   using (public.current_role() is not null);
 create policy settings_write on public.settings for all using (public.has_role(array['admin','super_admin']::app_role[]));
 
 -- LANDING CONTENT: public citește published; content_manager+ editează
+-- LANDING CONTENT: public reads published; content_manager+ edits
 alter table public.landing_content enable row level security;
 create policy landing_read on public.landing_content for select using (status='published' or public.has_role(array['content_manager','admin','super_admin']::app_role[]));
 create policy landing_write on public.landing_content for all using (public.has_role(array['content_manager','admin','super_admin']::app_role[]));
 
 -- LEGAL PAGES: public citește published; content_manager+ editează
+-- LEGAL PAGES: public reads published; content_manager+ edits
 alter table public.legal_pages enable row level security;
 create policy legal_read on public.legal_pages for select using (status='published' or public.has_role(array['content_manager','admin','super_admin']::app_role[]));
 create policy legal_write on public.legal_pages for all using (public.has_role(array['content_manager','admin','super_admin']::app_role[]));
 
 -- ---------- Vedere agregată pentru analytics (fără PII) ----------
+-- ---------- Aggregated view for analytics (no PII) ----------
 create or replace view public.analytics_daily as
   select date_trunc('day', created_at)::date as day, event_name, device_type, os, browser, country, locale, count(*) as n
   from public.analytics_events group by 1,2,3,4,5,6,7;
@@ -378,6 +425,10 @@ create or replace view public.analytics_daily as
 -- =====================================================================
 --  INDEXURI (performanță query-uri admin & landing)
 --  Coloanele filtrate/sortate frecvent: status, created_at, email.
+-- =====================================================================
+-- =====================================================================
+--  INDEXES (query performance for admin & landing)
+--  Frequently filtered/sorted columns: status, created_at, email.
 -- =====================================================================
 create index if not exists idx_reviews_status_created on public.reviews(status, created_at desc);
 create index if not exists idx_reviews_created on public.reviews(created_at desc);
@@ -394,6 +445,10 @@ create index if not exists idx_audit_created on public.audit_logs(created_at des
 --  RETENȚIE date (evită creșterea nelimitată — esențial pe free tier)
 --  Rulează periodic (pg_cron dacă e disponibil, altfel Edge Function/cron extern).
 -- =====================================================================
+-- =====================================================================
+--  Data RETENTION (avoids unlimited growth — essential on the free tier)
+--  Run periodically (pg_cron if available, otherwise an external Edge Function/cron).
+-- =====================================================================
 create or replace function public.cleanup_old_analytics()
 returns void language plpgsql security definer set search_path = public as $$
 begin
@@ -409,8 +464,15 @@ end $$;
 -- Programare (necesită extensia pg_cron — activează din Dashboard → Database → Extensions):
 --   select cron.schedule('zelynta_cleanup_analytics', '0 3 * * *', $$select public.cleanup_old_analytics()$$);
 --   select cron.schedule('zelynta_cleanup_audit',     '0 3 * * 0', $$select public.cleanup_old_audit()$$);
+-- Scheduling (requires the pg_cron extension — enable it from Dashboard → Database → Extensions):
+--   select cron.schedule('zelynta_cleanup_analytics', '0 3 * * *', $$select public.cleanup_old_analytics()$$);
+--   select cron.schedule('zelynta_cleanup_audit',     '0 3 * * 0', $$select public.cleanup_old_audit()$$);
 
 -- =====================================================================
 --  DUPĂ rulare: promovează-te admin (înlocuiește email-ul):
 --  update public.profiles set role='super_admin' where email='emailul_tau';
+-- =====================================================================
+-- =====================================================================
+--  AFTER running: promote yourself to admin (replace the email):
+--  update public.profiles set role='super_admin' where email='your_email';
 -- =====================================================================

@@ -1,4 +1,5 @@
 // E2E — Zelynta Admin Dashboard (mod DEMO). Verifică login, RBAC, moderare, setări, căutare.
+// E2E — Zelynta Admin Dashboard (DEMO mode). Checks login, RBAC, moderation, settings, search.
 const { test, expect } = require("@playwright/test");
 const path = require("path");
 const { pathToFileURL } = require("url");
@@ -7,8 +8,10 @@ const ADMIN = pathToFileURL(path.join(__dirname, "..", "admin", "index.html")).h
 
 async function open(page) {
   // acceptăm automat dialogurile native (confirm/alert) — moderarea cere confirmare
+  // we auto-accept native dialogs (confirm/alert) — moderation asks for confirmation
   page.on("dialog", (d) => d.accept());
   // blocăm CDN-ul supabase (în DEMO nu e folosit) ca testul să fie rapid și offline
+  // we block the supabase CDN (not used in DEMO) so the test is fast and offline
   await page.route(/supabase-js@2/, (r) => r.abort());
   await page.goto(ADMIN);
 }
@@ -62,11 +65,12 @@ test("Overview afișează KPI reale", async ({ page }) => {
 test("Moderare: aprobă o recenzie pending", async ({ page }) => {
   await login(page);
   await gotoSec(page, "reviews");
-  await expect(page.locator(".tbl tbody tr")).toHaveCount(2); // 2 pending în seed
+  await expect(page.locator(".tbl tbody tr")).toHaveCount(2); // 2 pending în seed // 2 pending in the seed
   await expect(page.locator(".tbl")).toContainText("Ana P.");
   await page.locator('button[data-act="approve"]').first().click();
   await page.waitForTimeout(200);
   // după aprobare, dispare din filtrul pending
+  // after approval, it disappears from the pending filter
   await expect(page.locator(".tbl")).not.toContainText("Ana P.");
   await expect(page.locator(".tbl tbody tr")).toHaveCount(1);
 });
@@ -111,18 +115,20 @@ test("Analytics: carduri eveniment cu iconițe + donut-uri", async ({ page }) =>
   await login(page);
   await gotoSec(page, "analytics");
   // evenimentele ca metric cards cu iconiță
+  // events as metric cards with an icon
   await expect(page.locator(".kpi", { hasText: "landing_view" })).toBeVisible();
   await expect(page.locator(".kpi .k-ic svg").first()).toBeVisible();
   // donut SVG pentru distribuții
+  // donut SVG for distributions
   await expect(page.locator(".panel", { hasText: "Dispozitiv" }).locator("svg").first()).toBeVisible();
 });
 
 test("Analytics: drapele la Limbă/Țară + iconițe colorate", async ({ page }) => {
   await login(page);
   await gotoSec(page, "analytics");
-  await expect(page.locator('img[src*="flagcdn"]').first()).toBeVisible(); // drapele
-  await expect(page.locator('.kpi .k-ic.k-soft .ico svg').first()).toBeVisible(); // iconițe colorate (nu negre)
-  await expect(page.locator(".vbar").first()).toBeVisible(); // grafic bare
+  await expect(page.locator('img[src*="flagcdn"]').first()).toBeVisible(); // drapele // flags
+  await expect(page.locator('.kpi .k-ic.k-soft .ico svg').first()).toBeVisible(); // iconițe colorate (nu negre) // colored icons (not black)
+  await expect(page.locator(".vbar").first()).toBeVisible(); // grafic bare // bar chart
 });
 
 test("Header de pagină per modul + grupuri sidebar", async ({ page }) => {
@@ -152,6 +158,7 @@ test("RBAC: moderator NU vede Utilizatori/Inbox", async ({ page }) => {
   await login(page, "mod@x.com");
   await expect(page.locator('.navlink[data-sec="users"]')).toHaveCount(0);
   // moderatorul nu are inbox (doar support/admin)
+  // the moderator has no inbox (support/admin only)
   await expect(page.locator('.navlink[data-sec="inbox"]')).toHaveCount(0);
 });
 

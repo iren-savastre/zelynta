@@ -47,9 +47,11 @@
   .lead{font-size:clamp(16px,2.2vw,20px);color:var(--muted);max-width:720px;margin:0 auto 8px}
 
   /* Imaginea hartă */
+/* Map image */
   .map-frame{margin:34px auto 8px;max-width:var(--maxw);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 30px 70px rgba(20,48,31,.16);position:relative}
   .map-frame img{width:100%;border-radius:14px;cursor:zoom-in}
   /* descărcare PDF */
+/* PDF download */
   .dl-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:center;margin-top:6px}
   .dl-btn{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(180deg,var(--green-2),var(--green));color:#fff;font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px;text-decoration:none;box-shadow:0 12px 26px rgba(46,125,50,.32);transition:transform .15s ease,filter .2s ease}
   .dl-btn:hover{transform:translateY(-2px);filter:brightness(1.06)}
@@ -1033,6 +1035,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
 
 
   <!-- Prezentare: textele hărții, traduse automat -->
+<!-- Presentation: the map's texts, auto-translated -->
   <style>
     .essays{padding:46px 0}
     .essays .eyebrow{margin-bottom:14px}
@@ -2823,6 +2826,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         var d=ZHEAL[cur]||ZHEAL.ro;
         try{ document.documentElement.lang=cur; }catch(e){}
         /* __pageI18n: traduce toată pagina (data-i18n) după limba aleasă */
+/* __pageI18n: translates the whole page (data-i18n) per the chosen language */
         var pg=(typeof ZPAGE!=="undefined") && (ZPAGE[cur]||ZPAGE.ro);
         if(pg){
           document.querySelectorAll("[data-i18n]").forEach(function(el){ var k=el.getAttribute("data-i18n"); if(pg[k]!=null) el.textContent=pg[k]; });
@@ -2851,6 +2855,8 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
       document.addEventListener("click",function(){ dd.classList.remove("open"); curBtn.setAttribute("aria-expanded","false"); });
       // ruleaza render() dupa ce TOATA pagina e in DOM (altfel sectiunile de mai jos — diagrame, legenda,
       // chakre, statistici, index — raman netraduse, fiindca inca nu erau create cand scriptul a rulat)
+      // runs render() after the WHOLE page is in the DOM (otherwise the sections below — diagrams,
+      // legend, chakras, stats, index — stay untranslated, because they didn't exist yet when the script ran)
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", render);
       else render();
       window.__healRender = render;
@@ -2881,6 +2887,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
     @keyframes cpulse{0%{box-shadow:0 0 0 0 rgba(155,231,166,.55)}100%{box-shadow:0 0 0 12px rgba(155,231,166,0)}}
     .century-ticks{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#7fa08c}
     /* 1. relaționare */
+/* 1. relation */
     .rel{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:12px}
     .rel-node{border-radius:18px;padding:20px 16px;text-align:center;border:1px solid var(--line);transition:transform .2s ease,box-shadow .2s ease}
     .rel-node:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,48,31,.12)}
@@ -3138,7 +3145,7 @@ WWW.DEEPSTATEMAPPINGPROJECT.COM</div>
         scale=ns; constrain(); apply();
       }
       function openLb(src){
-        rot=0; // pornim mereu neîntors
+        rot=0; // pornim mereu neîntors // we always start non-flipped
         lb.classList.add("open"); document.body.style.overflow="hidden";
         // Reincearca centrarea pana cand stage-ul are dimensiuni STABILE
         // (fereastra e in animatie de deschidere, latimea se schimba cateva frame-uri).

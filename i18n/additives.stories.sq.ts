@@ -1,6 +1,9 @@
 // Albaneza (sq) pentru descrierile "poveste" ale aditivilor cu risc si atentie.
 // Se aplica peste desc-ul din additives.ts, dupa merge-ul povestilor (vezi
 // finalul acelui fisier). Restul limbilor stau in additives.stories.ts.
+// Albanian (sq) for the "story" descriptions of risk and caution additives.
+// Applied over the desc from additives.ts, after the stories merge (see the
+// end of that file). The other languages live in additives.stories.ts.
 export const additiveStoriesSq: Record<string, string> = {
   e620: "Acidi glutamik (E620) është një përmirësues shijeje i afërt me glutamatin monosodik (MSG). Gjendet në supa të menjëhershme, salca, patatina dhe ushqime të përpunuara, ku forcon shijen e pasur (umami). Shumica e njerëzve e tolerojnë mirë, por personat e ndjeshëm mund të ndiejnë dhimbje koke, skuqje ose therje pas marrjes së sasive të mëdha. Këshillohet masa, sidomos për fëmijët.",
   e621: "Glutamati monosodik (E621), ose MSG, është përmirësuesi i shijes më i përdorur në botë. U jep shijen e pasur (umami) supave të menjëhershme, salcave, snackëve dhe ushqimit të shpejtë. Autoritetet e konsiderojnë të sigurt në dozat e zakonshme, por disa persona raportojnë dhimbje koke, djersitje ose ndjesi presioni pas vakteve të pasura me MSG (i ashtuquajturi sindromi i restorantit kinez). Si shenjë e ushqimit fort të përpunuar, është mirë të përdoret me masë.",

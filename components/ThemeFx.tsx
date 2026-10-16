@@ -4,6 +4,9 @@ import { Animated, Dimensions, StyleSheet, View } from "react-native";
 /**
  * Emoji care plutesc pe fundal, specifice temei (ca animația de pe landing page).
  * Pur decorativ, sub conținut.
+ *
+ * Theme-specific emoji floating in the background (like the animation on the
+ * landing page). Purely decorative, below the content.
  */
 export default function ThemeFx({ emoji }: { emoji: string }) {
   const { height } = Dimensions.get("window");

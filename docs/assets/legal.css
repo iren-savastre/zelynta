@@ -167,6 +167,7 @@ footer.ft::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;b
 .modal h3{font-size:20px;margin-bottom:6px}
 
 /* ===== imersiv: hero mesh + grilă tehnologică ===== */
+/* ===== immersive: hero mesh + tech grid ===== */
 .lhero{isolation:isolate}
 .lhero::before{content:"";position:absolute;inset:-25% -10% auto -10%;height:150%;z-index:-1;pointer-events:none;
   background:radial-gradient(40% 50% at 16% 18%,rgba(46,125,50,0.22),transparent 60%),radial-gradient(38% 46% at 88% 26%,rgba(133,187,47,0.20),transparent 60%),radial-gradient(45% 55% at 60% 100%,rgba(3,129,65,0.12),transparent 60%);
@@ -177,6 +178,7 @@ footer.ft::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;b
 @keyframes lmesh{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(2%,-1.5%,0) scale(1.05)}100%{transform:translate3d(-2%,1%,0) scale(1.02)}}
 
 /* ===== iconuri duotone în plăcuțe cu adâncime ===== */
+/* ===== duotone icons in tiles with depth ===== */
 .lcard .ic{width:58px;height:58px;border-radius:17px;font-size:30px;position:relative;
   background:linear-gradient(160deg,rgba(46,125,50,0.16),rgba(133,187,47,0.10));border:1px solid rgba(46,125,50,0.16);
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.75),0 10px 22px rgba(46,125,50,0.14);transition:transform .2s ease,box-shadow .2s ease}
@@ -191,10 +193,12 @@ footer.ft::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;b
 .badge .ico,.ft-badge .ico,.upd .dot{filter:drop-shadow(0 1px 1px rgba(20,48,31,0.12))}
 
 /* ===== reveal la scroll ===== */
+/* ===== reveal on scroll ===== */
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .65s cubic-bezier(.2,.7,.2,1),transform .65s cubic-bezier(.2,.7,.2,1);will-change:opacity,transform}
 .reveal.in{opacity:1;transform:none}
 
 /* 2-col layout pentru formulare */
+/* 2-col layout for forms */
 .split2{display:grid;grid-template-columns:0.9fr 1.1fr;gap:36px;align-items:start}
 
 /* responsive */
@@ -211,6 +215,7 @@ footer.ft::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;b
   .ft-top{grid-template-columns:1fr}
 }
 /* ===== selector de limbă ===== */
+/* ===== language selector ===== */
 .lang-sw{position:relative}
 .lang-btn{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:7px 11px;font-weight:700;font-size:13px;color:var(--green-dark);cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .12s ease,box-shadow .12s ease}
 .lang-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
@@ -226,10 +231,12 @@ footer.ft::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;b
 .nav-compact{display:none}
 
 /* ===== disclaimer „RO oficial" ===== */
+/* ===== "official RO" disclaimer ===== */
 .lang-note{display:flex;align-items:center;gap:9px;justify-content:center;background:linear-gradient(90deg,rgba(46,125,50,.10),rgba(133,187,47,.10));border-bottom:1px solid var(--line);color:var(--green-dark);font-size:12.5px;font-weight:600;padding:8px 16px;text-align:center}
 .lang-note .ln-ic{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px rgba(133,187,47,.18);flex:0 0 auto}
 
 /* ===== brand cu undă animată (ca pe landing) ===== */
+/* ===== brand with animated wave (like on the landing page) ===== */
 .wave{display:inline-flex;white-space:nowrap}
 .wave span{display:inline-block;animation:textwave 1.8s ease-in-out infinite}
 .wave span:nth-child(1){animation-delay:0s}
@@ -242,6 +249,7 @@ footer.ft::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;b
 @keyframes textwave{0%,55%,100%{transform:translateY(0)}28%{transform:translateY(-5px)}}
 
 /* ===== buton de descărcare evidențiat (roșu, inovativ) ===== */
+/* ===== highlighted download button (red, bold) ===== */
 .btn-dl{position:relative;overflow:hidden;background:linear-gradient(180deg,#ff5a5f,#e11d2a);color:#fff;border:1px solid rgba(255,255,255,0.20);font-weight:800;letter-spacing:.2px;box-shadow:0 14px 32px rgba(225,29,42,0.42),inset 0 1px 0 rgba(255,255,255,0.32)}
 .btn-dl:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(225,29,42,0.52),inset 0 1px 0 rgba(255,255,255,0.36)}
 .btn-dl:active{transform:translateY(0)}
@@ -251,6 +259,7 @@ footer.ft::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;b
 .ft-cta .btn-dl{padding:14px 26px;font-size:15px;border-radius:14px}
 
 /* ===== scrollbar brandat (identic cu aplicația) ===== */
+/* ===== branded scrollbar (identical to the app) ===== */
 *{scrollbar-width:thin;scrollbar-color:var(--green) transparent}
 ::-webkit-scrollbar{width:11px;height:11px}
 ::-webkit-scrollbar-track{background:rgba(120,130,120,0.10);border-radius:999px}

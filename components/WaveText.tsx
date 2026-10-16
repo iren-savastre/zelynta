@@ -8,6 +8,13 @@ import { Animated, type TextStyle, View } from "react-native";
  * Fara `playKey`: valul ruleaza in bucla continua (ex. footer).
  * Cu `playKey`: valul ruleaza O SINGURA data la fiecare schimbare a lui —
  * asa poate fi pus in alternanta cu alta animatie (rosia care sare).
+ *
+ * Text whose letters make a "wave" (like the Zelynta name on the landing page).
+ * Design only — decorative animation.
+ *
+ * Without `playKey`: the wave runs in a continuous loop (e.g. footer).
+ * With `playKey`: the wave runs ONCE on each change of it —
+ * so it can be alternated with another animation (the hopping tomato).
  */
 export default function WaveText({
   text,
@@ -22,6 +29,7 @@ export default function WaveText({
   const anims = useRef(letters.map(() => new Animated.Value(0))).current;
 
   // Mod continuu (comportamentul original), doar cand nu e controlat de parinte.
+  // Continuous mode (the original behavior), only when not controlled by the parent.
   useEffect(() => {
     if (playKey !== undefined) return;
     const step = 110;
@@ -40,6 +48,7 @@ export default function WaveText({
   }, [anims, letters.length, playKey]);
 
   // Mod controlat: o singura trecere de val per schimbare de playKey.
+  // Controlled mode: a single wave pass per change of playKey.
   useEffect(() => {
     if (playKey === undefined || playKey === 0) return;
     const step = 90;

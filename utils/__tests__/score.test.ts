@@ -70,6 +70,7 @@ describe("productDisplay", () => {
 describe("productDisplay (brands = persoană juridică)", () => {
   it("nu pune firma ca titlu când există un nume de produs", () => {
     // cazul real 5449000000996: brands = „COCA-COLA SERVICES SA/NV”
+    // real case 5449000000996: brands = "COCA-COLA SERVICES SA/NV"
     const d = productDisplay({
       product_name: "Coca-Cola",
       brands: "COCA-COLA SERVICES SA/NV",

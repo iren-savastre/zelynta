@@ -33,6 +33,8 @@ export default function AdvicePage() {
 
   // Recomandarea pentru copii tine cont de scor: produsele slabe (0/portocaliu)
   // nu se recomanda copiilor. Fara scor (undefined) pastram comportamentul vechi.
+  // The advice for children factors in the score: poor products (0/orange)
+  // aren't recommended for children. With no score (undefined) we keep the old behavior.
   const score = params.score != null ? parseInt(params.score, 10) : NaN;
   const pickLbl = (f: Record<string, string>) => f[i18n.language] ?? f.en ?? f.ro ?? "";
   let childKey = advice.labels.children;

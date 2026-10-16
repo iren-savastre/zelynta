@@ -1,6 +1,9 @@
 // Substanțe cosmetice de evitat / de urmărit (nomenclatură INCI)
 // Niveluri: risk = interzis/foarte îngrijorător, caution = restricționat/alergen,
 //           moderate = permis cu discuții, safe = fără probleme cunoscute
+// Cosmetic substances to avoid / watch out for (INCI nomenclature)
+// Levels: risk = banned/very concerning, caution = restricted/allergen,
+//         moderate = allowed with caveats, safe = no known issues
 import { cosmeticsExtra } from "./cosmetics.extra";
 import { cosmeticsBgEl } from "./cosmetics.bgel";
 import { cosmeticsSq } from "./cosmetics.sq";
@@ -369,6 +372,7 @@ export const cosmeticsInfo = {
 };
 
 // Imbina traducerile DE/RU/PL/NL (din cosmetics.extra.ts) peste limbile de baza.
+// Merges the DE/RU/PL/NL translations (from cosmetics.extra.ts) over the base languages.
 for (const code in cosmeticsExtra) {
   const base = (cosmeticsInfo as any)[code];
   const extra = cosmeticsExtra[code];
@@ -381,6 +385,9 @@ for (const code in cosmeticsExtra) {
 // Imbina bulgara (bg) + greaca (el) (din cosmetics.bgel.ts). Erau singurele
 // doua limbi fara cosmetice: pana acum un utilizator bulgar sau grec care scana
 // un sampon vedea substantele in engleza.
+// Merges Bulgarian (bg) + Greek (el) (from cosmetics.bgel.ts). They were the
+// only two languages with no cosmetics: until now a Bulgarian or Greek user
+// scanning a shampoo would see the substances in English.
 for (const code in cosmeticsBgEl) {
   const base = (cosmeticsInfo as any)[code];
   const be = cosmeticsBgEl[code];
@@ -391,6 +398,7 @@ for (const code in cosmeticsBgEl) {
 }
 
 // Imbina albaneza (din cosmetics.sq.ts).
+// Merges Albanian (from cosmetics.sq.ts).
 for (const code in cosmeticsSq) {
   const base = (cosmeticsInfo as any)[code];
   const sq = cosmeticsSq[code];

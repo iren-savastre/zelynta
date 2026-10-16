@@ -26,6 +26,8 @@ function pickField(field: any, lang: string) {
 
 // ---- Adnotare ingrediente: adaugă codul E lângă denumirea aditivului ----
 // Ex: "acidifiant: acid fosforic" -> "acidifiant: acid fosforic (E338)".
+// ---- Ingredient annotation: adds the E code next to the additive's name ----
+// E.g.: "acidifiant: acid fosforic" -> "acidifiant: acid fosforic (E338)".
 type AnnIndex = { re: RegExp; byName: Map<string, string> };
 const annCache: Record<string, AnnIndex> = {};
 
@@ -35,28 +37,34 @@ function escapeRe(s: string): string {
 
 function buildAnnIndex(lang: string): AnnIndex {
   if (annCache[lang]) return annCache[lang];
-  const byName = new Map<string, string>(); // nume(lowercase) -> cod E
+  const byName = new Map<string, string>(); // nume(lowercase) -> cod E // name (lowercase) -> E code
   for (const code in additivesInfo) {
     const info: any = (additivesInfo as any)[code];
-    const ecode = code.toUpperCase(); // ex. "E338"
+    const ecode = code.toUpperCase(); // ex. "E338" // e.g. "E338"
     const names = new Set<string>();
     // Numele din TOATE limbile dictionarului: etichetele europene sunt deseori
     // multilingve (nl/fr/de...), iar aditivul trebuie recunoscut indiferent de
     // limba in care l-a scris producatorul.
+    // Names from ALL the dictionary's languages: European labels are often
+    // multilingual (nl/fr/de...), and the additive must be recognized regardless
+    // of the language the manufacturer wrote it in.
     for (const l in info?.name ?? {}) {
       const nm = info.name[l];
       if (nm) names.add(String(nm).trim());
     }
     // Sinonime/variante de pe etichete (plural, alte grafii), daca exista.
+    // Synonyms/variants found on labels (plural, other spellings), if any.
     for (const nm of info?.alt ?? []) {
       if (nm) names.add(String(nm).trim());
     }
     for (const nm of names) {
       // doar nume specifice (evită cuvinte scurte comune); primul cod câștigă
+      // only specific names (avoids common short words); the first code wins
       if (nm.length >= 6 && !byName.has(nm.toLowerCase())) byName.set(nm.toLowerCase(), ecode);
     }
   }
   // o singură trecere, cu alternativă; cele mai lungi denumiri primele (câștigă)
+  // a single pass, with alternation; longest names first (they win)
   const names = [...byName.keys()].sort((a, b) => b.length - a.length).map(escapeRe);
   const re = new RegExp(
     "(^|[\\s,;:.()\\-/])(" + names.join("|") + ")(?![A-Za-zÀ-ÿ0-9])",
@@ -68,15 +76,20 @@ function buildAnnIndex(lang: string): AnnIndex {
 }
 
 // Cod E ca token de sine stătător: E1105, E 160b, E-160b.
+// E code as a standalone token: E1105, E 160b, E-160b.
 const E_CODE_RE = /\bE[\s-]?\d{3,4}[a-z]?\b/gi;
 
 // Elimină aditivii din textul de ingrediente (au secțiune separată în UI).
 // Scoate codurile E și segmentele formate doar din aditivi (ex. "conservant: lizozim").
 // Ingredientele compuse (cu paranteze) sunt păstrate — nu le tăiem din greșeală.
+// Removes additives from the ingredients text (they have a separate section in the UI).
+// Strips E codes and segments made up only of additives (e.g. "preservative: lysozyme").
+// Compound ingredients (with parentheses) are kept — we don't cut them by mistake.
 export function stripAdditives(text: string, lang: string): string {
   if (!text || text.length > 4000) return text;
   const { re } = buildAnnIndex(lang);
   // Împarte pe separatoare de nivel superior (virgulă/;), respectând parantezele.
+  // Splits on top-level separators (comma/;), respecting parentheses.
   const segs: string[] = [];
   let depth = 0;
   let cur = "";
@@ -95,10 +108,13 @@ export function stripAdditives(text: string, lang: string): string {
     const raw = seg.trim();
     if (!raw) continue;
     // Valoarea de testat: după ultimul ":" (eticheta de clasă: conservant/colorant/…).
+    // The value to test: after the last ":" (the class label: preservative/colorant/…).
     const colon = raw.lastIndexOf(":");
     const value = colon >= 0 ? raw.slice(colon + 1) : raw;
     // Scoate codurile E și numele de aditivi cunoscute; dacă nu mai rămâne text,
     // segmentul era format doar din aditivi și îl eliminăm.
+    // Strips E codes and known additive names; if no text remains, the
+    // segment was made up only of additives and we drop it.
     re.lastIndex = 0;
     const leftover = value
       .replace(E_CODE_RE, " ")
@@ -107,6 +123,7 @@ export function stripAdditives(text: string, lang: string): string {
       .trim();
     if (leftover === "") continue;
     // Păstrăm ingredientul, dar curățăm eventualele coduri E rămase.
+    // We keep the ingredient, but clean up any leftover E codes.
     kept.push(
       raw
         .replace(E_CODE_RE, "")
@@ -121,6 +138,8 @@ export function stripAdditives(text: string, lang: string): string {
 
 // Text de rezerva cand un cod E este valid dar nu-l avem inca in dictionar,
 // ca sa nu apara un rand gol (ex. aditivi noi sau rar intalniti).
+// Fallback text for when an E code is valid but we don't have it in the
+// dictionary yet, so an empty row never shows up (e.g. new or rare additives).
 const UNKNOWN_ADDITIVE_DESC: Record<string, string> = {
   ro: "Aditiv alimentar autorizat în UE. Nu avem încă o descriere detaliată pentru el în aplicație.",
   en: "Food additive authorized in the EU. We do not yet have a detailed description for it in the app.",
@@ -141,21 +160,28 @@ export function getAdditives(product: any, lang: string): AnalyzedAdditive[] {
   const out: AnalyzedAdditive[] = [];
 
   // Adaugă un aditiv după cod (ex. "e1105", "en:e160b", "E 471a"), fără duplicate.
+  // Adds an additive by code (e.g. "e1105", "en:e160b", "E 471a"), without duplicates.
   const addByCode = (codeRaw: string) => {
     const cleaned = String(codeRaw)
       .replace(/^[a-z]{2}:/i, "")
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "");
     // Accepta doar coduri E valide (E100..E1599, cu eventuala litera: e471a, e160b).
+    // Only accepts valid E codes (E100..E1599, with an optional letter: e471a, e160b).
     const m = cleaned.match(/^e(\d{3,4})([a-z])?$/);
-    if (!m) return; // ignora gunoiul de tip "e'(é"
+    if (!m) return; // ignora gunoiul de tip "e'(é" // ignores garbage like "e'(é"
     const code = "e" + m[1] + (m[2] ?? "");
     // Daca sub-varianta (ex. e322i, e471a) nu exista, cade pe codul de baza (e322, e471).
+    // If the sub-variant (e.g. e322i, e471a) doesn't exist, falls back to the base code (e322, e471).
     const base = code.replace(/[a-z]+$/, "");
     const info = (additivesInfo as any)[code] ?? (additivesInfo as any)[base];
     // Evita duplicatele aceleiasi substante (ex. E322 + E322i = lecitine).
     // Dar NU uni sub-variante distincte care exista separat in dictionar
     // (ex. E160a beta-caroten vs E160b annatto au aceeasi baza "e160", dar sunt substante diferite).
+    // Avoids duplicates of the same substance (e.g. E322 + E322i = lecithins).
+    // But does NOT merge distinct sub-variants that exist separately in the
+    // dictionary (e.g. E160a beta-carotene vs E160b annatto share the base "e160",
+    // but are different substances).
     const dedupeKey = (additivesInfo as any)[code] ? code : info ? base : code;
     if (seen.has(dedupeKey)) return;
     seen.add(dedupeKey);
@@ -171,10 +197,13 @@ export function getAdditives(product: any, lang: string): AnalyzedAdditive[] {
   };
 
   // 1) Din additives_tags (etichetele oferite de baza de date, la scanarea codului de bare).
+  // 1) From additives_tags (the tags provided by the database, when scanning the barcode).
   for (const rawTag of (product?.additives_tags ?? []) as string[]) addByCode(rawTag);
 
   // 2) Din textul de ingrediente: coduri E scrise explicit + denumiri cunoscute din dicționar.
   //    Așa intră la ADITIVI și cei pe care baza de date nu i-a etichetat (ex. lizozim, annatto).
+  // 2) From the ingredients text: explicitly written E codes + names known from the dictionary.
+  //    This is how additives not tagged by the database also get included (e.g. lysozyme, annatto).
   const text =
     product?.[`ingredients_text_${lang}`] ||
     product?.ingredients_text_en ||
@@ -182,10 +211,12 @@ export function getAdditives(product: any, lang: string): AnalyzedAdditive[] {
     "";
   if (text) {
     // Coduri E explicite (E1105, E 160b, E-160b).
+    // Explicit E codes (E1105, E 160b, E-160b).
     const codeRe = /\bE[\s-]?(\d{3,4})([a-z])?\b/gi;
     let cm: RegExpExecArray | null;
     while ((cm = codeRe.exec(text)) !== null) addByCode("e" + cm[1] + (cm[2] || ""));
     // Denumiri de aditivi cunoscute (ex. „lizozim", „annatto") -> codul E corespunzător.
+    // Known additive names (e.g. "lysozyme", "annatto") -> the corresponding E code.
     const { re, byName } = buildAnnIndex(lang);
     re.lastIndex = 0;
     let nm: RegExpExecArray | null;
@@ -208,6 +239,7 @@ export function getCosmetics(product: any, lang: string): AnalyzedAdditive[] {
     ""
   ).toLowerCase();
   // Produs declarat „fara parfum" — nu semnala parfum ca substanta de urmarit.
+  // Product declared "fragrance-free" — don't flag fragrance as a substance to watch.
   const fragranceFree =
     /sans\s+parfum|parfum[-\s]*free|fragrance[-\s]*free|without\s+(?:parfum|fragrance)|f[aă]r[aă]\s+parfum|no\s+(?:parfum|fragrance)/i.test(
       text
@@ -215,6 +247,7 @@ export function getCosmetics(product: any, lang: string): AnalyzedAdditive[] {
   return Object.keys(cosmeticsInfo)
     .filter((key) => {
       // potrivire pe cuvant intreg (nu substring — evita „parfum” din „sans parfum”, etc.)
+      // whole-word match (not substring — avoids "parfum" from "sans parfum", etc.)
       const re = new RegExp("\\b" + key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i");
       if (!re.test(text)) return false;
       if (key === "parfum" && fragranceFree) return false;
@@ -268,14 +301,19 @@ export function analyzeProduct(product: any, lang: string): Analysis {
   // Produsele NEALIMENTARE (pasta de dinti, sampon, cosmetice) nu au tabel
   // nutritional prin natura lor — la ele scorul se bazeaza DOAR pe ingrediente
   // si aditivi, identic indiferent de metoda de scanare (cod de bare sau poza).
+  // NON-FOOD products (toothpaste, shampoo, cosmetics) have no nutrition table
+  // by nature — for them the score is based ONLY on ingredients and additives,
+  // identically regardless of the scan method (barcode or photo).
   const isCosmetic =
     cosmetics.length > 0 ||
     // provine din baza de cosmetice OpenBeautyFacts (marcata de apiClient la scanarea codului)
+    // comes from the OpenBeautyFacts cosmetics database (flagged by apiClient when scanning the code)
     product?._db === "beauty" ||
     /beaut|cosmet|personal.?care|skin.?care|face.?care|hair.?care/i.test(
       ((product?.categories_tags ?? []) as string[]).join(",")
     ) ||
     // tipuri de produs cosmetic/ingrijire, in mai multe limbi
+    // cosmetic/care product types, in several languages
     /toothpaste|dentifrice|pasta de dinti|zahnpasta|cosmetic|hygiene|igien|shampoo|shampoing|sampon|soap|savon|sapun|deodorant|antiperspirant|cream|creme|crema|crème|lotion|lotiune|gel de dus|shower|cleanser|cleansing|face wash|demachiant|serum|\bser\b|toner|tonic|micellar|micelar|moistur|hydrating|hidratant|exfoliat|scrub|peeling|\bmask\b|masca|mască|masque|balm|balsam|conditioner|balsam de par|after.?shave|sunscreen|\bspf\b|make.?up|makeup|machiaj|mascara|foundation|fond de ten|concealer|nail|oja|skincare|skin care|face care|hair(?!\w)/i.test(
       (product?.categories ?? "") +
         ((product?.categories_tags ?? []) as string[]).join(",") +
@@ -287,6 +325,10 @@ export function analyzeProduct(product: any, lang: string): Analysis {
   // OCR-ul da doar ingredientele), nutritia e o necunoscuta: nu putem pretinde
   // ca produsul e sanatos. Scadem 50 (60% din scor ar fi venit din nutritie)
   // si aratam motivul; aditivii penalizeaza in continuare separat.
+  // With NO nutrition value at all for a FOOD item (e.g. a product read from
+  // a photo — OCR only gives the ingredients), nutrition is unknown: we can't
+  // claim the product is healthy. We subtract 50 (60% of the score would have
+  // come from nutrition) and show the reason; additives still penalize separately.
   const noNutritionData =
     calories == null && sugars == null && satFat == null && salt == null;
   if (noNutritionData && !isCosmetic) {
@@ -298,6 +340,11 @@ export function analyzeProduct(product: any, lang: string): Analysis {
   // dupa codul de bare fara ingrediente (ex. Nivea negasita cu compozitie), NU putem
   // sti ce contine — deci nu are voie sa apara „100% sanatos". Aplicam un scor neutru
   // si aratam motivul: utilizatorul e invitat sa scaneze eticheta pentru un scor real.
+  // For COSMETICS, the score is based on the ingredients list. If the product
+  // is read by barcode with no ingredients (e.g. Nivea found without a
+  // composition), we CAN'T know what it contains — so it must never show
+  // "100% healthy". We apply a neutral score and show the reason: the user
+  // is invited to scan the label for a real score.
   const cosmeticText = String(
     product?.[`ingredients_text_${lang}`] ||
       product?.ingredients_text_en ||
@@ -333,6 +380,10 @@ export function analyzeProduct(product: any, lang: string): Analysis {
   // (ex. „benzoatul formeaza benzen cu vitamina C cand e inghitit") sunt pentru mancare,
   // nu pentru un produs care se aplica/clateste pe piele. Scorul cosmetic se bazeaza pe
   // hazardele cosmetice (parabeni, sulfati, alergeni de parfum) din getCosmetics.
+  // For COSMETICS we don't apply FOOD additive penalties: their classifications
+  // (e.g. "benzoate forms benzene with vitamin C when ingested") are for food,
+  // not for a product applied/rinsed on skin. The cosmetic score is based on
+  // cosmetic hazards (parabens, sulfates, fragrance allergens) from getCosmetics.
   const scoredAdditives = isCosmetic ? [] : additives;
   scoredAdditives.forEach((a) => judge(a.name ? `${a.code} · ${a.name}` : a.code, a.level));
   cosmetics.forEach((c) => judge(c.code, c.level));
@@ -360,6 +411,15 @@ export function scoreColor(score: number) {
 //  - excepție: `brands` conține uneori persoana juridică, nu marca de raft
 //    („COCA-COLA SERVICES SA/NV”). Ca titlu arată rupt, așa că atunci preferăm
 //    product_name și lăsăm firma în subtitlu.
+// Picks the product's "display" name.
+// OpenFoodFacts data is inconsistent: sometimes the recognizable name is in
+// product_name (Nutella), other times in brands (Coca-Cola, when product_name
+// is just a descriptor like "Original Taste"). The rule:
+//  - if product_name is itself a brand from the list → use it as the title (Nutella)
+//  - otherwise use the first brand (Coca-Cola), and product_name becomes the subtitle
+//  - exception: `brands` sometimes contains the legal entity, not the shelf
+//    brand ("COCA-COLA SERVICES SA/NV"). As a title it looks broken, so in
+//    that case we prefer product_name and leave the company in the subtitle.
 const LEGAL_ENTITY_RE =
   /(^|[\s.,(])(s\.?a\.?\/?n\.?v\.?|s\.?r\.?l\.?|s\.?p\.?a\.?|gmbh|ltd\.?|limited|llc|inc\.?|corp\.?|plc|b\.?v\.?|n\.?v\.?|a\.?g\.?|a\/s|oy|oyj|kft|sp\.? ?z ?o\.?o\.?|d\.?o\.?o\.?|holding|group|company|services|international)([\s.,)]|$)/i;
 
@@ -385,6 +445,7 @@ export function productDisplay(product: any): { title: string; subtitle: string 
     };
   }
   // prima marcă care nu e nume de firmă; dacă toate sunt, rămâne prima
+  // the first brand that isn't a company name; if they all are, the first one stays
   const brandTitle = brandList.find((b) => !looksLikeLegalEntity(b)) || "";
   if (pname && !brandTitle && brand0) {
     return { title: pname, subtitle: brand0 };

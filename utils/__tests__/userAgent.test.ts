@@ -2,6 +2,8 @@ import { OFF_USER_AGENT, APP_NAME, APP_VERSION } from "../userAgent";
 
 // Open Food Facts cere formatul `NumeApp/Versiune (contact)` și poate bloca
 // pe IP aplicațiile care nu se prezintă. Testul păzește exact acel format.
+// Open Food Facts requires the `AppName/Version (contact)` format and can
+// block apps that don't identify themselves, by IP. The test guards exactly that format.
 describe("User-Agent pentru Open Food Facts", () => {
   it("respectă formatul cerut: NumeApp/Versiune (contact)", () => {
     expect(OFF_USER_AGENT).toMatch(/^[A-Za-z][\w.-]*\/\d+\.\d+(\.\d+)? \(\S+@\S+\.\S+\)$/);

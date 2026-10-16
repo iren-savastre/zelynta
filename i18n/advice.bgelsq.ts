@@ -2,6 +2,9 @@
 // Fisierul principal (advice.ts) a ramas pe 9 limbi, deci utilizatorii bg/el
 // vedeau sectiunea de recomandari in engleza, desi restul aplicatiei era
 // tradus. Se imbina in advice.ts.
+// Bulgarian, Greek and Albanian for the advice by product category.
+// The main file (advice.ts) stayed at 9 languages, so bg/el users would see
+// the advice section in English, even though the rest of the app was translated. Merged into advice.ts.
 type T3 = { bg: string; el: string; sq: string };
 
 export const adviceLabelsBgElSq: Record<string, T3> = {

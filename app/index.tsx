@@ -57,6 +57,8 @@ import { PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
 // Placeholder pt produse scanate din poza (fara nume real) — se traduce live
 // la afisare, nu se salveaza tradus, ca sa reflecte mereu limba curenta.
+// Placeholder for products scanned from a photo (no real name) — translated
+// live at render time, never saved translated, so it always reflects the current language.
 const OCR_TITLE_SENTINEL = "__ocr_title__";
 
 const languages = [
@@ -75,6 +77,7 @@ const languages = [
 ];
 
 // Pe Windows/web emoji-urile de drapel nu se randează → folosim imagini reale
+// On Windows/web, flag emoji don't render → we use real images
 function flagUrl(cc: string, w: number) {
   return `https://flagcdn.com/w${w}/${cc}.png`;
 }
@@ -83,6 +86,10 @@ function flagUrl(cc: string, w: number) {
 // `original` se arata cand textul NU e in limba aleasa si nu a putut fi tradus —
 // mai bine spunem asta pe fata decat sa lasam utilizatorul sa creada ca
 // aplicatia i-a amestecat limbile.
+// Labels for the automatic translation of ingredients (in all 11 languages).
+// `original` is shown when the text is NOT in the chosen language and
+// couldn't be translated — better to say so upfront than to let the user
+// think the app mixed up its languages.
 const autoLabels = {
   translating: { ro: "Se traduce…", en: "Translating…", fr: "Traduction…", it: "Traduzione…", es: "Traduciendo…", de: "Wird übersetzt…", ru: "Перевод…", pl: "Tłumaczenie…", nl: "Vertalen…", bg: "Превежда се…", el: "Μετάφραση…", sq: "Po përkthehet…" } as Record<string, string>,
   auto: { ro: "tradus automat", en: "auto-translated", fr: "traduit automatiquement", it: "tradotto automaticamente", es: "traducido automáticamente", de: "automatisch übersetzt", ru: "автоперевод", pl: "przetłumaczone automatycznie", nl: "automatisch vertaald", bg: "автоматичен превод", el: "αυτόματη μετάφραση", sq: "përkthim automatik" } as Record<string, string>,
@@ -97,6 +104,7 @@ const levelColors: Record<string, string> = {
 };
 
 // Titlul sectiunii cu silueta corpului (organe afectate), in 9 limbi.
+// The title of the body-silhouette section (affected organs), in 9 languages.
 const bodyTitle: Record<string, string> = {
   ro: "Ce poate afecta în corp",
   en: "What it can affect in the body",
@@ -115,6 +123,7 @@ const bodyTitle: Record<string, string> = {
 const isWeb = Platform.OS === "web";
 
 // Stiluri „glass" (doar web — folosesc CSS real pasat de react-native-web)
+// "Glass" styles (web only — use real CSS passed via react-native-web)
 function makeGlass(c: ThemeColors): any {
   return isWeb
     ? {
@@ -178,11 +187,13 @@ export default function Index() {
   const pal = PALETTES.find((p) => p.id === palette) || PALETTES[0];
   const paletteEmoji = pal.emoji;
   // butoanele (scanare/căutare) urmează tema
+  // the buttons (scan/search) follow the theme
   const scanTop = pal.primaryDark;
   const scanBottom = pal.primary;
   const searchTop = pal.primary;
 
   // drapel animat (sway) — ca pe landing page
+  // animated flag (sway) — like on the landing page
   const flagWave = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -201,10 +212,11 @@ export default function Index() {
   const glassStrong = useMemo(() => makeGlassStrong(colors), [colors]);
   const { width } = useWindowDimensions();
   const isDesktop = isWeb && width >= 900;
-  const isWide = isWeb && width >= 600; // tabletă+: aliniat sus (fără gol jos)
+  const isWide = isWeb && width >= 600; // tabletă+: aliniat sus (fără gol jos) // tablet+: aligned at the top (no gap below)
   const params = useLocalSearchParams<{ barcode?: string }>();
 
   // Roșia care țopăie 🍅 — bucla clasica: saritura + aterizare cu bounce.
+  // The hopping tomato 🍅 — a classic loop: jump + bounce landing.
   const hop = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -237,6 +249,7 @@ export default function Index() {
   });
 
   // Animație zoom poză (scale + fade)
+  // Photo zoom animation (scale + fade)
   const zoom = useRef(new Animated.Value(0)).current;
   function openZoom(url: string) {
     setZoomImage(url);
@@ -274,6 +287,9 @@ export default function Index() {
   // De ce a esuat cautarea. Textul erorii nu e suficient: butoanele „citeste
   // ingredientele" si „adauga pe Open Food Facts" au sens DOAR daca produsul
   // chiar lipseste din baza, nu cand utilizatorul e offline.
+  // Why the lookup failed. The error text isn't enough: the "read the
+  // ingredients" and "add to Open Food Facts" buttons only make sense if the
+  // product truly is missing from the database, not when the user is offline.
   const [errorKind, setErrorKind] = useState<LookupErrorKind | "EMPTY_INPUT" | null>(null);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -282,6 +298,8 @@ export default function Index() {
   const [ocrLoading, setOcrLoading] = useState(false);
   // Mod dedicat de fotografiere a ingredientelor: scannerul de coduri e oprit
   // complet, camera focalizeaza linistita, iar utilizatorul alege momentul pozei.
+  // Dedicated ingredients-photo mode: the code scanner is completely off, the
+  // camera focuses calmly, and the user picks the moment for the photo.
   const [ocrMode, setOcrMode] = useState(false);
   const cameraRef = useRef<CameraView>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -294,11 +312,18 @@ export default function Index() {
   //   "translating" — se traduce acum
   //   "auto"        — tradus automat (calitate de masina)
   //   "original"    — NU e in limba aleasa si nu a putut fi tradus
+  // What's happening with the displayed ingredients text:
+  //   null          — it's already in the chosen language, nothing to flag
+  //   "translating" — being translated right now
+  //   "auto"        — machine-translated
+  //   "original"    — NOT in the chosen language and couldn't be translated
   const [ingredientsNote, setIngredientsNote] = useState<
     null | "translating" | "auto" | "original"
   >(null);
   // Al treilea element citeste starea curenta a permisiunii fara a cere nimic —
   // exact ce ne trebuie ca sa nu mai intrebam cand accesul e deja acordat.
+  // The third element reads the current permission state without asking for
+  // anything — exactly what we need so we don't ask again when access is already granted.
   const [permission, requestPermission, getCameraPermission] = useCameraPermissions();
   const insets = useSafeAreaInsets();
 
@@ -316,6 +341,10 @@ export default function Index() {
     // multe ori intr-o fractiune de secunda → doar ULTIMA cerere are voie sa
     // scrie rezultatul, altfel una lenta/esuata suprascrie produsul deja gasit
     // cu "negasit".
+    // Request serial number: the scanner can trigger the same code several
+    // times within a fraction of a second → only the LAST request is allowed
+    // to write the result, otherwise a slow/failed one overwrites the product
+    // already found with "not found".
     const seq = ++fetchSeqRef.current;
     setLoading(true);
     setError("");
@@ -327,15 +356,17 @@ export default function Index() {
 
     try {
       // Caută pe rând în cele 4 baze: alimente, cosmetice, produse generale, hrană animale
+      // Looks in turn across the 4 databases: food, cosmetics, general products, pet food
       const result = await lookupProductByBarcode(code);
-      if (seq !== fetchSeqRef.current) return; // a pornit alta cautare intre timp
+      if (seq !== fetchSeqRef.current) return; // a pornit alta cautare intre timp // another lookup started in the meantime
       if (result.ok) {
         setProduct(result.product);
         setLoading(false);
-        return; // produs găsit, ne oprim
+        return; // produs găsit, ne oprim // product found, we stop
       }
 
       // Fiecare motiv are alt mesaj SI alt set de butoane (vezi cardul de eroare).
+      // Each reason has a different message AND a different set of buttons (see the error card).
       setErrorKind(result.kind);
       setError(
         result.kind === "PRODUCT_NOT_FOUND"
@@ -349,6 +380,8 @@ export default function Index() {
     } catch {
       // lookupProductByBarcode nu arunca, dar daca s-ar schimba vreodata,
       // tratam ca problema de retea — nu ca „produsul nu exista".
+      // lookupProductByBarcode doesn't throw, but if that were ever to
+      // change, we treat it as a network problem — not as "the product doesn't exist".
       if (seq !== fetchSeqRef.current) return;
       setErrorKind("NETWORK_ERROR");
       setError(t("errorConnection"));
@@ -369,6 +402,7 @@ export default function Index() {
   async function openScanner() {
     setTorchOn(false);
     // Deschidem camera direct — utilizatorul a apăsat, e clar că vrea camera.
+    // We open the camera directly — the user tapped, it's clear they want the camera.
     setScannerOpen(true);
 
     // De ce aparea dialogul de permisiune la FIECARE scanare:
@@ -379,6 +413,14 @@ export default function Index() {
     //
     // Acum, daca starea nu s-a incarcat inca, o citim intai si abia apoi
     // decidem. Cerem doar cand chiar nu avem permisiunea.
+    // Why the permission dialog showed up on EVERY scan:
+    // `useCameraPermissions()` returns `null` while the state is still
+    // loading, not an object with granted=false. The old code wrote
+    // `!permission?.granted`, and `null` passed that condition — so it asked
+    // for permission again, even if the user had granted it long ago.
+    //
+    // Now, if the state hasn't loaded yet, we read it first and only then
+    // decide. We only ask when we truly don't have permission.
     let p = permission;
     if (!p) {
       try {
@@ -387,8 +429,8 @@ export default function Index() {
         p = null;
       }
     }
-    if (p?.granted) return; // deja acordata — nu deranjam utilizatorul
-    if (p && !p.canAskAgain) return; // refuzata definitiv — ecranul dedicat explica ce are de facut
+    if (p?.granted) return; // deja acordata — nu deranjam utilizatorul // already granted — we don't bother the user
+    if (p && !p.canAskAgain) return; // refuzata definitiv — ecranul dedicat explica ce are de facut // permanently denied — the dedicated screen explains what to do
 
     requestPermission().catch(() => {});
   }
@@ -409,9 +451,11 @@ export default function Index() {
   }, [scannerOpen]);
 
   function handleBarcodeScanned({ data }: { data: string }) {
-    if (!scannerOpen || ocrLoading) return; // evită declanșarea multiplă
+    if (!scannerOpen || ocrLoading) return; // evită declanșarea multiplă // avoids triggering multiple times
     // Scannerul emite acelasi cod de mai multe ori pe secunda inainte ca
     // starea sa apuce sa se schimbe — ignoram repetarile apropiate.
+    // The scanner emits the same code several times a second before the
+    // state manages to change — we ignore repeats that are close together.
     const now = Date.now();
     if (
       data === lastScanRef.current.code &&
@@ -420,6 +464,7 @@ export default function Index() {
       return;
     lastScanRef.current = { code: data, at: now };
     // Feedback haptic la scanare reușită
+    // Haptic feedback on a successful scan
     if (Platform.OS !== "web") {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
         () => {}
@@ -432,11 +477,15 @@ export default function Index() {
 
   // Nr. de serie al cautarii curente (doar ultima are voie sa scrie starea)
   // si ultimul cod scanat (anti-dublura la scanari repetate ale camerei).
+  // Serial number of the current lookup (only the last one may write the
+  // state) and the last scanned code (anti-duplicate for repeated camera scans).
   const fetchSeqRef = useRef(0);
   const lastScanRef = useRef<{ code: string; at: number }>({ code: "", at: 0 });
 
   // Produsul curent, accesibil din bucla de recunoastere automata fara
   // problemele de "closure invechit" ale state-ului.
+  // The current product, accessible from the auto-recognition loop without
+  // state's "stale closure" problems.
   const productRef = useRef<any>(null);
   useEffect(() => {
     productRef.current = product;
@@ -444,12 +493,16 @@ export default function Index() {
 
   // Recunoastere AUTOMATA a ingredientelor: cat timp modul foto e activ,
   // camera incearca singura (poza -> OCR) pana gaseste text — fara buton.
+  // AUTOMATIC ingredient recognition: while photo mode is active, the camera
+  // tries on its own (photo -> OCR) until it finds text — no button needed.
   useEffect(() => {
     if (!ocrMode || !scannerOpen) return;
     let alive = true;
     (async () => {
       // Lasam autofocusul sa se aseze si utilizatorului timp sa incadreze
       // eticheta dupa ce a apasat butonul.
+      // We give the autofocus time to settle and the user time to frame the
+      // label after they tapped the button.
       await new Promise((r) => setTimeout(r, 2000));
 
       // Nu mai acceptam prima citire de peste 25 de caractere. Greselile de
@@ -458,6 +511,13 @@ export default function Index() {
       // data, camera nu apuca litere adevarate (prea departe, miscata, blur).
       // Inainte, o citire complet gresita era acceptata instant si din ea se
       // calcula si un scor — adica un verdict de sanatate pe text inventat.
+      // We no longer accept the first reading over 25 characters at face
+      // value. Reading mistakes are random: if two photos of the same label
+      // produce practically the same text, the text is real; if they
+      // produce something different each time, the camera isn't catching
+      // real letters (too far, shaky, blurry). Before, a completely wrong
+      // reading was accepted instantly and a score was computed from it —
+      // i.e. a health verdict on made-up text.
       let best: { text: string; photoUri: string } | null = null;
       let prev: { text: string; photoUri: string } | null = null;
 
@@ -469,11 +529,14 @@ export default function Index() {
 
           if (r && r.text.length >= 25) {
             // Pastram citirea cea mai bogata, ca rezerva.
+            // We keep the richest reading, as a fallback.
             if (!best || r.text.length > best.text.length) best = r;
 
             if (prev && ocrSimilarity(prev.text, r.text) >= 0.7) {
               // Doua citiri concordante — avem incredere. O luam pe cea mai
               // completa dintre ele.
+              // Two matching readings — we trust it. We take the more
+              // complete one of the two.
               const winner = r.text.length >= prev.text.length ? r : prev;
               applyOcrResult(winner.text, winner.photoUri);
               return;
@@ -482,6 +545,7 @@ export default function Index() {
           }
         } catch {
           // eroare trecatoare (retea/captura) — reincercam
+          // transient error (network/capture) — we retry
         } finally {
           if (alive) setOcrLoading(false);
         }
@@ -490,6 +554,8 @@ export default function Index() {
 
       // Nicio pereche concordanta in 12 incercari. Daca am prins totusi ceva,
       // il folosim — dar e semnul unei poze slabe.
+      // No matching pair in 12 attempts. If we still caught something, we
+      // use it — but it's a sign of a poor photo.
       if (alive && best) {
         applyOcrResult(best.text, best.photoUri);
         return;
@@ -507,15 +573,18 @@ export default function Index() {
   }, [ocrMode, scannerOpen]);
 
   // Face o poza, o micsoreaza si intoarce textul citit (gol daca nu e text).
+  // Takes a photo, shrinks it, and returns the read text (empty if there's no text).
   async function snapAndRead(): Promise<{ text: string; photoUri: string } | null> {
     if (!cameraRef.current) return null;
     let photo;
     try {
       // Intai poza procesata normal (orientare si expunere corecte).
+      // First, the normally-processed photo (correct orientation and exposure).
       photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
     } catch {
       await new Promise((r) => setTimeout(r, 400));
       // Fallback: captura rapida, fara post-procesare.
+      // Fallback: quick capture, no post-processing.
       photo = await cameraRef.current.takePictureAsync({
         quality: 0.7,
         skipProcessing: true,
@@ -523,6 +592,9 @@ export default function Index() {
     }
     // Micsoram poza inainte de OCR: sub limita de 1MB a OCR.space (gratuit)
     // si cu orientarea EXIF aplicata corect (pozele mari veneau rotite/goale).
+    // We shrink the photo before OCR: under OCR.space's 1MB limit (free
+    // tier) and with the EXIF orientation applied correctly (large photos
+    // used to come in rotated/blank).
     const small = photo?.uri
       ? await manipulateAsync(photo.uri, [{ resize: { width: 1280 } }], {
           compress: 0.7,
@@ -537,6 +609,9 @@ export default function Index() {
   // Aplica textul citit: il ataseaza produsului deschis (scanat cu cod de
   // bare) sau creeaza un produs de sine statator. Poza nu contine codul de
   // bare, deci legatura o facem prin produsul deschis in acel moment.
+  // Applies the read text: attaches it to the currently open product
+  // (scanned by barcode) or creates a standalone product. The photo doesn't
+  // contain the barcode, so we make the link through the product open at that moment.
   function applyOcrResult(text: string, photoUri: string) {
     const prevProduct =
       productRef.current && !String(productRef.current.code ?? "").startsWith("ocr-")
@@ -551,6 +626,9 @@ export default function Index() {
     // Aditivii ii cautam in TOT textul (etichetele multilingve repeta lista —
     // prindem orice cod E indiferent de limba); pentru afisare pastram doar
     // lista de ingrediente, in limba preferata, si o traducem automat.
+    // We look for additives in the WHOLE text (multilingual labels repeat
+    // the list — we catch any E code regardless of language); for display
+    // we only keep the ingredients list, in the preferred language, and auto-translate it.
     const tags = extractAdditiveTags(text);
     const { segment, srcLang } = extractIngredientsSegment(text, i18n.language);
     if (prevProduct) {
@@ -558,6 +636,10 @@ export default function Index() {
       // scris de oameni (procente corecte), pe cand OCR-ul mai greseste cifre
       // (ex. "72%" citit "8%"). Textul din poza intra DOAR daca produsul nu
       // are deloc ingrediente; aditivii din poza se adauga intotdeauna.
+      // We ENRICH the existing product, we don't ruin it: the database text
+      // is written by humans (correct percentages), while OCR still gets
+      // digits wrong (e.g. "72%" read as "8%"). The photo's text goes in
+      // ONLY if the product has no ingredients at all; additives from the photo are always added.
       const merged: any = { ...prevProduct };
       const hasIngredients = Object.keys(prevProduct).some(
         (k) =>
@@ -566,7 +648,7 @@ export default function Index() {
       );
       if (!hasIngredients) {
         merged.ingredients_text = segment;
-        merged.lang = srcLang; // limba-sursa pentru traducerea automata
+        merged.lang = srcLang; // limba-sursa pentru traducerea automata // source language for automatic translation
       }
       merged.additives_tags = [
         ...new Set([...(prevProduct.additives_tags ?? []), ...tags]),
@@ -579,7 +661,7 @@ export default function Index() {
         brands: "",
         image_url: photoUri,
         ingredients_text: segment,
-        lang: srcLang, // limba-sursa pentru traducerea automata
+        lang: srcLang, // limba-sursa pentru traducerea automata // source language for automatic translation
         additives_tags: tags,
         nutriments: {},
         categories_tags: [],
@@ -591,12 +673,15 @@ export default function Index() {
   const lang = i18n.language;
   // Text de ingrediente FĂRĂ aditivi (au secțiunea lor separată în UI) și cu
   // termenii INCI de pe cosmetice ("aqua") localizați în limba aleasă ("apă").
+  // Ingredients text WITHOUT additives (they have their own section in the
+  // UI) and with cosmetics' INCI terms ("aqua") localized into the chosen language ("apă").
   const ingredientsDisplay = useMemo(
     () => localizeInci(stripAdditives(ingredientsText, lang), lang),
     [ingredientsText, lang]
   );
 
   // Analiza completă (scor + motive + aditivi + cosmetice) — partajată cu comparația/alternativele
+  // Full analysis (score + reasons + additives + cosmetics) — shared with comparison/alternatives
   const analysis = useMemo(
     () =>
       product
@@ -616,6 +701,7 @@ export default function Index() {
   const palm = product && hasPalmOil(product) ? getPalmNote(lang) : null;
 
   // Ingrediente: foloseste limba aleasa daca exista; altfel traduce automat online.
+  // Ingredients: use the chosen language if it exists; otherwise translate automatically online.
   useEffect(() => {
     if (!product) {
       setIngredientsText("");
@@ -623,6 +709,7 @@ export default function Index() {
       return;
     }
     // 1) Textul exista chiar in limba aleasa — cazul ideal, fara traducere.
+    // 1) The text already exists in the chosen language — the ideal case, no translation.
     const native = (product[`ingredients_text_${lang}`] || "").trim();
     if (native) {
       setIngredientsText(native);
@@ -653,6 +740,15 @@ export default function Index() {
     //
     // Open Food Facts pastreaza acelasi text si sub cheia limbii lui, deci il
     // putem identifica prin potrivire exacta. E determinist si nu costa nimic.
+    // 2) What language is the unsuffixed text actually in?
+    //
+    // We do NOT rely on `product.lang`: on real Romanian products in the
+    // database it says "en", "de" or "es", even though the ingredients are
+    // in Romanian. With a wrong source language, the translation comes out
+    // garbled — exactly the complaint "translates wrong even though I picked a language".
+    //
+    // Open Food Facts keeps the same text under its own language key too, so
+    // we can identify it by exact match. It's deterministic and costs nothing.
     let sourceLang: string | null = enText ? "en" : null;
     if (!sourceLang) {
       for (const l of APP_LANGS) {
@@ -665,6 +761,9 @@ export default function Index() {
 
     // 3) Textul e deja in limba aleasa, doar ca fara sufix. Nu traducem nimic:
     // traducerea „din spaniola in romana" a unui text deja romanesc l-ar strica.
+    // 3) The text is already in the chosen language, just without the
+    // suffix. We don't translate anything: translating an already-Romanian
+    // text "from Spanish to Romanian" would ruin it.
     if (sourceLang === lang) {
       setIngredientsText(source);
       setIngredientsNote(null);
@@ -674,6 +773,9 @@ export default function Index() {
     // 4) Nu stim in ce limba e. Il aratam asa cum e, SPUNAND ca e textul
     // original — mai bine decat o traducere ghicita, si mai bine decat sa
     // lasam utilizatorul sa creada ca aplicatia i-a amestecat limbile.
+    // 4) We don't know what language it's in. We show it as-is, SAYING it's
+    // the original text — better than a guessed translation, and better
+    // than letting the user think the app mixed up its languages.
     if (!sourceLang) {
       setIngredientsText(source);
       setIngredientsNote("original");
@@ -681,8 +783,9 @@ export default function Index() {
     }
 
     // 5) Sursa e cunoscuta si diferita — traducem.
+    // 5) The source is known and different — we translate.
     let cancelled = false;
-    setIngredientsText(source); // arata originalul cat se traduce
+    setIngredientsText(source); // arata originalul cat se traduce // shows the original while it translates
     setIngredientsNote("translating");
     translateText(source, sourceLang, lang)
       .then((tx) => {
@@ -691,6 +794,8 @@ export default function Index() {
         setIngredientsText(changed ? tx : source);
         // Daca traducatorul a esuat si a intors acelasi text, NU tacem: inainte
         // ramanea textul strain fara nicio eticheta, parand continut normal.
+        // If the translator failed and returned the same text, we don't stay
+        // quiet about it: before, the foreign text stayed with no label at all, looking like normal content.
         setIngredientsNote(changed ? "auto" : "original");
       })
       .catch(() => {
@@ -754,6 +859,13 @@ useEffect(() => {
     // deja B — si i-ar afisa alternativele produsului A. `cancelled` inchide
     // acest efect cand produsul se schimba: React ruleaza functia de curatare
     // inainte de urmatoarea rulare a efectului.
+    // Looks for better alternatives.
+    //
+    // The search takes a good few seconds. If the user scans product A and
+    // then immediately product B, A's slow response could arrive AFTER B is
+    // already on screen — and would show A's alternatives. `cancelled` closes
+    // over this effect when the product changes: React runs the cleanup
+    // function before the next run of the effect.
     let cancelled = false;
     setAlternatives([]);
     setAltLoading(true);
@@ -792,6 +904,8 @@ useEffect(() => {
 
     // Calculează poziția săgeții ASTFEL încât să se alinieze cu culorile:
     // sub mid = zona verde (0-50%), între mid-high = galben/portocaliu (50-75%), peste high = roșu (75-100%)
+    // Computes the arrow's position SO THAT it lines up with the colors:
+    // below mid = green zone (0-50%), between mid-high = yellow/orange (50-75%), above high = red (75-100%)
     function pos(value: number, mid: number, high: number) {
       if (value <= mid) return (value / mid) * 50;
       if (value <= high) return 50 + ((value - mid) / (high - mid)) * 25;
@@ -833,6 +947,9 @@ useEffect(() => {
     // Nutrienti "buni" — logica inversa: cu cat mai mult, cu atat mai verde.
     // Praguri per 100g dupa reglementarea UE: fibre >=3g "sursa", >=6g "bogat";
     // proteine — semnificativ peste ~8g/100g.
+    // "Good" nutrients — inverse logic: the more, the greener.
+    // Thresholds per 100g per EU regulation: fiber >=3g "source", >=6g "high";
+    // protein — significantly above ~8g/100g.
     const goodColor = (v: number, mid: number, high: number) =>
       v >= high ? "#038141" : v >= mid ? "#85BB2F" : "#EE8100";
     if (fiber != null)
@@ -857,6 +974,7 @@ useEffect(() => {
   }
   const nutrientBadges = product ? buildNutrientBadges() : [];
   // Ambalaj
+  // Packaging
   function detectPackaging() {
     const pkg = (
       (product?.packaging ?? "") + (product?.packaging_tags ?? "")
@@ -897,6 +1015,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       <StatusBar style="dark" />
       <ThemeFx emoji={paletteEmoji} />
       {/* Scanner camera */}
+      {/* Camera scanner */}
       {scannerOpen && (
         <Modal visible transparent={false} animationType="slide">
           <View style={styles.scannerScreen}>
@@ -908,6 +1027,8 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               enableTorch={torchOn}
               // In modul foto-ingrediente analizorul de coduri de bare e oprit
               // complet — altfel pe Android captura esueaza ("Failed to capture").
+              // In ingredients-photo mode the barcode scanner is turned off
+              // completely — otherwise on Android the capture fails ("Failed to capture").
               barcodeScannerSettings={
                 ocrMode || ocrLoading
                   ? undefined
@@ -996,6 +1117,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       )}
 
       {/* Zoom poză produs */}
+      {/* Product photo zoom */}
       {zoomImage && (
         <Modal visible transparent animationType="none" onRequestClose={closeZoom}>
           <Animated.View style={[styles.zoomOverlay, { opacity: zoom }]}>
@@ -1098,6 +1220,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       )}
 
       {/* Meniu limbi */}
+      {/* Language menu */}
       {langMenuOpen && (
         <Modal visible transparent animationType="fade" onRequestClose={() => setLangMenuOpen(false)}>
           <Pressable
@@ -1135,6 +1258,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
       )}
 
       {/* Detalii aditiv */}
+      {/* Additive details */}
       {selectedAdditive && (
         <Modal visible transparent animationType="fade" onRequestClose={() => setSelectedAdditive(null)}>
           <Pressable
@@ -1143,6 +1267,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           >
             <Pressable style={styles.additiveModal} onPress={() => {}} accessibilityViewIsModal accessibilityRole="none">
               {/* X fix sus-dreapta — mereu vizibil, chiar si cand derulezi */}
+              {/* Fixed X top-right — always visible, even while scrolling */}
               <TouchableOpacity
                 style={styles.additiveModalX}
                 onPress={() => setSelectedAdditive(null)}
@@ -1186,6 +1311,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               <Text style={styles.additiveModalDesc}>{additiveDesc}</Text>
 
               {/* Silueta corpului: organele afectate se aprind si pulseaza */}
+              {/* Body silhouette: affected organs light up and pulse */}
               {(() => {
                 const organs = organsForAdditive(selectedAdditive.code);
                 if (!organs.length) return null;
@@ -1209,6 +1335,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               })()}
 
               {/* Surse științifice — evaluările publice pe care se bazează nivelurile de risc */}
+              {/* Scientific sources — the public assessments the risk levels are based on */}
               <Text style={styles.additiveSourcesTitle}>{pickM("sciSources", lang)}</Text>
               <TouchableOpacity
                 onPress={() =>
@@ -1297,6 +1424,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           isWide && styles.containerWide,
           isDesktop && styles.containerDesktop,
           // loc pentru bara de jos suprapusa, ca sa nu acopere finalul paginii
+          // room for the overlapping bottom bar, so it doesn't cover the end of the page
           { paddingBottom: 118 },
         ]}
         keyboardShouldPersistTaps="handled"
@@ -1377,6 +1505,8 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
           <View style={[styles.errorCard, isWeb && glassStrong]}>
             {/* Offline arata un semn de conexiune, nu o fata trista: problema
                 nu e produsul, ci legatura la internet. */}
+            {/* Offline shows a connection icon, not a sad face: the problem
+                isn't the product, it's the internet connection. */}
             <Text style={styles.errorIcon}>
               {errorKind === "NETWORK_ERROR" ? "📡" : errorKind === "RATE_LIMITED" ? "⏳" : "😕"}
             </Text>
@@ -1387,12 +1517,16 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             )}
             {/* Fara conexiune nu stim daca produsul exista. Spunem exact asta,
                 in loc sa lasam utilizatorul sa creada ca lipseste din baza. */}
+            {/* Without a connection we don't know if the product exists. We
+                say exactly that, instead of letting the user think it's missing from the database. */}
             {errorKind === "NETWORK_ERROR" && (
               <Text style={styles.errorHint}>{t("offlineHint")}</Text>
             )}
 
             {/* OCR-ul citeste eticheta de pe ambalaj, local, fara internet —
                 deci ajuta si cand produsul lipseste, si cand esti offline. */}
+            {/* OCR reads the label on the package, locally, with no
+                internet — so it helps both when the product is missing and when you're offline. */}
             {(errorKind === "PRODUCT_NOT_FOUND" || errorKind === "NETWORK_ERROR") && (
               <TouchableOpacity
                 style={styles.ocrFillButton}
@@ -1417,6 +1551,13 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 tine parola contului), deschidem formularul propriu. Altfel
                 pastram comportamentul vechi: deschidem Open Food Facts in
                 browser, ca utilizatorul sa aiba totusi o cale. */}
+            {/* Adding the product only makes sense when we're SURE it's
+                missing. Offline, we'd be sending the user to add a product
+                that might already exist — and it wouldn't go anywhere without a connection anyway.
+
+                When in-app contribution is enabled (the proxy holding the
+                account password exists), we open our own form. Otherwise we
+                keep the old behavior: open Open Food Facts in the browser, so the user still has a path. */}
             {errorKind === "PRODUCT_NOT_FOUND" && (
               <TouchableOpacity
                 style={[styles.retryButton, { marginTop: 10 }]}
@@ -1496,6 +1637,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             </View>
 
             {/* Gauge circular de scor */}
+            {/* Circular score gauge */}
             <View style={styles.scoreSection}>
               <View
                 style={[
@@ -1622,6 +1764,9 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             {/* Completeaza/actualizeaza ingredientele direct de pe eticheta:
                 camera se deschide gata in modul foto, iar rezultatul se
                 toarna in ACEASTA pagina (nume + nutritie pastrate). */}
+            {/* Fills in/updates the ingredients straight from the label: the
+                camera opens already in photo mode, and the result flows
+                into THIS page (name + nutrition kept). */}
             <TouchableOpacity
               style={styles.ocrFillButton}
               onPress={() => {
@@ -1649,6 +1794,13 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
               // minciună pe care omul o ia drept verdict. (Pastă de dinți
               // Jordan Kids, cod 7070866038342: baza are produsul și poza, dar
               // nu și compoziția; Yuka o are din baza lor proprie.)
+              // "No additives detected" is only allowed to show up when we
+              // actually had something to read. If the database has no
+              // ingredients list, then we know nothing about additives — and
+              // saying there are none is a lie that the person takes as a
+              // verdict. (Jordan Kids toothpaste, code 7070866038342: the
+              // database has the product and the photo, but not the
+              // composition; Yuka has it from their own database.)
               <Text style={styles.scoreUnknown}>
                 {ingredientsText.trim() ? t("noAdditives") : t("additivesUnknown")}
               </Text>
@@ -1712,6 +1864,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             )}
 
             {/* Buton catre pagina de recomandari */}
+            {/* Button to the advice page */}
             {advice && (
               <TouchableOpacity
                 style={styles.adviceButton}
@@ -1740,6 +1893,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             )}
 
             {/* Alternative mai bune */}
+            {/* Better alternatives */}
             {(altLoading || alternatives.length > 0) && (
               <>
                 <Text style={styles.scoreLabel}>{t("alternativesLabel")}</Text>
@@ -1843,7 +1997,7 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
          style={{
            alignSelf: "stretch",
            marginHorizontal: isDesktop ? -32 : -24,
-           marginTop: "auto", // împinge footer-ul la baza paginii când conținutul e scurt
+           marginTop: "auto", // împinge footer-ul la baza paginii când conținutul e scurt // pushes the footer to the bottom of the page when the content is short
          }}
        >
          <AppFooter isDesktop={isDesktop} />
@@ -1852,6 +2006,8 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
       {/* Bara de jos, suprapusa peste aplicatie (pandantul headerului) —
           gazduieste Istoricul, scos din header ca sa nu-l aglomereze. */}
+      {/* Bottom bar, overlaid on the app (the header's counterpart) —
+          hosts History, moved out of the header so it doesn't clutter it. */}
       <View style={[styles.bottomBar, isWeb && glass]}>
         <TouchableOpacity
           style={styles.bottomBarBtn}
@@ -1918,6 +2074,8 @@ const makeStyles = (c: ThemeColors) =>
   },
   // Butoanele de actiune (palete/dark/limba) au prioritate — nu se micsoreaza
   // niciodata; numele „Zelynta" cedeaza spatiu daca ecranul e ingust.
+  // The action buttons (palette/dark/language) take priority — they never
+  // shrink; the "Zelynta" name gives up space if the screen is narrow.
   topBarActions: { flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 0 },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 10, flexShrink: 1, minWidth: 0 },
   brandLogo: { width: 38, height: 38, flexShrink: 0 },
@@ -2043,9 +2201,11 @@ const makeStyles = (c: ThemeColors) =>
   torchButtonOn: { backgroundColor: "rgba(255,213,79,0.9)" },
   torchIcon: { fontSize: 24 },
   // Buton search dezactivat
+  // Disabled search button
   buttonDisabled: { backgroundColor: "transparent", borderWidth: 2, borderColor: c.border },
   buttonTextDisabled: { color: c.textFaint },
   // Skeleton
+  // Loading skeleton
   skeleton: { backgroundColor: c.surfaceAlt, borderRadius: 8, opacity: 0.8 },
   skelImage: { width: 90, height: 90, borderRadius: 8 },
   skelLineLg: { height: 20, width: "70%" },
@@ -2053,6 +2213,7 @@ const makeStyles = (c: ThemeColors) =>
   skelPill: { height: 16, width: 90, marginTop: 4 },
   skelBar: { height: 28, width: "100%", marginTop: 14 },
   // Card eroare
+  // Error card
   errorCard: {
     width: "100%",
     maxWidth: 400,
@@ -2086,6 +2247,7 @@ const makeStyles = (c: ThemeColors) =>
   },
   ocrFillButtonText: { color: c.primary, fontSize: 13.5, fontWeight: "800" },
   // Gauge de scor
+  // Score gauge
   scoreSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -2154,6 +2316,7 @@ const makeStyles = (c: ThemeColors) =>
     justifyContent: "center",
     paddingTop: 10,
     // Distanta generoasa fata de butoanele de navigare ale telefonului.
+    // Generous distance from the phone's navigation buttons.
     paddingBottom: isWeb ? 10 : 56,
     backgroundColor: c.navbarBg,
     borderTopWidth: 1,
@@ -2498,6 +2661,7 @@ const makeStyles = (c: ThemeColors) =>
     fontStyle: "italic",
   },
   // Avertisment ulei de palmier
+  // Palm oil warning
   palmBox: {
     backgroundColor: c.isDark ? "rgba(238,129,0,0.14)" : "#FFF4E5",
     borderRadius: 14,
@@ -2510,6 +2674,7 @@ const makeStyles = (c: ThemeColors) =>
   palmTitle: { fontSize: 15, fontWeight: "800", color: "#C2410C" },
   palmText: { fontSize: 14, color: c.textMuted, lineHeight: 20 },
   // Buton catre recomandari
+  // Button to advice
   adviceButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -2532,6 +2697,7 @@ const makeStyles = (c: ThemeColors) =>
     marginBottom: 8,
   },
   // Favorite
+  // Favorites
   favButton: {
     width: 40,
     height: 40,
@@ -2651,6 +2817,7 @@ const makeStyles = (c: ThemeColors) =>
   altAddOn: { backgroundColor: c.isDark ? "rgba(91,189,98,0.25)" : "#EAF5EA" },
   altAddText: { fontSize: 16 },
   // Alternative
+  // Alternatives
   altCard: {
     backgroundColor: c.surfaceAlt,
     borderRadius: 12,

@@ -2,6 +2,10 @@
 // Fisierul principal (methodology.ts) a ramas pe 9 limbi: bg si el vedeau
 // pagina in engleza, desi aplicatia e tradusa in 11 limbi.
 // Se imbina in methodology.ts, inainte de pickM().
+// Bulgarian, Greek and Albanian for the "How the score is calculated" page.
+// The main file (methodology.ts) stayed at 9 languages: bg and el would see
+// the page in English, even though the app is translated into 11 languages.
+// Merged into methodology.ts, before pickM().
 export const methodologyBgElSq: Record<string, { bg: string; el: string; sq: string }> = {
   title: {
     bg: "Как се изчислява оценката",

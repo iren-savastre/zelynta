@@ -4,10 +4,15 @@ import { type PropsWithChildren } from "react";
 // Aplicația web e servită dintr-un subfolder (zelynta.com/app), iar în dezvoltare
 // din rădăcină. `EXPO_BASE_URL` vine din `experiments.baseUrl` și e gol în dev,
 // deci aceleași legături merg în amândouă locurile — fără cale scrisă de mână.
+// The web app is served from a subfolder (zelynta.com/app), and from the
+// root in development. `EXPO_BASE_URL` comes from `experiments.baseUrl` and
+// is empty in dev, so the same links work in both places — no hand-written path.
 const BASE = process.env.EXPO_BASE_URL ?? "";
 
 // Documentul HTML root pentru versiunea web (randare statică).
 // Aici fixăm viewport-ul ca aplicația să se încadreze corect pe telefon.
+// The root HTML document for the web version (static rendering).
+// We fix the viewport here so the app fits correctly on the phone.
 export default function Root({ children }: PropsWithChildren) {
   return (
     <html lang="ro">
@@ -15,12 +20,14 @@ export default function Root({ children }: PropsWithChildren) {
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         {/* Încadrare mobilă: lățime = ecranul, fără pinch-zoom, fără pan */}
+        {/* Mobile fit: width = screen, no pinch-zoom, no pan */}
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         />
         <meta name="theme-color" content="#2E7D32" />
         {/* PWA: instalabilă + funcțională offline */}
+        {/* PWA: installable + works offline */}
         <link rel="manifest" href={`${BASE}/manifest.json`} />
         <link rel="apple-touch-icon" href={`${BASE}/icon-192.png`} />
         <link rel="icon" type="image/png" href={`${BASE}/icon-192.png`} />
@@ -39,6 +46,7 @@ export default function Root({ children }: PropsWithChildren) {
 }
 
 // Înregistrează service worker-ul (PWA offline). Rulează doar în browser, pe context sigur.
+// Registers the service worker (offline PWA). Runs only in the browser, in a secure context.
 const swRegister = `
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
@@ -70,6 +78,7 @@ body {
   box-sizing: border-box;
 }
 /* ===== bară de scroll personalizată (web) — urmează tema ===== */
+/* ===== custom scrollbar (web) — follows the theme ===== */
 :root {
   --zscroll-1: #85BB2F;
   --zscroll-2: #2E7D32;

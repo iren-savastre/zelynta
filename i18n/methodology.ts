@@ -1,6 +1,9 @@
 // Pagina „Cum se calculează scorul" — metodologia Zelynta, transparentă,
 // în cele 9 limbi ale aplicației. Sursele/autoritățile sunt reale (EFSA,
 // IARC/OMS, regulamentele UE); nu inventăm afilieri sau procente.
+// The "How the score is calculated" page — Zelynta's methodology,
+// transparent, in the app's 9 languages. The sources/authorities are real
+// (EFSA, IARC/WHO, EU regulations); we don't invent affiliations or percentages.
 
 import { methodologyBgElSq } from "./methodology.bgelsq";
 
@@ -185,6 +188,8 @@ export const methodology: Record<string, Record<string, string>> = {
 
 // Imbina bulgara, greaca si albaneza. Fisierul principal a ramas pe 9 limbi,
 // deci utilizatorii bg/el vedeau pagina de metodologie in engleza.
+// Merges Bulgarian, Greek and Albanian. The main file stayed at 9
+// languages, so bg/el users would see the methodology page in English.
 for (const key in methodologyBgElSq) {
   if ((methodology as any)[key]) Object.assign((methodology as any)[key], methodologyBgElSq[key]);
 }

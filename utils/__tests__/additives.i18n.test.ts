@@ -1,6 +1,7 @@
 import { additivesInfo } from "../../i18n/additives";
 
 // Cele 11 limbi active + albaneza, in pregatire.
+// The 11 active languages + Albanian, in progress.
 const LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el", "sq"] as const;
 const FIELDS = ["name", "use", "desc"] as const;
 
@@ -14,6 +15,9 @@ describe("aditivii sunt tradusi in toate limbile", () => {
   // Descrierea vine din doua locuri: fisierul limbii (pentru aditivii fara
   // poveste) si additives.stories (pentru cei cu risc/atentie). Testul nu
   // tine cont de unde vine — doar ca exista.
+  // The description comes from two places: the language file (for additives
+  // with no "story") and additives.stories (for risk/caution ones). The test
+  // doesn't care where it comes from — only that it exists.
   for (const lang of LANGS) {
     it(`${lang}: fiecare aditiv are nume, categorie si descriere`, () => {
       const lipsa: string[] = [];

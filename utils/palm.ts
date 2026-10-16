@@ -2,6 +2,10 @@
 // Uleiul de palmier in sine NU e clasificat cancerigen; problema o reprezinta
 // contaminantii formati la rafinare (esteri glicidilici / 3-MCPD), pe care EFSA
 // ii considera posibil cancerigeni, plus continutul mare de grasimi saturate.
+// Palm oil detection + an accurate (not exaggerated) warning.
+// Palm oil itself is NOT classified as carcinogenic; the real issue is the
+// contaminants formed during refining (glycidyl esters / 3-MCPD), which EFSA
+// considers possibly carcinogenic, plus the high saturated fat content.
 
 const PALM_LABEL: Record<string, string> = {
   ro: "Ulei de palmier",
@@ -38,6 +42,7 @@ function pick(field: Record<string, string>, lang: string) {
 }
 
 // Detecteaza uleiul de palmier: intai din tag-ul oficial, apoi din lista de ingrediente.
+// Detects palm oil: first from the official tag, then from the ingredients list.
 export function hasPalmOil(product: any): boolean {
   const tags = product?.ingredients_analysis_tags;
   if (Array.isArray(tags)) {

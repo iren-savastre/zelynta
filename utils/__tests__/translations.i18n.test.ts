@@ -1,6 +1,7 @@
 import { translations } from "../../i18n/translations";
 
 // Romana e limba de referinta: ea are mereu setul complet de chei.
+// Romanian is the reference language: it always has the full set of keys.
 const REF = "ro";
 const langs = Object.keys(translations as Record<string, any>);
 const refKeys = Object.keys((translations as any)[REF]);
@@ -12,6 +13,8 @@ describe("textele de interfata sunt complete in toate limbile", () => {
 
   // Bulgara si greaca aveau 6 chei lipsa (fibre, proteine, mesaje OCR) si
   // cadeau pe engleza fara ca nimeni sa observe. Testul opreste reaparitia.
+  // Bulgarian and Greek had 6 missing keys (fiber, protein, OCR messages)
+  // and fell back to English without anyone noticing. The test stops that from recurring.
   for (const lang of langs) {
     it(`${lang}: are toate cheile si niciuna goala`, () => {
       const dict = (translations as any)[lang];

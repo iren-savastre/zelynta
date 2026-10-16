@@ -7,6 +7,13 @@ import Constants from "expo-constants";
 //
 // Ținem un singur loc pentru șir, ca versiunea să nu rămână în urmă în trei
 // fișiere diferite.
+// Open Food Facts requires every app to identify itself with a User-Agent
+// of the form `AppName/Version (contactEmail)`. Without it, requests can be
+// blocked at the IP level. Documented at:
+// https://openfoodfacts.github.io/openfoodfacts-server/api/
+//
+// We keep a single place for the string, so the version doesn't drift out
+// of sync across three different files.
 export const APP_NAME = "Zelynta";
 
 export const APP_VERSION =

@@ -18,8 +18,8 @@ type Props = {
   emoji?: string;
   onPress?: () => void;
   disabled?: boolean;
-  colorTop: string; // partea de sus a fructului (lucioasă)
-  colorBottom: string; // baza 3D (umbra solidă dedesubt)
+  colorTop: string; // partea de sus a fructului (lucioasă) // the top part of the fruit (glossy)
+  colorBottom: string; // baza 3D (umbra solidă dedesubt) // the 3D base (solid shadow underneath)
   textColor?: string;
   big?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -53,6 +53,7 @@ export default function JuicyButton({
   function handlePress() {
     if (disabled) return;
     // mic „topăit" de fruct la apăsare
+    // a little fruit "hop" on press
     wobble.setValue(0);
     Animated.timing(wobble, {
       toValue: 1,
@@ -90,8 +91,10 @@ export default function JuicyButton({
       style={[styles.wrap, big && styles.wrapBig, disabled && styles.disabled, style]}
     >
       {/* baza 3D (umbra solidă a fructului) */}
+      {/* the 3D base (the fruit's solid shadow) */}
       <View style={[styles.base, { backgroundColor: colorBottom }]} />
       {/* fața fructului */}
+      {/* the fruit's face */}
       <Animated.View
         style={[
           styles.face,
@@ -101,6 +104,7 @@ export default function JuicyButton({
         ]}
       >
         {/* luciu de sus */}
+        {/* top gloss */}
         <View style={styles.gloss} />
         <View style={styles.content}>
           {emoji ? <Text style={[styles.emoji, big && styles.emojiBig]}>{emoji}</Text> : null}

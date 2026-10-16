@@ -10,6 +10,9 @@ on:
 # Token-ul primit de job-uri poate doar sa citeasca codul. CI-ul nu scrie nimic
 # in repo, deci nu are nevoie de mai mult — daca o dependenta compromisa ar rula
 # in timpul build-ului, nu ar putea modifica repo-ul.
+# The token jobs receive can only read the code. CI doesn't write anything to
+# the repo, so it doesn't need more than that — if a compromised dependency
+# ran during the build, it wouldn't be able to modify the repo.
 permissions:
   contents: read
 
@@ -36,6 +39,9 @@ jobs:
     # Ruleaza DOAR manual (Actions -> CI -> Run workflow), nu la fiecare push.
     # Testul e2e are nevoie de un server pornit (neconfigurat inca), deci pica in
     # CI si trimitea mail-uri de eroare la fiecare push. Il facem manual pana e gata.
+    # Runs ONLY manually (Actions -> CI -> Run workflow), not on every push.
+    # The e2e test needs a running server (not configured yet), so it was
+    # failing in CI and sending error emails on every push. We make it manual until it's ready.
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:

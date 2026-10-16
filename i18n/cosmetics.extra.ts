@@ -1,6 +1,9 @@
 // AUTO-GENERAT — traduceri DE/RU/PL/NL pentru substante cosmetice (INCI).
 // Se imbina automat in fisierul principal (vezi merge-ul de la finalul acelui fisier).
 // Pentru a edita o limba existenta (ro/en/fr/it/es) modifica fisierul principal.
+// AUTO-GENERATED — DE/RU/PL/NL translations for cosmetic substances (INCI).
+// Merged automatically into the main file (see the merge at the end of that file).
+// To edit an existing language (ro/en/fr/it/es) modify the main file.
 export const cosmeticsExtra: Record<string, { name: any; use: any; desc: any }> = {
   "methylparaben": {
     name: { de: "Methylparaben", ru: "Метилпарабен", pl: "Metyloparaben", nl: "Methylparabeen" },

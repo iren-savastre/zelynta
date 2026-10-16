@@ -2,6 +2,10 @@
 // Fiecare produs scanat e incadrat intr-o categorie (vezi utils/advice.ts),
 // iar aici sunt textele: beneficii + cand / cum / cine + nota pentru copii.
 // Limbi: toate cele 9 ale aplicatiei (ro, en, fr, it, es, de, ru, pl, nl).
+// Advice by product CATEGORY (offline, free).
+// Each scanned product is classified into a category (see utils/advice.ts),
+// and here are the texts: benefits + when / how / who + a note for children.
+// Languages: all 9 of the app's (ro, en, fr, it, es, de, ru, pl, nl).
 
 type L = Record<string, string>;
 export type Advice = {
@@ -232,6 +236,8 @@ export const adviceInfo: Record<string, Advice> = {
 
 // Imbina bulgara, greaca si albaneza. Fisierul de mai sus a ramas pe 9 limbi,
 // deci utilizatorii bg/el vedeau recomandarile in engleza.
+// Merges Bulgarian, Greek and Albanian. The file above stayed at 9
+// languages, so bg/el users would see the advice in English.
 for (const key in adviceLabelsBgElSq) {
   if ((adviceLabels as any)[key]) Object.assign((adviceLabels as any)[key], adviceLabelsBgElSq[key]);
 }

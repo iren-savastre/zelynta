@@ -10,6 +10,18 @@
 //   Moderation.  -> С умереност. / Με μέτρο.
 //   Caution.     -> Внимание. / Προσοχή.
 //   Avoid.       -> Избягвайте. / Αποφύγετε.
+// Bulgarian (bg) + Greek (el) for cosmetic substances (INCI).
+// Merged into cosmetics.ts, same as cosmetics.extra.ts (de/ru/pl/nl).
+//
+// Until now, bg and el were the only two languages with no cosmetics: a
+// Bulgarian or Greek user scanning a shampoo would see the substances in English.
+//
+// Terminology used, kept consistent:
+//   preservative -> консервант / συντηρητικό
+//   fragrance    -> ароматна съставка / αρωματική ουσία
+//   Moderation.  -> С умереност. / Με μέτρο.
+//   Caution.     -> Внимание. / Προσοχή.
+//   Avoid.       -> Избягвайте. / Αποφύγετε.
 export const cosmeticsBgEl: Record<
   string,
   { name: { bg: string; el: string }; use: { bg: string; el: string }; desc: { bg: string; el: string } }
@@ -200,6 +212,7 @@ export const cosmeticsBgEl: Record<
   },
 
   // Cheile de mai jos contin spatii, exact ca in cosmetics.ts.
+  // The keys below contain spaces, exactly as in cosmetics.ts.
   "dmdm hydantoin": {
     name: { bg: "DMDM хидантоин", el: "DMDM υδαντοΐνη" },
     use: { bg: "консервант", el: "συντηρητικό" },

@@ -1,5 +1,6 @@
 :root{
   /* Tema implicită — Emerald (verde→smarald viu) */
+/* Default theme — Emerald (vivid green->emerald) */
   --green:#059669;--green-2:#10b981;--lime:#34d399;--leaf:#047857;
   --ink:#06140f;--side:#08221b;--bg-base:#04130d;
   --text:#e7f6ef;--muted:#9fccb9;--faint:#71ab93;--line:rgba(255,255,255,0.08);
@@ -92,6 +93,7 @@ select option{background:var(--card);color:var(--text);font-weight:600}
 .nav-group{font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);padding:15px 12px 6px;opacity:.9}
 .nav-group:first-child{padding-top:4px}
 /* header de pagină (per modul) */
+/* page header (per module) */
 .page-head{display:flex;align-items:center;gap:15px;margin-bottom:22px;animation:fadeUp .42s cubic-bezier(.2,.7,.2,1) both}
 .ph-ic{width:50px;height:50px;border-radius:15px;font-size:25px;flex:0 0 auto;color:var(--ic,var(--lime));
   background:color-mix(in srgb,var(--ic,var(--green)) 16%,transparent);border:1px solid color-mix(in srgb,var(--ic,var(--green)) 32%,transparent);
@@ -113,6 +115,7 @@ select option{background:var(--card);color:var(--text);font-weight:600}
 /* KPI cards */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
 /* Overview: 6 KPI pe un singur rând, compacte și aliniate */
+/* Overview: 6 KPIs on a single row, compact and aligned */
 .kpis-6{grid-template-columns:repeat(6,1fr);gap:13px}
 .kpis-6 .kpi{padding:15px 14px}
 .kpis-6 .k-ic{width:38px;height:38px;font-size:19px;border-radius:11px;margin-bottom:9px}
@@ -135,6 +138,7 @@ select option{background:var(--card);color:var(--text);font-weight:600}
 .kpi .k-val{font-size:31px;font-weight:800;color:#fff;line-height:1;letter-spacing:-.5px}
 .kpi .k-lab{font-size:13px;color:var(--muted);margin-top:6px}
 /* animație de intrare a conținutului */
+/* content entrance animation */
 .content>*{animation:fadeUp .42s cubic-bezier(.2,.7,.2,1) both}
 .content>*:nth-child(2){animation-delay:.05s}.content>*:nth-child(3){animation-delay:.1s}.content>*:nth-child(4){animation-delay:.15s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -167,6 +171,7 @@ select option{background:var(--card);color:var(--text);font-weight:600}
 .t-card:hover{transform:translateY(-3px)}
 .t-card.active{border-color:var(--lime)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--lime) 32%,transparent), 0 10px 24px rgba(0,0,0,0.3)}
 /* grafice next-level: animații */
+/* next-level charts: animations */
 .donut-svg{animation:donutIn .55s cubic-bezier(.2,.7,.2,1) both;transform-origin:center}
 @keyframes donutIn{from{opacity:0;transform:scale(.86) rotate(-12deg)}to{opacity:1;transform:none}}
 .donut-svg .seg{transition:stroke-width .16s ease,filter .16s ease;cursor:pointer}
@@ -177,6 +182,7 @@ select option{background:var(--card);color:var(--text);font-weight:600}
 @keyframes zfade{to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.donut-svg{animation:none}.area-line{stroke-dasharray:none;stroke-dashoffset:0;animation:none}.area-fill{opacity:1;animation:none}}
 /* iconițe metric (soft, distincte, NU negre) */
+/* metric icons (soft, distinct, NOT black) */
 .k-ic.k-soft{box-shadow:inset 0 1px 0 rgba(255,255,255,0.10)}
 .k-ic.k-soft .ico{font-size:23px}
 .k-ic.k-soft svg{width:23px;height:23px}

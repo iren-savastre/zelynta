@@ -134,6 +134,8 @@ function makeStyles(c: ThemeColors, accent: string) {
       bottom: 0,
       // Aplicatia e edge-to-edge pe Android: lasam loc barei de navigare si
       // aer fata de marginile ecranului, altfel cardul "intra in pereti".
+      // The app is edge-to-edge on Android: we leave room for the navigation
+      // bar and breathing space from the screen edges, otherwise the card "hits the walls".
       paddingHorizontal: 18,
       paddingBottom: isWeb ? 16 : 52,
       alignItems: "center",
@@ -183,7 +185,7 @@ function makeStyles(c: ThemeColors, accent: string) {
     btnRow: {
       flexDirection: "row",
       alignItems: "center",
-      flexWrap: "wrap", // pe ecrane inguste butoanele coboara pe randul urmator
+      flexWrap: "wrap", // pe ecrane inguste butoanele coboara pe randul urmator // on narrow screens the buttons wrap to the next row
       marginTop: 12,
       gap: 8,
     },

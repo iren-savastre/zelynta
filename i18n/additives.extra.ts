@@ -1,6 +1,9 @@
 // AUTO-GENERAT — traduceri DE/RU/PL/NL pentru aditivi (E-uri).
 // Se imbina automat in fisierul principal (vezi merge-ul de la finalul acelui fisier).
 // Pentru a edita o limba existenta (ro/en/fr/it/es) modifica fisierul principal.
+// AUTO-GENERATED — DE/RU/PL/NL translations for additives (E numbers).
+// Merged automatically into the main file (see the merge at the end of that file).
+// To edit an existing language (ro/en/fr/it/es) modify the main file.
 export const additivesExtra: Record<string, { name: any; use: any; desc: any }> = {
   "e160b": {
     name: { de: "Annatto (Bixin/Norbixin)", ru: "Аннато (биксин/норбиксин)", pl: "Annato (biksyna/norbiksyna)", nl: "Annatto (bixine/norbixine)" },

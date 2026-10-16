@@ -8,6 +8,16 @@
 //   Moderation.   -> Me masë.
 //   Caution.      -> Kujdes.
 //   Avoid.        -> Shmange.
+// Albanian (sq) for cosmetic substances (INCI).
+// Merged into cosmetics.ts, same as cosmetics.extra.ts and cosmetics.bgel.ts.
+//
+// Terminology, kept consistent:
+//   preservative  -> konservues
+//   fragrance     -> lëndë aromatike
+//   foaming agent -> agjent shkumëzues
+//   Moderation.   -> Me masë.
+//   Caution.      -> Kujdes.
+//   Avoid.        -> Shmange.
 export const cosmeticsSq: Record<
   string,
   { name: { sq: string }; use: { sq: string }; desc: { sq: string } }
@@ -175,6 +185,7 @@ export const cosmeticsSq: Record<
   },
 
   // Cheile de mai jos contin spatii, exact ca in cosmetics.ts.
+  // The keys below contain spaces, exactly as in cosmetics.ts.
   "dmdm hydantoin": {
     name: { sq: "DMDM hidantoinë" },
     use: { sq: "konservues" },

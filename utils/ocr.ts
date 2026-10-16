@@ -5,17 +5,22 @@ import { fetchWithTimeout } from "./net";
 // Cheie API OCR.space — citită din mediu (EXPO_PUBLIC_OCR_KEY); "helloworld" e
 // cheia demo gratuită (limitată) folosită doar ca fallback în dezvoltare.
 // Pentru producție, setează o cheie proprie de pe https://ocr.space/ocrapi
+// OCR.space API key — read from the environment (EXPO_PUBLIC_OCR_KEY); "helloworld"
+// is the free (rate-limited) demo key used only as a fallback in development.
+// For production, set your own key from https://ocr.space/ocrapi
 const OCR_API_KEY =
   (typeof process !== "undefined" && process.env?.EXPO_PUBLIC_OCR_KEY) || "helloworld";
 
 if (OCR_API_KEY === "helloworld" && typeof __DEV__ !== "undefined" && __DEV__) {
   // Avertisment doar în dezvoltare: cheia demo e puternic limitată în producție.
+  // Warning only in development: the demo key is heavily rate-limited in production.
   console.warn(
     "[Zelynta] OCR folosește cheia demo 'helloworld' (rate-limited). Setează EXPO_PUBLIC_OCR_KEY în .env pentru producție."
   );
 }
 
 // Trimite imaginea (base64) la OCR.space și întoarce textul recunoscut
+// Sends the image (base64) to OCR.space and returns the recognized text
 export async function ocrImage(uri?: string, base64?: string): Promise<string> {
   const source = uri ?? (base64 ? `data:image/jpeg;base64,${base64}` : undefined);
   if (!source) throw new Error("No image provided for OCR");
@@ -25,9 +30,12 @@ export async function ocrImage(uri?: string, base64?: string): Promise<string> {
     return (result?.text ?? "").replace(/\r/g, " ").replace(/\s+/g, " ").trim();
   } catch (error: any) {
     // ML Kit nativ e indisponibil in Expo Go/web — trecem pe OCR.space.
+    // Native ML Kit is unavailable in Expo Go/web — we fall back to OCR.space.
     if (!base64) throw error;
     // Motorul 2 e mai bun pe etichete moderne, dar uneori intoarce gol acolo
     // unde motorul 1 reuseste — incercam pe rand.
+    // Engine 2 is better on modern labels, but sometimes returns empty where
+    // engine 1 succeeds — we try them in order.
     const text2 = await ocrSpaceRequest(base64, "2");
     if (text2) return text2;
     return await ocrSpaceRequest(base64, "1");
@@ -41,6 +49,7 @@ async function ocrSpaceRequest(base64: string, engine: "1" | "2"): Promise<strin
   form.append("OCREngine", engine);
   form.append("scale", "true");
   // Pozele de pe Android pot veni rotite — serverul detecteaza orientarea.
+  // Photos from Android can come in rotated — the server detects the orientation.
   form.append("detectOrientation", "true");
   form.append("apikey", OCR_API_KEY);
 
@@ -63,6 +72,9 @@ async function ocrSpaceRequest(base64: string, engine: "1" | "2"): Promise<strin
 // Etichetele europene sunt deseori multilingve si contin si texte de pastrare,
 // gramaj, marketing. Extragem DOAR lista de ingrediente, o singura data,
 // preferand limba utilizatorului — restul textului nu il intereseaza.
+// European labels are often multilingual and also contain storage text,
+// net weight, marketing. We extract ONLY the ingredients list, once,
+// preferring the user's language — the rest of the text doesn't matter to us.
 const ING_KEYWORDS: { lang: string; re: RegExp }[] = [
   { lang: "ro", re: /ingrediente\s*[:;]/gi },
   { lang: "en", re: /ingredients\s*[:;]/gi },
@@ -76,6 +88,9 @@ const ING_KEYWORDS: { lang: string; re: RegExp }[] = [
   // Fara bulgara si greaca, extragerea listei de ingrediente esua complet pe
   // etichetele din Bulgaria si Grecia: nu gaseam cuvantul care marcheaza
   // inceputul listei, desi aplicatia e tradusa in ambele limbi.
+  // Without Bulgarian and Greek, extracting the ingredients list failed
+  // completely on labels from Bulgaria and Greece: we couldn't find the word
+  // marking the start of the list, even though the app is translated into both languages.
   { lang: "bg", re: /съставки\s*[:;]/gi },
   { lang: "el", re: /συστατικά\s*[:;]/gi },
   { lang: "sq", re: /përbërës(?:it)?\s*[:;]/gi },
@@ -83,6 +98,8 @@ const ING_KEYWORDS: { lang: string; re: RegExp }[] = [
 
 // Fraze care marcheaza sfarsitul listei (alergeni "poate contine", pastrare,
 // gramaj, producator) — in limbile uzuale de pe etichete.
+// Phrases that mark the end of the list (allergens "may contain", storage,
+// net weight, manufacturer) — in the languages commonly found on labels.
 const ING_END_RE =
   /(poate con[tț]ine|urme de|may contain|kan sporen|peut contenir|può contenere|puede contener|kann spuren|może zawierać|может содержать|a conserver|à conserver|conserver|bewaren|store in|p[aă]stra|netto|net weight|poids net|nettogewicht|mindestens haltbar|best before|[aà] consommer|da consumarsi|consumir antes|tegen warmte|ungeöffnet|hergestellt|fabricat|produced by|suggestion de|може да съдържа|следи от|срок на годност|да се съхранява|μπορεί να περιέχει|ίχνη από|ανάλωση κατά προτίμηση|διατηρείται|mund të përmbajë|gjurmë|afati i përdorimit|ruajeni)/i;
 
@@ -105,6 +122,7 @@ export function extractIngredientsSegment(
     hits.find((h) => h.lang === "en") ??
     hits[0];
   // Lista se termina la urmatoarea repetare in alta limba sau la markerii de final.
+  // The list ends at the next repetition in another language or at the end markers.
   const next = hits.find((h) => h.start > pick.start);
   let seg = text.slice(pick.contentStart, next ? next.start : undefined);
   const em = ING_END_RE.exec(seg);
@@ -116,6 +134,8 @@ export function extractIngredientsSegment(
 
 // Extrage codurile E (E150d, E 621, E-330...) din text și le mapează la tag-uri
 // de aditivi, doar pe cele cunoscute în dicționarul nostru.
+// Extracts E codes (E150d, E 621, E-330...) from the text and maps them to
+// additive tags, only the ones known in our dictionary.
 export function extractAdditiveTags(text: string): string[] {
   const found = new Set<string>();
   const regex = /e[\s-]?(\d{3,4})([a-z])?/gi;
@@ -139,6 +159,16 @@ export function extractAdditiveTags(text: string): string[] {
  *
  * Comparam multimile de cuvinte (Jaccard), nu sirurile: ordinea si semnele de
  * punctuatie nu conteaza, dar cuvintele inventate de OCR ies imediat la iveala.
+ *
+ * How similar two OCR readings of the same label are (0 = not at all, 1 = identical).
+ *
+ * What it's for: reading mistakes are random. If you photograph the same
+ * label twice and get practically the same text, the text is probably
+ * correct. If you get something different each time, the camera isn't
+ * catching real letters — it's too far, shaky, or out of focus.
+ *
+ * We compare word sets (Jaccard), not strings: order and punctuation don't
+ * matter, but words invented by OCR show up immediately.
  */
 export function ocrSimilarity(a: string, b: string): number {
   const words = (s: string) =>

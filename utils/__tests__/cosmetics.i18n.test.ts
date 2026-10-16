@@ -1,6 +1,7 @@
 import { cosmeticsInfo } from "../../i18n/cosmetics";
 
 // Cele 11 limbi ale aplicatiei.
+// The app's 11 languages.
 const LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el", "sq"] as const;
 const FIELDS = ["name", "use", "desc"] as const;
 
@@ -14,6 +15,9 @@ describe("substantele cosmetice sunt traduse in toate limbile", () => {
   // Bulgara si greaca lipseau complet pana pe 23 sept. 2026: un utilizator
   // bulgar care scana un sampon vedea substantele in engleza. Testul asta
   // opreste reaparitia golului, in oricare limba.
+  // Bulgarian and Greek were completely missing until Sep 23, 2026: a
+  // Bulgarian user scanning a shampoo would see the substances in English.
+  // This test prevents that gap from coming back, in any language.
   for (const lang of LANGS) {
     it(`${lang}: fiecare substanta are nume, categorie si descriere`, () => {
       const lipsa: string[] = [];

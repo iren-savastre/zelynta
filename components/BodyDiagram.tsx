@@ -10,6 +10,7 @@ const AC = Animated.createAnimatedComponent(Circle);
 const AG = Animated.createAnimatedComponent(G);
 
 // --- ADN dublu-helix (precalculat) pe lateral, viewBox 100x220 ---
+// --- DNA double-helix (precomputed) on the side, viewBox 100x220 ---
 const DNA_CX = 88, DNA_TOP = 40, DNA_BOT = 198, DNA_AMP = 7, DNA_K = (2 * Math.PI) / 42;
 const dnaA: string[] = [], dnaB: string[] = [], dnaRungs: { x1: number; x2: number; y: number; front: boolean }[] = [];
 for (let y = DNA_TOP; y <= DNA_BOT; y += 4) {
@@ -24,6 +25,8 @@ for (let y = DNA_TOP; y <= DNA_BOT; y += 12) {
 
 // Corp uman holografic masculin (viewBox 100 x 220) cu organele care se aprind.
 // `organs` = lista de organe afectate; `color` = culoarea riscului (glow).
+// Holographic male human body (viewBox 100 x 220) with organs that light up.
+// `organs` = list of affected organs; `color` = the risk color (glow).
 export default function BodyDiagram({
   organs,
   color = "#EE8100",
@@ -68,10 +71,13 @@ export default function BodyDiagram({
         </Defs>
 
         {/* disc de lumina sub picioare */}
+        {/* light disc under the feet */}
         <Ellipse cx="50" cy="212" rx="34" ry="5" fill="url(#disc)" />
 
         {/* corp translucid MASCULIN (umeri lati, V-taper, solduri inguste) */}
+        {/* translucent MALE body (wide shoulders, V-taper, narrow hips) */}
         {/* stratul de "glow" difuz (stroke gros translucid dedesubt) */}
+        {/* the diffuse "glow" layer (thick translucent stroke underneath) */}
         <G fill="none" stroke="#00cfff" strokeOpacity={0.30} strokeWidth={3.8} strokeLinejoin="round">
           <BodyPaths />
         </G>
@@ -80,6 +86,7 @@ export default function BodyDiagram({
         </G>
 
         {/* linii de scanare pe torso */}
+        {/* scan lines on the torso */}
         <G stroke="#4fb3d0" strokeWidth={0.4} opacity={0.45}>
           {[40, 52, 64, 76, 88, 100].map((y) => (
             <Line key={y} x1="30" y1={y} x2="70" y2={y} />
@@ -87,11 +94,13 @@ export default function BodyDiagram({
         </G>
 
         {/* retea de energie centrala */}
+        {/* central energy network */}
         <G stroke="#37c8ff" strokeWidth={0.5} opacity={0.5} fill="none">
           <Path d="M50 30 L50 92 M50 52 L40 74 M50 52 L60 74 M50 74 L44 100 M50 74 L56 100" />
         </G>
 
         {/* ADN dublu-helix */}
+        {/* DNA double-helix */}
         <G>
           <Polyline points={dnaA.join(" ")} fill="none" stroke="#1f9fca" strokeWidth={1} opacity={0.95} />
           <Polyline points={dnaB.join(" ")} fill="none" stroke="#3fa8c8" strokeWidth={1} opacity={0.7} />
@@ -109,6 +118,12 @@ export default function BodyDiagram({
             sold arata ca o greseala de desen, asa ca le aratam ca atare —
             conturul intreg, respectiv reteaua centrala, se aprind in culoarea
             riscului. Punctul ramane, ca reper pentru eticheta de dedesubt. */}
+        {/* Skin and blood aren't organs at one specific point: skin is the
+            whole body surface, blood runs through everything. A simple dot
+            near the hip would look like a drawing mistake, so we show them
+            as what they are — the whole outline, respectively the central
+            network, light up in the risk color. The dot stays, as a marker
+            for the label below. */}
         {active.has("skin") && (
           <AG opacity={glowOpacity as any}>
             <G fill="none" stroke={color} strokeWidth={2.2} strokeLinejoin="round">
@@ -128,6 +143,7 @@ export default function BodyDiagram({
         )}
 
         {/* Aura pulsatoare + punct pe fiecare organ afectat */}
+        {/* Pulsing aura + dot on each affected organ */}
         {(Object.keys(ORGANS) as OrganId[]).map((id) => {
           if (!active.has(id)) return null;
           const o = ORGANS[id];
@@ -146,23 +162,31 @@ export default function BodyDiagram({
 }
 
 // Formele corpului masculin (refolosite pentru stratul de glow + cel principal)
+// The male body shapes (reused for the glow layer + the main one)
 function BodyPaths() {
   return (
     <>
       {/* cap */}
+      {/* head */}
       <Ellipse cx="50" cy="15" rx="7" ry="8" />
       {/* gat */}
+      {/* neck */}
       <Path d="M46 22 h8 v6 h-8 z" />
       {/* umeri / trapez lat */}
+      {/* shoulders / wide trapezius */}
       <Path d="M50 27 q-6 1 -10 3 q-11 4 -15 11 q7 -3 14 -3 h22 q7 0 14 3 q-4 -7 -15 -11 q-4 -2 -10 -3 z" />
       {/* tors piept in V (lat sus, ingust la talie) */}
+      {/* V-shaped chest torso (wide at top, narrow at waist) */}
       <Path d="M30 40 q20 -5 40 0 l-9 52 q-11 3 -22 0 z" />
       {/* brate */}
+      {/* arms */}
       <Path d="M31 42 l-9 46 q-1 5 3 6 q4 1 5 -4 l8 -46 z" />
       <Path d="M69 42 l9 46 q1 5 -3 6 q-4 1 -5 -4 l-8 -46 z" />
       {/* bazin ingust */}
+      {/* narrow pelvis */}
       <Path d="M40 92 q10 4 20 0 l-2 16 q-8 3 -16 0 z" />
       {/* picioare drepte/musculoase */}
+      {/* straight/muscular legs */}
       <Path d="M42 108 h7 l-2 96 q-1 6 -4 6 q-3 0 -4 -6 l-2 -64 q-1 -18 5 -32 z" />
       <Path d="M58 108 h-7 l2 96 q1 6 4 6 q3 0 4 -6 l2 -64 q1 -18 -5 -32 z" />
     </>

@@ -5,6 +5,14 @@
  *      cu <picture> (webp + fallback png). Favicon-ele rămân png.
  *   3. Minifică HTML + CSS + JS inline (html-minifier-terser).
  * Rulează: npm run optimize   (apoi deploy-ul publică folderul build/)
+ *
+ * Zelynta — optimized build of the landing page (docs/ -> build/).
+ * What it does:
+ *   1. Copies docs/ into build/ (the source stays editable).
+ *   2. Converts icon.png -> icon.webp (sharp) and replaces <img src="icon.png">
+ *      with <picture> (webp + png fallback). Favicons stay png.
+ *   3. Minifies inline HTML + CSS + JS (html-minifier-terser).
+ * Run: npm run optimize   (then the deploy publishes the build/ folder)
  */
 const fs = require("fs");
 const path = require("path");
@@ -19,6 +27,7 @@ function kb(n) { return (n / 1024).toFixed(1) + " KB"; }
 
 async function run() {
   // 1) curăță + copiază docs -> build
+  // 1) clean + copy docs -> build
   fs.rmSync(OUT, { recursive: true, force: true });
   fs.cpSync(SRC, OUT, { recursive: true });
   console.log("✓ copiat docs/ -> build/");
@@ -26,6 +35,9 @@ async function run() {
   // 1b) niciun .md nu ajunge pe site. docs/ e rădăcina publică, iar un document
   // intern lăsat din greșeală acolo ar fi servit la zelynta.com/<nume>.md.
   // Documentele interne stau în docs-internal/; asta e plasa de siguranță.
+  // 1b) no .md ever reaches the site. docs/ is the public root, and an
+  // internal document left there by mistake would be served at
+  // zelynta.com/<name>.md. Internal documents live in docs-internal/; this is the safety net.
   let mdRemoved = 0;
   (function stripMarkdown(dir) {
     for (const f of fs.readdirSync(dir)) {
@@ -37,6 +49,7 @@ async function run() {
   if (mdRemoved) console.log(`✓ exclus din build: ${mdRemoved} fișier(e) .md`);
 
   // 2) WebP din icon.png
+  // 2) WebP from icon.png
   const pngPath = path.join(OUT, "icon.png");
   let webpDone = false;
   if (fs.existsSync(pngPath)) {
@@ -48,6 +61,7 @@ async function run() {
   }
 
   // 3) procesează fiecare .html: <picture> pentru logo + minificare
+  // 3) process each .html: <picture> for the logo + minification
   const htmlFiles = [];
   (function walk(dir) {
     for (const f of fs.readdirSync(dir)) {
@@ -64,16 +78,19 @@ async function run() {
     totalBefore += before;
 
     // calea relativă către icon.webp (root pages = "icon.webp", legal/ = "../icon.webp")
+    // relative path to icon.webp (root pages = "icon.webp", legal/ = "../icon.webp")
     const rel = path.relative(path.dirname(file), OUT).replace(/\\/g, "/");
     const webpHref = (rel ? rel + "/" : "") + "icon.webp";
 
     if (webpDone) {
+      // 3a) preload png -> webp
       // 3a) preload png -> webp
       html = html.replace(
         /<link rel="preload" as="image" href="([^"]*?)icon\.png"([^>]*)\/?>/g,
         (m, pfx, rest) => `<link rel="preload" as="image" href="${pfx}icon.webp" type="image/webp"${rest}>`
       );
       // 3b) <img ... src=".../icon.png" ...> -> <picture> cu source webp + fallback png
+      // 3b) <img ... src=".../icon.png" ...> -> <picture> with webp source + png fallback
       html = html.replace(
         /<img\b([^>]*?)\ssrc="([^"]*?)icon\.png"([^>]*?)\/?>/g,
         (m, pre, pfx, post) =>
@@ -82,6 +99,7 @@ async function run() {
     }
 
     // 3c) minificare
+    // 3c) minification
     try {
       html = await minify(html, {
         collapseWhitespace: true,
@@ -95,6 +113,7 @@ async function run() {
       });
     } catch (e) {
       // dacă minifyJS dă peste un script complex, reîncearcă fără minifyJS (sigur)
+      // if minifyJS chokes on a complex script, retry without minifyJS (safe)
       html = await minify(html, {
         collapseWhitespace: true,
         removeComments: true,

@@ -8,6 +8,16 @@
 //   acidity reg.    -> rregullues aciditeti                emulsifier -> emulsifikues
 //   sweetener       -> ëmbëlsues         stabilizer       -> stabilizues
 //   antioxidant     -> antioksidant      flavor enhancer  -> përmirësues shijeje
+// Albanian (sq) for additives: name + category (use) for all 89 of them,
+// plus description (desc) for the 36 without a "story". For the other 53,
+// the description comes from additives.stories.ts, applied after this merge.
+// Merged into additives.ts, same as additives.extra.ts and additives.bgel.ts.
+//
+// Terminology, kept consistent:
+//   colorant        -> ngjyrues          preservative     -> konservues
+//   acidity reg.    -> rregullues aciditeti                emulsifier -> emulsifikues
+//   sweetener       -> ëmbëlsues         stabilizer       -> stabilizues
+//   antioxidant     -> antioksidant      flavor enhancer  -> përmirësues shijeje
 export const additivesSq: Record<
   string,
   { name: { sq: string }; use: { sq: string }; desc?: { sq: string } }

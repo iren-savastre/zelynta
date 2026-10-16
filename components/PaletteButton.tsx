@@ -15,6 +15,9 @@ import { PALETTES, useTheme } from "../utils/theme";
 /**
  * Selector de teme de culoare (15 palete, ca pe landing page).
  * DOAR design — schimbă accentul aplicației. Nu folosește emoji.
+ *
+ * Color theme picker (15 palettes, like on the landing page).
+ * Design ONLY — changes the app's accent color. Doesn't use emoji.
  */
 export default function PaletteButton({ glass }: { glass?: any }) {
   const { t } = useTranslation();

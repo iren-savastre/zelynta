@@ -26,6 +26,7 @@ export default function BasketBar() {
   const [open, setOpen] = useState(false);
 
   // Ascunde bara pe ecranul de comparație (acolo are propriul flux)
+  // Hides the bar on the comparison screen (it has its own flow there)
   if (items.length === 0 || pathname === "/compare") return null;
 
   async function saveAllToFavorites() {
@@ -108,7 +109,7 @@ const makeStyles = (c: ThemeColors) =>
   StyleSheet.create({
     fab: {
       position: "absolute",
-      bottom: 122, // deasupra barei de jos cu Istoric
+      bottom: 122, // deasupra barei de jos cu Istoric // above the bottom bar with History
       right: 20,
       width: 60,
       height: 60,

@@ -58,6 +58,8 @@ export default function History() {
 
   // React Native Web nu implementează Alert.alert — pe web nu apărea nimic și
   // butoanele de ștergere păreau moarte. Pe telefon rămâne dialogul nativ.
+  // React Native Web doesn't implement Alert.alert — on web nothing appeared
+  // and the delete buttons looked dead. On phone, the native dialog stays.
   function confirmThen(title: string, message: string, ok: string, run: () => void) {
     if (isWeb) {
       if (typeof window !== "undefined" && window.confirm(`${title}\n\n${message}`)) run();
@@ -81,6 +83,8 @@ export default function History() {
 
   // Șterge exact produsul atins, din lista pe care o are omul în față —
   // din istoric dacă e pe tabul Istoric, de la favorite dacă e pe Favorite.
+  // Deletes exactly the tapped product, from the list the person has in
+  // front of them — from history if on the History tab, from favorites if on Favorites.
   function onRemoveOne(item: HistoryItem) {
     confirmThen(item.name, t("removeOneConfirm"), t("removeOne"), () => {
       const done =
@@ -94,6 +98,9 @@ export default function History() {
   // Data se compune manual, nu prin toLocaleDateString: pe unele telefoane
   // Android suportul pentru formatarea localizata e partial, iar anul putea
   // sa lipseasca din ce vedea utilizatorul. Asa aratam mereu zi.luna.an, ora.
+  // The date is built manually, not via toLocaleDateString: on some Android
+  // phones, localized formatting support is partial, and the year could be
+  // missing from what the user saw. This way we always show day.month.year, time.
   function formatDate(ts: number) {
     const d = new Date(ts);
     const p = (n: number) => String(n).padStart(2, "0");
@@ -108,6 +115,7 @@ export default function History() {
   return (
     <View style={styles.overlay}>
       {/* Fundalul aplicatiei ramane vizibil; atingerea lui inchide panoul. */}
+      {/* The app's background stays visible; tapping it closes the panel. */}
       <Pressable
         style={styles.backdrop}
         onPress={() => {
@@ -146,6 +154,7 @@ export default function History() {
       </View>
 
       {/* Taburi Istoric / Favorite */}
+      {/* History / Favorites tabs */}
       <View style={[styles.tabs, isDesktop && styles.centered]}>
         {TABS.map((tb) => {
           const active = tab === tb.key;
@@ -242,6 +251,7 @@ const reliefWeb = (c: ThemeColors): any =>
 const makeStyles = (c: ThemeColors) =>
   StyleSheet.create({
     // Panou glisant PESTE aplicatie: fundal intunecat + foaie rotunjita jos.
+    // Sliding panel OVER the app: dark background + rounded sheet at the bottom.
     overlay: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(8,16,11,0.45)" },
     backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
     screen: {
@@ -370,6 +380,7 @@ const makeStyles = (c: ThemeColors) =>
     },
     scoreText: { fontSize: 18, fontWeight: "900", color: "#fff" },
     // Discret lângă scor: se vede, dar nu concurează cu produsul în sine.
+    // Understated next to the score: visible, but doesn't compete with the product itself.
     removeBtn: {
       width: 34,
       height: 34,

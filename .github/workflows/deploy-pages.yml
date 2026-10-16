@@ -2,6 +2,8 @@ name: Deploy landing (GitHub Pages)
 
 # Publică folderul docs/ (landing + pagini legale) pe GitHub Pages la push pe main.
 # Necesită: Settings → Pages → Source = GitHub Actions.
+# Publishes the docs/ folder (landing + legal pages) to GitHub Pages on push to main.
+# Requires: Settings → Pages → Source = GitHub Actions.
 
 on:
   push:
@@ -12,12 +14,17 @@ on:
       # Build-ul e produs de scriptul de optimizare: daca el se schimba
       # (sau dependintele lui), site-ul publicat trebuie regenerat. Fara
       # liniile astea, o imbunatatire din scripts/ nu ajungea niciodata live.
+      # The build is produced by the optimization script: if it changes
+      # (or its dependencies do), the published site needs to be regenerated.
+      # Without these lines, an improvement in scripts/ would never go live.
       - "scripts/**"
       - "package.json"
       - "package-lock.json"
       # Aplicatia web (PWA) se construieste aici, la publicare, ca sa nu tinem
       # 9 MB de bundle in repo. Deci orice schimbare in codul aplicatiei
       # trebuie sa regenereze si site-ul.
+      # The web app (PWA) is built here, at publish time, so we don't keep a
+      # 9 MB bundle in the repo. So any change to the app's code must also regenerate the site.
       - "app/**"
       - "utils/**"
       - "i18n/**"
@@ -54,6 +61,9 @@ jobs:
         # `experiments.baseUrl` din app.json o face sa functioneze sub /app.
         # Rulat DUPA optimize, ca minificatorul de HTML sa nu atinga bundle-ul
         # Expo (e deja minificat de Metro).
+        # `experiments.baseUrl` in app.json makes it work under /app.
+        # Run AFTER optimize, so the HTML minifier doesn't touch the Expo
+        # bundle (it's already minified by Metro).
         run: |
           npx expo export -p web --output-dir dist-web
           mkdir -p build/app

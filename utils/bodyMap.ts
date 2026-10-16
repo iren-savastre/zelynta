@@ -2,6 +2,10 @@
 // Fiecare organ are o pozitie pe silueta (coordonate intr-un viewBox 100x220)
 // si un nume in cele 9 limbi. Maparea aditiv -> organe se bazeaza pe efectele
 // documentate (EFSA / IARC), aceleasi surse ca descrierile.
+// "Human body -> affected organs" map for additives.
+// Each organ has a position on the silhouette (coordinates in a 100x220
+// viewBox) and a name in 9 languages. The additive -> organs mapping is based
+// on documented effects (EFSA / IARC), the same sources as the descriptions.
 
 export type OrganId =
   | "brain"
@@ -23,9 +27,9 @@ type L9 = { ro: string; en: string; fr: string; it: string; es: string; de: stri
 export type Organ = {
   id: OrganId;
   name: L9;
-  cx: number; // centru X pe silueta (viewBox 100 x 220)
-  cy: number; // centru Y
-  r: number; // raza „aura" de highlight
+  cx: number; // centru X pe silueta (viewBox 100 x 220) // center X on the silhouette (viewBox 100 x 220)
+  cy: number; // centru Y // center Y
+  r: number; // raza „aura" de highlight // radius of the highlight "aura"
 };
 
 export const ORGANS: Record<OrganId, Organ> = {
@@ -46,8 +50,11 @@ export const ORGANS: Record<OrganId, Organ> = {
 
 // Aditiv (cod E) -> organele afectate, dupa efectele documentate.
 // Acopera aditivii cu „poveste" (risk/caution). Cheia e codul minuscul.
+// Additive (E code) -> affected organs, based on documented effects.
+// Covers additives with a "story" (risk/caution). The key is the lowercase code.
 export const ADDITIVE_ORGANS: Record<string, OrganId[]> = {
   // Fosfati — echilibrul fosfor/calciu: rinichi, oase, inima/vase
+  // Phosphates — phosphorus/calcium balance: kidneys, bones, heart/vessels
   e338: ["kidneys", "bones", "heart", "teeth"],
   e339: ["kidneys", "bones", "heart"],
   e340: ["kidneys", "bones", "heart"],
@@ -56,18 +63,23 @@ export const ADDITIVE_ORGANS: Record<string, OrganId[]> = {
   e451: ["kidneys", "bones", "heart"],
   e452: ["kidneys", "bones", "heart"],
   // Nitriti/nitrati — stomac/colon (nitrozamine), sange (methemoglobina)
+  // Nitrites/nitrates — stomach/colon (nitrosamines), blood (methemoglobin)
   e250: ["stomach", "intestines", "blood"],
   e251: ["stomach", "intestines", "blood"],
   e252: ["stomach", "intestines", "blood"],
   // Caramel amoniacal — ficat/sistem imunitar
+  // Ammonia caramel — liver/immune system
   e150d: ["liver", "blood"],
   // Dioxid de titan — intestine (interzis in UE la alimente din 2022)
+  // Titanium dioxide — intestines (banned in the EU for food since 2022)
   e171: ["intestines"],
   // Indulcitori — aspartam: creier/sistem nervos; ciclamat/zaharina: vezica
+  // Sweeteners — aspartame: brain/nervous system; cyclamate/saccharin: bladder
   e951: ["brain"],
   e952: ["bladder"],
   e954: ["bladder"],
   // Coloranti azoici — hiperactivitate (creier), alergii (piele)
+  // Azo dyes — hyperactivity (brain), allergies (skin)
   e102: ["brain", "skin"],
   e104: ["brain", "skin"],
   e110: ["brain", "skin"],
@@ -75,21 +87,28 @@ export const ADDITIVE_ORGANS: Record<string, OrganId[]> = {
   e124: ["brain", "skin"],
   e129: ["brain", "skin"],
   // Annatto — reactii alergice cutanate
+  // Annatto — allergic skin reactions
   e160b: ["skin"],
   // Lizozim (din ou) — alergen: piele/sistem imunitar
+  // Lysozyme (from egg) — allergen: skin/immune system
   e1105: ["skin"],
   // Sorbati — reactii cutanate la sensibili
+  // Sorbates — skin reactions in sensitive people
   e200: ["skin"],
   e202: ["skin"],
   // Benzoati — piele; cu vitamina C pot forma benzen (sange)
+  // Benzoates — skin; with vitamin C can form benzene (blood)
   e210: ["skin", "blood"],
   e211: ["skin", "blood"],
   // Sulfiti — astm (plamani), iritatie gastrica
+  // Sulfites — asthma (lungs), gastric irritation
   e220: ["lungs", "stomach"],
   e223: ["lungs", "stomach"],
   // MSG (glutamat) — sistem nervos la persoanele sensibile
+  // MSG (glutamate) — nervous system in sensitive people
   e621: ["brain"],
   // Xantan / amidon modificat — tract digestiv
+  // Xanthan / modified starch — digestive tract
   e415: ["intestines", "stomach"],
   e1442: ["intestines", "stomach"],
 };

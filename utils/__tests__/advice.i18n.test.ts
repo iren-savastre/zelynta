@@ -2,6 +2,7 @@ import { adviceInfo, adviceLabels } from "../../i18n/advice";
 import { methodology } from "../../i18n/methodology";
 
 // Cele 11 limbi active + albaneza, in pregatire.
+// The 11 active languages + Albanian, in progress.
 const LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", "bg", "el", "sq"] as const;
 const FIELDS = ["benefits", "when", "how", "who", "children"] as const;
 
@@ -14,6 +15,8 @@ describe("sfaturile pe categorii sunt traduse in toate limbile", () => {
 
   // Bulgara si greaca lipseau complet: utilizatorii lor vedeau sectiunea de
   // recomandari in engleza, desi restul aplicatiei era tradus.
+  // Bulgarian and Greek were completely missing: their users would see the
+  // advice section in English, even though the rest of the app was translated.
   for (const lang of LANGS) {
     it(`${lang}: fiecare categorie are toate cele 5 texte`, () => {
       const lipsa: string[] = [];

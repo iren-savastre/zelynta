@@ -56,6 +56,7 @@ function FloatLeaf({ left, size, delay, dur }: { left: string; size: number; del
 }
 
 // Pagina oficiala de Facebook; TikTok/Instagram raman pe site pana exista conturi.
+// Official Facebook page; TikTok/Instagram stay on the site until accounts exist.
 const FACEBOOK = "https://www.facebook.com/profile.php?id=100063203081052";
 const SOCIAL: { ic: any; url: string }[] = [
   { ic: "logo-facebook", url: FACEBOOK },
@@ -69,20 +70,31 @@ const SOCIAL: { ic: any; url: string }[] = [
 // ducea la aceeasi pagina goala de GitHub ca si cea de Google Play. O insigna
 // care nu duce nicaieri il face pe utilizator sa creada ca a gresit el ceva.
 // In locul ei aratam textul „in curand", exact ca pe site (cheia `iosSoon`).
+// Store buttons (below social).
+//
+// The App Store badge was removed: the app doesn't exist on iOS, and tapping
+// it led to the same empty GitHub page as the Google Play one. A badge that
+// leads nowhere makes the user think they did something wrong. Instead we
+// show the "coming soon" text, exactly like on the site (the `iosSoon` key).
 const STORE_URL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
 const STORES: { img: any; url: string; label: string }[] = [
   { img: require("../assets/images/google-play.png"), url: STORE_URL, label: "Google Play" },
 ];
 
 // Linkuri externe pentru coloana „Susține".
+// External links for the "Support" column.
 const REVIEW_URL = "https://play.google.com/store/apps/details?id=com.savastre.zelynta";
-const DONATE_URL = "https://www.buymeacoffee.com/zelynta"; // creeaza contul cu username "zelynta"
+const DONATE_URL = "https://www.buymeacoffee.com/zelynta"; // creeaza contul cu username "zelynta" // create the account with username "zelynta"
 // Creditul catre Media Expert Solution, care a ajutat la proiect. Acelasi link
 // pe care il are si site-ul, in footer.
+// Credit to Media Expert Solution, who helped with the project. The same
+// link the site has, in the footer.
 const PARTNER_URL = "https://mediaexpertsolution.com/";
 
 // head/label sunt CHEI i18n (traduse cu t() la randare).
 // route = navigare în app (fără 404); url = link extern (Linking.openURL).
+// head/label are i18n KEYS (translated with t() at render time).
+// route = in-app navigation (no 404); url = external link (Linking.openURL).
 type Item = { label: string; route?: string; url?: string; ic: any };
 const COLS: { head: string; headIc: any; items: Item[] }[] = [
   {
@@ -123,6 +135,10 @@ const COLS: { head: string; headIc: any; items: Item[] }[] = [
       // dar deschidea clientul de email — comportament de buton de contact,
       // care exista oricum in coloana Suport. Creditul catre partener e acum
       // jos in footer, ca pe site.
+      // "Partners" was removed from here: the label promised you'd see the
+      // partners, but it opened the email client — contact-button behavior,
+      // which already exists in the Support column. The partner credit is
+      // now at the bottom of the footer, like on the site.
     ],
   },
 ];
@@ -138,6 +154,7 @@ export default function AppFooter({
   const router = useRouter();
 
   // Rosia din footer topaie si ea, ca sora ei din navbar (aceleasi timpi).
+  // The tomato in the footer hops too, like its sibling in the navbar (same timings).
   const hop = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -227,6 +244,8 @@ export default function AppFooter({
 
           {/* Creditul catre cel care a ajutat la proiect — acelasi pe care il
               are si site-ul, cu aceeasi formulare si acelasi logo. */}
+          {/* Credit to whoever helped with the project — the same one the
+              site has, with the same wording and the same logo. */}
           <TouchableOpacity
             style={styles.creditRow}
             onPress={() => open(PARTNER_URL)}
@@ -264,6 +283,7 @@ const styles = StyleSheet.create({
   inner: { width: "100%", paddingHorizontal: 22, paddingVertical: 34 },
   innerDesktop: { maxWidth: 1180, alignSelf: "center", paddingHorizontal: 24, paddingVertical: 48 },
   // rând care se înfășoară: desktop = un rând, tabletă = 2 rânduri, telefon = stivuit
+  // row that wraps: desktop = one row, tablet = 2 rows, phone = stacked
   top: { flexDirection: "row", flexWrap: "wrap", gap: 30, rowGap: 32 },
   brandCol: { flexGrow: 1, flexBasis: 280, minWidth: 240, maxWidth: 420, gap: 14 },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 10 },
@@ -276,6 +296,8 @@ const styles = StyleSheet.create({
   storeImg: { height: 44, width: 150 },
   // Textul care tine locul insignei App Store. Aceeasi latime ca insigna, ca
   // sa se alinieze sub ea, si discret — e o informatie, nu un buton.
+  // The text standing in for the App Store badge. Same width as the badge,
+  // so it lines up underneath it, and understated — it's information, not a button.
   storeSoon: {
     width: 150,
     color: "#9fc4ab",

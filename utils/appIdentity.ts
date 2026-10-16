@@ -17,6 +17,21 @@ const KEY = "zelynta_app_uuid";
  *
  * GDPR: fiind o valoare pur locala, stergerea datelor aplicatiei o elimina
  * definitiv. Nu exista nicio evidenta la noi care sa o lege de o persoana.
+ *
+ * `app_uuid` — the identifier sent to Open Food Facts with every contribution.
+ *
+ * What it IS: a random number, generated on the phone on the first contribution,
+ * saved locally. What it is NOT: an account. It doesn't contain and isn't
+ * derived from anything about the person — no email, no phone, no IP, no name.
+ * Two installs of the app on the same phone get different values.
+ *
+ * What it's for: Open Food Facts receives all of Zelynta's contributions through
+ * a single app account. Without this identifier, a single abuser would get the
+ * entire account blocked — meaning all users. With it, moderators only block
+ * the problematic install.
+ *
+ * GDPR: being a purely local value, deleting the app's data removes it
+ * permanently. We keep no record anywhere linking it to a person.
  */
 export async function getAppUuid(): Promise<string> {
   try {
@@ -24,6 +39,7 @@ export async function getAppUuid(): Promise<string> {
     if (existing && existing.length >= 32) return existing;
   } catch {
     // Storage indisponibil: generam unul de unica folosinta mai jos.
+    // Storage unavailable: we generate a one-off one below.
   }
 
   const fresh = randomUuid();
@@ -32,16 +48,20 @@ export async function getAppUuid(): Promise<string> {
   } catch {
     // Nu putem salva — contributia merge oricum, doar ca data viitoare
     // instalarea va aparea ca alta. Acceptabil; nu blocam utilizatorul.
+    // Can't save — the contribution still goes through, it's just that next
+    // time the install will look like a different one. Acceptable; we don't block the user.
   }
   return fresh;
 }
 
 /** Sterge identificatorul. Folosit de „sterge toate datele". */
+/** Deletes the identifier. Used by "delete all data". */
 export async function resetAppUuid(): Promise<void> {
   try {
     await AsyncStorage.removeItem(KEY);
   } catch {
     // ignoram
+    // ignored
   }
 }
 
@@ -57,6 +77,18 @@ export async function resetAppUuid(): Promise<void> {
  * il puna sub blocaj, iar asta presupune oricum sa treaca de proxy-ul nostru.
  * Daca vrem sa eliminam si acest risc, `npx expo install expo-crypto` e tot ce
  * trebuie: functia de mai jos il va prelua automat.
+ *
+ * UUID v4.
+ *
+ * Uses the platform's cryptographic generator when available (web, and
+ * React Native with expo-crypto installed). Otherwise falls back to Math.random.
+ *
+ * Why the fallback is acceptable: the value is a moderation pseudonym, not a
+ * secret and not proof of identity — it doesn't unlock anything. The real
+ * risk of a guessable value would be someone using another person's uuid to
+ * get it blocked, which requires getting past our proxy anyway. If we want
+ * to remove even this risk, `npx expo install expo-crypto` is all it takes:
+ * the function below will pick it up automatically.
  */
 export function randomUuid(): string {
   const g: any = globalThis as any;
@@ -73,6 +105,7 @@ export function randomUuid(): string {
   }
 
   // Marcajele obligatorii pentru versiunea 4 si varianta RFC 4122.
+  // The mandatory markers for version 4 and the RFC 4122 variant.
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
 

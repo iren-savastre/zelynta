@@ -4,6 +4,9 @@ import { fetchWithTimeout } from "./net";
 // Traducere automata gratuita prin MyMemory (fara cont, fara cheie).
 // Folosita pentru ingrediente cand limba aleasa nu exista in baza de date.
 // MyMemory limiteaza fiecare cerere la ~500 caractere, deci taiem textul in bucati.
+// Free automatic translation via MyMemory (no account, no API key).
+// Used for ingredients when the chosen language isn't in our database.
+// MyMemory caps each request at ~500 characters, so we split the text into chunks.
 
 const memoryCache = new Map<string, string>();
 const CACHE_MAX = 500;
@@ -20,9 +23,10 @@ function cacheKey(from: string, to: string, text: string) {
 }
 
 // Taie textul in bucati <= 480 caractere, preferabil la virgule (lista de ingrediente).
+// Splits the text into chunks <= 480 characters, preferably at commas (ingredient lists).
 function splitChunks(text: string, max = 480): string[] {
   if (text.length <= max) return [text];
-  const parts = text.split(/(,\s*)/); // pastreaza separatorii
+  const parts = text.split(/(,\s*)/); // pastreaza separatorii // keeps the separators
   const chunks: string[] = [];
   let cur = "";
   for (const p of parts) {
@@ -31,6 +35,7 @@ function splitChunks(text: string, max = 480): string[] {
       cur = "";
     }
     // daca o singura bucata e mai mare decat max, o taiem brutal
+    // if a single piece is bigger than max, we cut it brute-force
     if (p.length > max) {
       for (let i = 0; i < p.length; i += max) chunks.push(p.slice(i, i + max));
     } else {
@@ -57,6 +62,7 @@ async function translateChunk(chunk: string, from: string, to: string): Promise<
 }
 
 // Traduce un text dintr-o limba in alta. Intoarce textul original daca ceva eseaza.
+// Translates a text from one language to another. Returns the original text if anything fails.
 export async function translateText(
   text: string,
   from: string,
@@ -69,6 +75,7 @@ export async function translateText(
   if (memoryCache.has(key)) return memoryCache.get(key)!;
 
   // cache persistent (ca sa nu reapeleze dupa repornire)
+  // persistent cache (so it doesn't call again after a restart)
   try {
     const stored = await AsyncStorage.getItem(key);
     if (stored) {
@@ -87,6 +94,6 @@ export async function translateText(
     AsyncStorage.setItem(key, result).catch(() => {});
     return result;
   } catch {
-    return clean; // la eroare, aratam originalul
+    return clean; // la eroare, aratam originalul // on error, we show the original
   }
 }

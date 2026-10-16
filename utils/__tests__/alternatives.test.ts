@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getBetterAlternatives } from "../alternatives";
 
 /** Produs din categoria X, cu date nutritionale reale si nume citibil. */
+/** Product from category X, with real nutrition data and a readable name. */
 function alt(code: string, name: string, sugars: number) {
   return {
     code,
@@ -23,6 +24,7 @@ function searchRes(products: any[]) {
 }
 
 // Nutella reala: amesteca etichete canonice cu nume afisabile in franceza.
+// Real Nutella: mixes canonical tags with displayable French names.
 const NUTELLA_TAGS = [
   "en:breakfasts",
   "en:spreads",

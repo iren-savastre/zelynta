@@ -525,6 +525,7 @@ export const additivesInfo = {
     level: "safe",
     name: { ro: "Lecitine", en: "Lecithins", fr: "Lécithines", it: "Lecitine", es: "Lecitinas" },
     // Variante intalnite pe etichete (singular, alte limbi, "lecitina din soia").
+    // Variants found on labels (singular, other languages, "soy lecithin").
     alt: [
       "lecitină", "lecitina", "lecithin", "lecithine", "lecithinen", "lecitinen",
       "lécithine", "lecytyna", "lecytyny", "лецитин", "лецитины", "soy lecithin",
@@ -820,6 +821,7 @@ export const additivesInfo = {
     level: "safe",
     name: { ro: "Bicarbonat de sodiu", en: "Sodium bicarbonate", fr: "Bicarbonate de sodium", it: "Bicarbonato di sodio", es: "Bicarbonato de sodio" },
     // Variante intalnite pe etichete (plural, alte limbi, denumiri uzuale).
+    // Variants found on labels (plural, other languages, common names).
     alt: [
       "carbonat de sodiu", "carbonați de sodiu", "sodium carbonates", "sodium carbonate",
       "natriumcarbonaat", "natriumcarbonaten", "natriumcarbonate", "natriumkarbonat",
@@ -840,6 +842,7 @@ export const additivesInfo = {
     level: "safe",
     name: { ro: "Carbonat de amoniu", en: "Ammonium carbonate", fr: "Carbonate d'ammonium", it: "Carbonato di ammonio", es: "Carbonato de amonio" },
     // Variante intalnite pe etichete (plural, alte limbi, denumiri uzuale).
+    // Variants found on labels (plural, other languages, common names).
     alt: [
       "carbonați de amoniu", "bicarbonat de amoniu", "ammonium carbonates", "ammonium bicarbonate",
       "ammoniumcarbonaat", "ammoniumcarbonaten", "ammoniumcarbonate", "ammoniumkarbonat",
@@ -1098,6 +1101,7 @@ export const additivesInfo = {
 };
 
 // Imbina traducerile DE/RU/PL/NL (din additives.extra.ts) peste limbile de baza.
+// Merges the DE/RU/PL/NL translations (from additives.extra.ts) over the base languages.
 for (const code in additivesExtra) {
   const base = (additivesInfo as any)[code];
   const extra = additivesExtra[code];
@@ -1108,6 +1112,7 @@ for (const code in additivesExtra) {
 }
 
 // Imbina bulgara (bg) + greaca (el) pentru nume + categorie (din additives.bgel.ts).
+// Merges Bulgarian (bg) + Greek (el) for name + category (from additives.bgel.ts).
 for (const code in additivesBgEl) {
   const base = (additivesInfo as any)[code];
   const be = additivesBgEl[code];
@@ -1119,6 +1124,8 @@ for (const code in additivesBgEl) {
 
 // Imbina albaneza (din additives.sq.ts). Pentru aditivii cu poveste,
 // descrierea vine mai jos, din additives.stories.ts.
+// Merges Albanian (from additives.sq.ts). For additives with a "story",
+// the description comes below, from additives.stories.ts.
 for (const code in additivesSq) {
   const base = (additivesInfo as any)[code];
   const sq = additivesSq[code];
@@ -1129,6 +1136,7 @@ for (const code in additivesSq) {
 }
 
 // Suprascrie desc-ul cu descrierile "poveste" (risk/caution), in toate limbile.
+// Overwrites desc with the "story" descriptions (risk/caution), in all languages.
 for (const code in additiveStories) {
   const base = (additivesInfo as any)[code];
   if (base) base.desc = additiveStories[code];
@@ -1136,6 +1144,8 @@ for (const code in additiveStories) {
 
 // Albaneza pentru descrierile "poveste". Se aplica DUPA merge-ul povestilor,
 // fiindca acela inlocuieste tot obiectul desc.
+// Albanian for the "story" descriptions. Applied AFTER the stories merge,
+// because that one replaces the entire desc object.
 for (const code in additiveStoriesSq) {
   const base = (additivesInfo as any)[code];
   if (base) base.desc.sq = additiveStoriesSq[code];

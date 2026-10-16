@@ -15,11 +15,18 @@ export type Alternative = {
 // page_size=50 intoarce ~47 produse utilizabile, 163 KB; page_size=100 intoarce
 // ~91 utilizabile, 258 KB. Afisam cel mult 8 alternative dintr-un bazin de 20,
 // deci 50 e suficient si taie ~37% din trafic.
+// How many products we request per search. Measured on the real API (Sep 12, 2026):
+// page_size=50 returns ~47 usable products, 163 KB; page_size=100 returns
+// ~91 usable, 258 KB. We show at most 8 alternatives from a pool of 20,
+// so 50 is enough and cuts ~37% of the traffic.
 const PAGE_SIZE = 50;
 
 // Listele de categorie se schimba lent (produsele noi apar in zile, nu in
 // minute), iar raspunsul e mare. O zi de cache scade masiv presiunea pe
 // plafonul de rata cand utilizatorul scaneaza mai multe produse similare.
+// Category lists change slowly (new products appear over days, not
+// minutes), and the response is large. A day of caching massively reduces
+// rate-limit pressure when the user scans several similar products.
 const CATEGORY_TTL_MS = 24 * 60 * 60 * 1000;
 
 // `categories_tags` amesteca doua feluri de etichete:
@@ -28,6 +35,12 @@ const CATEGORY_TTL_MS = 24 * 60 * 60 * 1000;
 // Parametrul `categories_tags_en` intelege doar prima forma. Versiunea veche
 // lua ultimele 3 etichete, care sunt tocmai cele afisabile — masurat pe Nutella:
 // eticheta franceza returna 7 produse utilizabile, cea canonica 30.
+// `categories_tags` mixes two kinds of tags:
+//   en:confectionary-based-spreads   <- canonical taxonomy key
+//   en:Pâtes à tartiner              <- same thing, as a displayable French name
+// The `categories_tags_en` parameter only understands the first form. The old
+// version took the last 3 tags, which are exactly the displayable ones —
+// measured on Nutella: the French tag returned 7 usable products, the canonical one 30.
 const isCanonicalTag = (t: string) => /^en:[a-z0-9][a-z0-9-]*$/.test(t);
 
 async function searchCategory(category: string, lang: string): Promise<any[]> {
@@ -44,7 +57,7 @@ async function searchCategory(category: string, lang: string): Promise<any[]> {
   const res = await fetchWithTimeout(url, {
     headers: { "User-Agent": OFF_USER_AGENT },
   });
-  if (!res.ok) return []; // 429/503 — endpoint-ul de cautare OFF cade des
+  if (!res.ok) return []; // 429/503 — endpoint-ul de cautare OFF cade des // 429/503 — the OFF search endpoint fails often
   const data = await res.json();
   const products = (data?.products ?? []) as any[];
   if (products.length) await cacheSet(cacheKey, products, CATEGORY_TTL_MS);
@@ -54,6 +67,9 @@ async function searchCategory(category: string, lang: string): Promise<any[]> {
 // Caută produse mai sănătoase din aceeași categorie (OpenFoodFacts).
 // Tinta e O SINGURA cautare, pe cea mai specifica categorie canonica. Trecem la
 // una mai larga doar daca prima nu a dat nimic (categorie invalida sau 503).
+// Looks for healthier products in the same category (OpenFoodFacts).
+// The goal is A SINGLE search, on the most specific canonical category. We
+// fall back to a broader one only if the first gave nothing (invalid category or 503).
 export async function getBetterAlternatives(
   product: any,
   currentScore: number,
@@ -63,11 +79,13 @@ export async function getBetterAlternatives(
   if (cats.length === 0) return [];
 
   // Doar etichetele canonice, de la cea mai specifica spre cele mai largi.
+  // Only the canonical tags, from the most specific to the broadest.
   const candidates = cats.filter(isCanonicalTag).reverse().map((c) => c.replace(/^en:/, ""));
   if (candidates.length === 0) return [];
 
   const pool = new Map<string, any>();
   // Cel mult 2 cereri: in practica prima ajunge aproape mereu.
+  // At most 2 requests: in practice the first one is nearly always enough.
   for (const category of candidates.slice(0, 2)) {
     try {
       for (const p of await searchCategory(category, lang)) {
@@ -77,17 +95,21 @@ export async function getBetterAlternatives(
       }
     } catch {
       // ignoră categoria asta și încearcă următoarea
+      // skip this category and try the next one
     }
-    if (pool.size > 0) break; // avem din ce alege — nu mai cerem nimic
+    if (pool.size > 0) break; // avem din ce alege — nu mai cerem nimic // we have something to pick from — no more requests needed
   }
   if (pool.size === 0) return [];
 
   // Scripturi pe care aplicația NU le folosește (arabă, ebraică, CJK, thai, coreeană…).
   // Produsele cu nume doar în aceste scripturi nu sunt utile utilizatorului -> le sărim.
+  // Scripts the app does NOT use (Arabic, Hebrew, CJK, Thai, Korean…).
+  // Products with names only in these scripts aren't useful to the user -> we skip them.
   const FOREIGN_SCRIPT =
     /[֐-׿؀-ۿݐ-ݿ฀-๿぀-ヿ一-鿿가-힯]/;
 
   // Cheile nutriționale care arată că produsul chiar are date (altfel scorul e un fals 100).
+  // The nutrition keys that show the product actually has data (otherwise the score is a fake 100).
   const NUTRI_KEYS = [
     "energy-kcal_100g",
     "sugars_100g",
@@ -100,16 +122,19 @@ export async function getBetterAlternatives(
   const scored = [...pool.values()]
     .map((p): Alternative | null => {
       // Preferă numele în limba utilizatorului, apoi engleză, apoi cel implicit.
+      // Prefers the name in the user's language, then English, then the default one.
       const name = String(
         p[`product_name_${lang}`] || p.product_name_en || p.product_name || ""
       ).trim();
-      if (!name || FOREIGN_SCRIPT.test(name)) return null; // nume gol sau în script străin
+      if (!name || FOREIGN_SCRIPT.test(name)) return null; // nume gol sau în script străin // empty name or in a foreign script
       // Dacă are ingrediente, trebuie să fie citibile (nu în arabă/CJK etc.).
+      // If it has ingredients, they must be readable (not Arabic/CJK etc.).
       const ing = String(
         p[`ingredients_text_${lang}`] || p.ingredients_text_en || p.ingredients_text || ""
       ).trim();
       if (ing && FOREIGN_SCRIPT.test(ing)) return null;
       // Trebuie să aibă date nutriționale reale — altfel scorul ar fi un fals „100".
+      // It must have real nutrition data — otherwise the score would be a fake "100".
       const nut = p.nutriments || {};
       if (!NUTRI_KEYS.some((k) => typeof nut[k] === "number")) return null;
 
@@ -124,12 +149,15 @@ export async function getBetterAlternatives(
     })
     // Doar produse VERZI (scor ≥ 66, sănătoase) și mai bune decât cel scanat.
     // Recomandăm exclusiv opțiuni clar sănătoase, nu doar „mai puțin rele".
+    // Only GREEN products (score ≥ 66, healthy) and better than the scanned one.
+    // We recommend exclusively clearly-healthy options, not just "less bad".
     .filter((p): p is Alternative => p !== null && p.score >= 66 && p.score > currentScore)
     .sort((a, b) => b.score - a.score);
 
   const ranked = scored;
 
   // Deduplicare după nume — construim un bazin mai larg (până la 20 de opțiuni bune).
+  // Dedupe by name — we build a wider pool (up to 20 good options).
   const seen = new Set<string>();
   const pool2: Alternative[] = [];
   for (const p of ranked) {
@@ -142,6 +170,8 @@ export async function getBetterAlternatives(
 
   // Amestecăm bazinul (Fisher-Yates) și afișăm până la 8 — utilizatorul vede că
   // există MAI MULTE soluții, în ordine aleatorie, nu doar cea mai bună.
+  // We shuffle the pool (Fisher-Yates) and show up to 8 — the user sees that
+  // MULTIPLE solutions exist, in random order, not just the best one.
   for (let i = pool2.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool2[i], pool2[j]] = [pool2[j], pool2[i]];

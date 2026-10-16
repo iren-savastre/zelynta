@@ -2,10 +2,12 @@ import { Component, type ReactNode } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 
 // Mesaje minimale, bilingve (i18n poate fi exact ce a eșuat) — fallback engleză.
+// Minimal, bilingual messages (i18n could be exactly what failed) — English fallback.
 function msgs() {
   let lang = "en";
   try {
     // citim limba salvată fără a depinde de i18n (care poate fi sursa erorii)
+    // we read the saved language without depending on i18n (which could be the error's source)
     if (typeof navigator !== "undefined" && navigator.language) lang = navigator.language.slice(0, 2);
   } catch {}
   const ro = lang === "ro";
@@ -31,6 +33,8 @@ export default class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: unknown) {
     // Hook de logare opțional: dacă există un logger global (ex. setat de un provider
     // de monitorizare), îl folosim; altfel doar consola. Fără PII.
+    // Optional logging hook: if a global logger exists (e.g. set by a
+    // monitoring provider), we use it; otherwise just the console. No PII.
     try {
       const w: any = typeof globalThis !== "undefined" ? globalThis : {};
       if (typeof w.__zelyntaLogError === "function") w.__zelyntaLogError(error);

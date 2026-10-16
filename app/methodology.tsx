@@ -20,6 +20,7 @@ import { PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 const isWeb = Platform.OS === "web";
 
 // Culorile celor 4 niveluri de risc — identice cu cele din analiza produsului.
+// The colors of the 4 risk levels — identical to the ones in the product analysis.
 const LEVELS: { key: string; labelKey: string; color: string }[] = [
   { key: "risk", labelKey: "levelRisk", color: "#E63E11" },
   { key: "caution", labelKey: "levelCaution", color: "#EE8100" },
@@ -28,6 +29,7 @@ const LEVELS: { key: string; labelKey: string; color: string }[] = [
 ];
 
 // Autoritățile citate — nume oficiale + link către pagina publică relevantă.
+// The cited authorities — official names + a link to the relevant public page.
 const AUTHORITIES: { abbr: string; descKey: string; url: string }[] = [
   {
     abbr: "EFSA",
@@ -88,6 +90,7 @@ export default function MethodologyPage() {
         <Text style={styles.intro}>{pickM("intro", lang)}</Text>
 
         {/* 1 · Nutriția */}
+        {/* 1 · Nutrition */}
         <View style={styles.card}>
           <View style={styles.cardHead}>
             <View style={[styles.numBadge, { backgroundColor: "#34d399" }]}>
@@ -99,6 +102,7 @@ export default function MethodologyPage() {
         </View>
 
         {/* 2 · Aditivii */}
+        {/* 2 · Additives */}
         <View style={styles.card}>
           <View style={styles.cardHead}>
             <View style={[styles.numBadge, { backgroundColor: "#a78bfa" }]}>
@@ -120,6 +124,7 @@ export default function MethodologyPage() {
         </View>
 
         {/* Autorități / surse */}
+        {/* Authorities / sources */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{pickM("authTitle", lang)}</Text>
           {AUTHORITIES.map((a) => (
@@ -142,6 +147,7 @@ export default function MethodologyPage() {
         </View>
 
         {/* 3 · Onestitatea datelor */}
+        {/* 3 · Data honesty */}
         <View style={styles.card}>
           <View style={styles.cardHead}>
             <View style={[styles.numBadge, { backgroundColor: "#60a5fa" }]}>

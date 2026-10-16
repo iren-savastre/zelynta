@@ -60,7 +60,7 @@ export const translations = {
     magnesium: "Magneziu",
     sodium: "Sodiu",
 
-    // despre aditivi//////////////////////////////////////
+    // despre aditivi////////////////////////////////////// // about additives
     additivesLabel: "Aditivi",
     noAdditives: "Niciun aditiv detectat",
     additivesUnknown: "Nu putem ști — lista de ingrediente lipsește din baza de date. Fotografiaz-o de pe ambalaj.",
@@ -118,10 +118,10 @@ export const translations = {
     clearAllConfirm: "Ștergi tot istoricul, favoritele și coșul de pe acest dispozitiv?",
     removeOne: "Șterge",
     removeOneConfirm: "Scoți acest produs din listă?",
-     // procentajul cu bulina///////////
+     // procentajul cu bulina/////////// // percentage with the badge
      scoreOutOf: "din 100",
     saturatedFat: "Grăsimi saturate",
-    // /////////////   scanare camera    /////////////////////
+    // /////////////   scanare camera    ///////////////////// // camera scan
     scanButton: "Scanează cu camera",
     scanInstructions: "Îndreaptă camera spre codul de bare",
     cancel: "Anulează",
@@ -239,7 +239,7 @@ export const translations = {
     magnesium: "Magnesium",
     sodium: "Sodium",
 
-//  ///////////////Aditivi/////////////////////////
+//  ///////////////Aditivi///////////////////////// // Additives
 additivesLabel: "Additives",
     noAdditives: "No additives detected",
     additivesUnknown: "We can't tell — the ingredient list is missing from the database. Photograph it from the packaging.",
@@ -248,7 +248,7 @@ additivesLabel: "Additives",
     levelCaution: "Caution advised",
     levelRisk: "High risk",
     disclaimer: "This information is educational and not medical advice. For health concerns, consult a doctor.",
-  // ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+  // ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
     verdictHealthy: "Healthy",
     verdictModerate: "Moderate",
     verdictUnhealthy: "Unhealthy",
@@ -297,10 +297,10 @@ additivesLabel: "Additives",
     clearAllConfirm: "Delete all history, favorites and basket on this device?",
     removeOne: "Delete",
     removeOneConfirm: "Remove this product from the list?",
-    // procentajul cu bulina///////////
+    // procentajul cu bulina/////////// // percentage with the badge
     scoreOutOf: "out of 100",
     saturatedFat: "Saturated fat",
-     // /////////////   scanare camera    /////////////////////
+     // /////////////   scanare camera    ///////////////////// // camera scan
      scanButton: "Scan with camera",
     scanInstructions: "Point the camera at the barcode",
     cancel: "Cancel",
@@ -418,7 +418,7 @@ additivesLabel: "Additives",
     magnesium: "Magnésium",
     sodium: "Sodium",
 
-    ///////////////////  LES ADITIVES /////////////////////////////
+    ///////////////////  LES ADITIVES ///////////////////////////// // ADDITIVES
     additivesLabel: "Additifs",
     noAdditives: "Aucun additif détecté",
     additivesUnknown: "Impossible de savoir — la liste des ingrédients manque dans la base. Photographiez-la sur l'emballage.",
@@ -427,7 +427,7 @@ additivesLabel: "Additives",
     levelCaution: "Prudence recommandée",
     levelRisk: "Risque élevé",
     disclaimer: "Ces informations sont éducatives et ne constituent pas un avis médical. Pour tout problème de santé, consultez un médecin.",
- ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+ ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
     verdictHealthy: "Sain",
     verdictModerate: "Modéré",
     verdictUnhealthy: "Mauvais",
@@ -506,10 +506,10 @@ additivesLabel: "Additives",
     cameraBlockedTitle: "La caméra est bloquée",
     cameraBlockedHelp:
       "Vous avez bloqué l'accès à la caméra. Touchez le cadenas 🔒 dans la barre d'adresse → Autorisations → Caméra → Autoriser, puis rechargez la page.",
-    // procentajul cu bulina///////////
+    // procentajul cu bulina/////////// // percentage with the badge
     scoreOutOf: "sur 100",
     saturatedFat: "Graisses saturées",
-    // /////////////   scanare camera    /////////////////////
+    // /////////////   scanare camera    ///////////////////// // camera scan
     scanButton: "Scanner avec la caméra",
     scanInstructions: "Pointez la caméra vers le code-barres",
     cancel: "Annuler",
@@ -596,7 +596,7 @@ additivesLabel: "Additives",
     calcium: "Calcio",
     magnesium: "Magnesio",
     sodium: "Sodio",
-    // ///////////////////////////////////////////aditivi/////////////////////
+    // ///////////////////////////////////////////aditivi///////////////////// // additives
     additivesLabel: "Additivi",
     noAdditives: "Nessun additivo rilevato",
     additivesUnknown: "Non possiamo saperlo — la lista degli ingredienti manca nella banca dati. Fotografala dalla confezione.",
@@ -605,7 +605,7 @@ additivesLabel: "Additives",
     levelCaution: "Prudenza consigliata",
     levelRisk: "Rischio elevato",
     disclaimer: "Queste informazioni sono educative e non costituiscono un parere medico. Per problemi di salute, consulta un medico.",
-  ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+  ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
     verdictHealthy: "Sano",
     verdictModerate: "Moderato",
     verdictUnhealthy: "Non sano",
@@ -684,10 +684,10 @@ additivesLabel: "Additives",
     cameraBlockedTitle: "La fotocamera è bloccata",
     cameraBlockedHelp:
       "Hai bloccato l'accesso alla fotocamera. Tocca il lucchetto 🔒 nella barra degli indirizzi → Autorizzazioni → Fotocamera → Consenti, poi ricarica la pagina.",
-    // procentajul cu bulina///////////
+    // procentajul cu bulina/////////// // percentage with the badge
     scoreOutOf: "su 100",
     saturatedFat: "Grassi saturi",
-     // /////////////   scanare camera    /////////////////////
+     // /////////////   scanare camera    ///////////////////// // camera scan
      scanButton: "Scansiona con la fotocamera",
     scanInstructions: "Punta la fotocamera sul codice a barre",
     cancel: "Annulla",
@@ -774,7 +774,7 @@ additivesLabel: "Additives",
     calcium: "Calcio",
     magnesium: "Magnesio",
     sodium: "Sodio",
-// //////////////////////     ADITIVI      //////////////////////////////
+// //////////////////////     ADITIVI      ////////////////////////////// // ADDITIVES
     additivesLabel: "Aditivos",
     noAdditives: "No se detectaron aditivos",
     additivesUnknown: "No podemos saberlo — falta la lista de ingredientes en la base de datos. Fotografíala del envase.",
@@ -783,7 +783,7 @@ additivesLabel: "Additives",
     levelCaution: "Se recomienda precaución",
     levelRisk: "Riesgo alto",
     disclaimer: "Esta información es educativa y no constituye consejo médico. Para problemas de salud, consulta a un médico.",
-   ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+   ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
    verdictHealthy: "Saludable",
     verdictModerate: "Moderado",
     verdictUnhealthy: "Poco saludable",
@@ -862,10 +862,10 @@ additivesLabel: "Additives",
     cameraBlockedTitle: "La cámara está bloqueada",
     cameraBlockedHelp:
       "Has bloqueado el acceso a la cámara. Toca el candado 🔒 en la barra de direcciones → Permisos → Cámara → Permitir, luego recarga la página.",
-    // procentajul cu bulina///////////
+    // procentajul cu bulina/////////// // percentage with the badge
     scoreOutOf: "de 100",
     saturatedFat: "Grasas saturadas",
-    // /////////////   scanare camera    /////////////////////
+    // /////////////   scanare camera    ///////////////////// // camera scan
     scanButton: "Escanear con la cámara",
     scanInstructions: "Apunta la cámara al código de barras",
     cancel: "Cancelar",
@@ -953,7 +953,7 @@ additivesLabel: "Additives",
     magnesium: "Magnesium",
     sodium: "Natrium",
 
-    // ////////////////////        aditivi     //////////////////////////
+    // ////////////////////        aditivi     ////////////////////////// // additives
     additivesLabel: "Zusatzstoffe",
     noAdditives: "Keine Zusatzstoffe erkannt",
     additivesUnknown: "Wir können es nicht wissen — die Zutatenliste fehlt in der Datenbank. Fotografiere sie von der Verpackung.",
@@ -962,7 +962,7 @@ additivesLabel: "Additives",
     levelCaution: "Vorsicht empfohlen",
      levelRisk: "Hohes Risiko",
     disclaimer: "Diese Informationen dienen der Bildung und sind kein medizinischer Rat. Bei gesundheitlichen Fragen konsultiere einen Arzt.",
-   ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+   ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
    verdictHealthy: "Gesund",
     verdictModerate: "Mäßig",
     verdictUnhealthy: "Ungesund",
@@ -1041,7 +1041,7 @@ additivesLabel: "Additives",
     cameraBlockedTitle: "Kamera ist blockiert",
     cameraBlockedHelp:
       "Du hast den Kamerazugriff blockiert. Tippe auf das Schloss 🔒 in der Adressleiste → Berechtigungen → Kamera → Zulassen, dann lade die Seite neu.",
-     // procentajul cu bulina///////////
+     // procentajul cu bulina/////////// // percentage with the badge
      scoreOutOf: "von 100",
     saturatedFat: "Gesättigte Fettsäuren",
     scanButton: "Mit Kamera scannen",
@@ -1130,7 +1130,7 @@ additivesLabel: "Additives",
     calcium: "Кальций",
     magnesium: "Магний",
     sodium: "Натрий",
-    // /////////////////////      aditivi    //////////////////////////
+    // /////////////////////      aditivi    ////////////////////////// // additives
     additivesLabel: "Добавки",
     noAdditives: "Добавки не обнаружены",
     additivesUnknown: "Мы не можем знать — списка ингредиентов нет в базе. Сфотографируйте его с упаковки.",
@@ -1139,7 +1139,7 @@ additivesLabel: "Additives",
     levelCaution: "Рекомендуется осторожность",
     levelRisk: "Высокий риск",
     disclaimer: "Эта информация носит образовательный характер и не является медицинским советом. При проблемах со здоровьем обратитесь к врачу.",
-    ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+    ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
     verdictHealthy: "Полезно",
     verdictModerate: "Умеренно",
     verdictUnhealthy: "Вредно",
@@ -1218,10 +1218,10 @@ additivesLabel: "Additives",
     cameraBlockedTitle: "Камера заблокирована",
     cameraBlockedHelp:
       "Вы заблокировали доступ к камере. Нажмите на замок 🔒 в адресной строке → Разрешения → Камера → Разрешить, затем перезагрузите страницу.",
-    // procentajul cu bulina///////////
+    // procentajul cu bulina/////////// // percentage with the badge
     scoreOutOf: "из 100",
     saturatedFat: "Насыщенные жиры",
-     // /////////////   scanare camera    /////////////////////
+     // /////////////   scanare camera    ///////////////////// // camera scan
      scanButton: "Сканировать камерой",
     scanInstructions: "Наведите камеру на штрих-код",
     cancel: "Отмена",
@@ -1309,7 +1309,7 @@ additivesLabel: "Additives",
     magnesium: "Magnez",
     sodium: "Sód",
 
-    // ////////////    aditivi     //////////////////////////
+    // ////////////    aditivi     ////////////////////////// // additives
     additivesLabel: "Dodatki",
     noAdditives: "Nie wykryto dodatków",
     additivesUnknown: "Nie możemy tego wiedzieć — w bazie brakuje listy składników. Zrób jej zdjęcie z opakowania.",
@@ -1318,7 +1318,7 @@ additivesLabel: "Additives",
     levelCaution: "Zalecana ostrożność",
     levelRisk: "Wysokie ryzyko",
     disclaimer: "Te informacje mają charakter edukacyjny i nie stanowią porady medycznej. W razie problemów zdrowotnych skonsultuj się z lekarzem.",     
-    ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+    ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
     verdictHealthy: "Zdrowy",
     verdictModerate: "Umiarkowany",
     verdictUnhealthy: "Niezdrowy",
@@ -1397,10 +1397,10 @@ additivesLabel: "Additives",
     cameraBlockedTitle: "Aparat jest zablokowany",
     cameraBlockedHelp:
       "Zablokowałeś dostęp do aparatu. Dotknij kłódki 🔒 na pasku adresu → Uprawnienia → Aparat → Zezwól, następnie odśwież stronę.",
-     // procentajul cu bulina///////////
+     // procentajul cu bulina/////////// // percentage with the badge
      scoreOutOf: "na 100",
     saturatedFat: "Tłuszcze nasycone",
-      // /////////////   scanare camera    /////////////////////
+      // /////////////   scanare camera    ///////////////////// // camera scan
       scanButton: "Skanuj aparatem",
     scanInstructions: "Skieruj aparat na kod kreskowy",
     cancel: "Anuluj",
@@ -1488,7 +1488,7 @@ additivesLabel: "Additives",
     magnesium: "Magnesium",
     sodium: "Natrium",
 
-      // ///////////////    aditivi      ///////////////////////////
+      // ///////////////    aditivi      /////////////////////////// // additives
       additivesLabel: "Additieven",
     noAdditives: "Geen additieven gedetecteerd",
     additivesUnknown: "We kunnen het niet weten — de ingrediëntenlijst ontbreekt in de databank. Fotografeer die van de verpakking.",
@@ -1497,7 +1497,7 @@ additivesLabel: "Additives",
     levelCaution: "Voorzichtigheid geadviseerd",
     levelRisk: "Hoog risico",
     disclaimer: "Deze informatie is educatief en geen medisch advies. Raadpleeg bij gezondheidsproblemen een arts.", 
-      ////////////////////////// verdict "sanatos" sau "nesanatos"    //////////////
+      ////////////////////////// verdict "sanatos" sau "nesanatos"    ////////////// // "healthy" or "unhealthy" verdict
     verdictHealthy: "Gezond",
     verdictModerate: "Matig",
     verdictUnhealthy: "Ongezond",
@@ -1577,10 +1577,10 @@ additivesLabel: "Additives",
     cameraBlockedHelp:
       "Je hebt cameratoegang geblokkeerd. Tik op het slotje 🔒 in de adresbalk → Machtigingen → Camera → Toestaan, en herlaad daarna de pagina.",
 
-    // procentajul cu bulina///////////
+    // procentajul cu bulina/////////// // percentage with the badge
     scoreOutOf: "van 100",
     saturatedFat: "Verzadigde vetten",
-    // /////////////   scanare camera    /////////////////////
+    // /////////////   scanare camera    ///////////////////// // camera scan
     scanButton: "Scannen met camera",
     scanInstructions: "Richt de camera op de barcode",
     cancel: "Annuleren",

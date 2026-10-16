@@ -1,4 +1,5 @@
 // Playwright — e2e pentru dashboard-ul admin (mod DEMO, fără backend real).
+// Playwright — e2e for the admin dashboard (DEMO mode, no real backend).
 const { defineConfig, devices } = require("@playwright/test");
 module.exports = defineConfig({
   testDir: "./e2e",

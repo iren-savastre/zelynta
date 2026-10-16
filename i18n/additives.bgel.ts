@@ -2,6 +2,11 @@
 // plus descriere (desc) pentru cei "safe" (fara poveste). Se merge-uieste in
 // additives.ts ca additives.extra.ts. Pt aditivii cu poveste, desc bg/el vine din
 // additives.stories.ts (suprascrie dupa acest merge). NU edita manual — generat.
+// Bulgarian (bg) + Greek (el) for additives: name + category (use) for all,
+// plus description (desc) for the "safe" ones (no story). Merged into
+// additives.ts like additives.extra.ts. For additives with a story, the
+// bg/el desc comes from additives.stories.ts (overwrites after this merge).
+// Do NOT edit manually — generated.
 export const additivesBgEl: Record<string, { name: { bg: string; el: string }; use: { bg: string; el: string }; desc?: { bg: string; el: string } }> = {
   "e160b": {
     "name": {
