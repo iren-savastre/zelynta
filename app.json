@@ -51,6 +51,15 @@
           "cameraPermission": "Zelynta folosește camera pentru a scana codul de bare și pentru a citi lista de ingrediente dintr-o fotografie.",
           "recordAudioAndroid": false
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
       ]
     ],
     "experiments": {
