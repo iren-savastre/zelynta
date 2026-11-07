@@ -5,8 +5,8 @@
 // Paste the PUBLIC keys from Supabase (Project Settings → API).
 // These are public keys, safe for the client — security is enforced by Row-Level Security.
 window.ZELYNTA_SUPABASE = {
-  url: "https://zuvvlrfvztfrsznicbaz.supabase.co",
-  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1dnZscmZ2enRmcnN6bmljYmF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNDUyNTgsImV4cCI6MjEwNzcyMTI1OH0.AGATziAHpUZ3SVOH7XAmyF4z74kJNG6wuyFGMfoLzVg"
+  url: "https://zzqyenqxmnsnryzvigew.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6cXllbnF4bW5zbnJ5enZpZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwODczMDcsImV4cCI6MjEwOTY2MzMwN30.xKHzxvTLJMKBwB3ep_fX1ZC_O95xVmpp7-tBA6P5WgU"
 };
 window.ZELYNTA_CONFIGURED = function () {
   return !!(window.ZELYNTA_SUPABASE && window.ZELYNTA_SUPABASE.url && window.ZELYNTA_SUPABASE.anonKey);
