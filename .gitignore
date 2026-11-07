@@ -65,3 +65,6 @@ coverage/
 
 # export temporar al aplicatiei web (se construieste la publicare)
 dist-web/
+
+# reguli private pentru Claude (raman doar pe calculator)
+CLAUDE.local.md

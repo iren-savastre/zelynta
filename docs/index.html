@@ -4877,8 +4877,10 @@
       function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
       function loadApproved(){
         var SB=window.ZELYNTA_SUPABASE; if(!SB||!SB.url||!SB.anonKey) return;
-        var empty=document.querySelector("#reviews .rv-empty"); var holder=document.getElementById("rvApproved");
-        if(!empty && !holder) return;
+        // recenziile aprobate se pun sub bara .rv-note (fostul bloc .rv-empty nu mai exista in HTML)
+        // approved reviews go below the .rv-note bar (the old .rv-empty block no longer exists in the HTML)
+        var note=document.querySelector("#reviews .rv-note"); var holder=document.getElementById("rvApproved");
+        if(!note && !holder) return;
         fetch(SB.url+"/rest/v1/reviews?status=eq.approved&select=name,nickname,rating,title,body,created_at&order=created_at.desc&limit=12",{headers:{apikey:SB.anonKey,Authorization:"Bearer "+SB.anonKey}})
         .then(function(r){return r.json();}).then(function(rows){
           if(!rows||!rows.length) return;
@@ -4887,8 +4889,12 @@
             return '<div class="rev-card"><div class="quote">”</div>'+(x.title?'<strong style="display:block;color:var(--green-dark);margin-bottom:4px">'+esc(x.title)+'</strong>':'')+
               '<p>'+esc(x.body)+'</p><div class="rev-who"><div class="rev-av">'+esc(ini)+'</div><div><b>'+esc(who)+'</b><span class="rv-live-stars" style="display:block">'+"★".repeat(x.rating)+'</span></div></div></div>';
           }).join("")+'</div>';
-          var target=document.getElementById("rvApproved")||empty;
-          target.outerHTML=html;
+          if(holder) holder.outerHTML=html; else note.insertAdjacentHTML("afterend",html);
+          if(note){
+            var avg=rows.reduce(function(s,x){return s+x.rating;},0)/rows.length;
+            var badge=note.querySelector(".rv-note-badge"); if(badge&&badge.lastChild) badge.lastChild.nodeValue=" "+avg.toFixed(1)+" / 5 ("+rows.length+")";
+            var txt=note.querySelector(".rv-note-txt"); if(txt) txt.style.display="none";
+          }
         }).catch(function(){});
       }
       upCount(); sync(); loadApproved();
