@@ -83,7 +83,7 @@ const ING_END_RE =
 export function extractIngredientsSegment(
   text: string,
   preferredLang: string
-): { segment: string; srcLang: string } {
+): { segment: string; srcLang: string; found: boolean } {
   const hits: { lang: string; start: number; contentStart: number }[] = [];
   for (const k of ING_KEYWORDS) {
     k.re.lastIndex = 0;
@@ -92,7 +92,7 @@ export function extractIngredientsSegment(
       hits.push({ lang: k.lang, start: m.index, contentStart: m.index + m[0].length });
     }
   }
-  if (!hits.length) return { segment: text, srcLang: "en" };
+  if (!hits.length) return { segment: text, srcLang: "en", found: false };
   hits.sort((a, b) => a.start - b.start);
   const pick =
     hits.find((h) => h.lang === preferredLang) ??
@@ -104,8 +104,9 @@ export function extractIngredientsSegment(
   const em = ING_END_RE.exec(seg);
   if (em && em.index > 10) seg = seg.slice(0, em.index);
   seg = seg.trim().replace(/[.,;\s]+$/, "");
-  if (seg.length < 12) return { segment: text, srcLang: pick.lang };
-  return { segment: seg, srcLang: pick.lang };
+  if (seg.length < 12) return { segment: text, srcLang: pick.lang, found: false };
+  // found = lista a fost izolata sigur (dupa "Ingrediente:"), nu e tot textul pozei.
+  return { segment: seg, srcLang: pick.lang, found: true };
 }
 
 // Extrage codurile E (E150d, E 621, E-330...) din text și le mapează la tag-uri

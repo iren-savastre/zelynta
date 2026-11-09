@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
     ActivityIndicator,
+    Alert,
     Animated,
     BackHandler,
     Easing,
@@ -46,6 +47,14 @@ import BodyDiagram from "../components/BodyDiagram";
 import { organsForAdditive, organName } from "../utils/bodyMap";
 import { localizeInci } from "../utils/inci";
 import { extractAdditiveTags, extractIngredientsSegment, ocrImage } from "../utils/ocr";
+import {
+  canSubmitDirectly,
+  CONTRIB_DBS,
+  contribEditUrl,
+  submitContribution,
+  type ContribDb,
+  type ContribDraft,
+} from "../utils/contribute";
 import { analyzeProduct, stripAdditives, productDisplay } from "../utils/score";
 import { mixHex, PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
@@ -293,6 +302,7 @@ export default function Index() {
     // scrie rezultatul, altfel una lenta/esuata suprascrie produsul deja gasit
     // cu "negasit".
     const seq = ++fetchSeqRef.current;
+    notFoundCodeRef.current = "";
     setLoading(true);
     setError("");
     setProduct(null);
@@ -310,6 +320,7 @@ export default function Index() {
         return; // produs găsit, ne oprim
       }
       // dacă am terminat toate bazele fără rezultat
+      notFoundCodeRef.current = code;
       setError(t("errorNotFound"));
     } catch (e) {
       if (seq !== fetchSeqRef.current) return;
@@ -379,6 +390,9 @@ export default function Index() {
   // si ultimul cod scanat (anti-dublura la scanari repetate ale camerei).
   const fetchSeqRef = useRef(0);
   const lastScanRef = useRef<{ code: string; at: number }>({ code: "", at: 0 });
+  // Codul de bare cautat si negasit in nicio baza. Daca utilizatorul fotografiaza
+  // apoi eticheta, il folosim ca sa trimita ingredientele in baza publica.
+  const notFoundCodeRef = useRef("");
 
   // Produsul curent, accesibil din bucla de recunoastere automata fara
   // problemele de "closure invechit" ale state-ului.
@@ -468,7 +482,17 @@ export default function Index() {
     // prindem orice cod E indiferent de limba); pentru afisare pastram doar
     // lista de ingrediente, in limba preferata, si o traducem automat.
     const tags = extractAdditiveTags(text);
-    const { segment, srcLang } = extractIngredientsSegment(text, i18n.language);
+    const { segment, srcLang, found } = extractIngredientsSegment(text, i18n.language);
+    // Ce se poate trimite in baza publica, ca altii sa gaseasca produsul analizat.
+    const draft = (code: string, db: ContribDb | null): ContribDraft => ({
+      code,
+      db,
+      text: segment,
+      textLang: found ? srcLang : null,
+      photoUri,
+      fallbackLang: i18n.language,
+    });
+    setContribState("idle");
     if (prevProduct) {
       // COMPLETAM produsul existent, nu il stricam: textul din baza de date e
       // scris de oameni (procente corecte), pe cand OCR-ul mai greseste cifre
@@ -483,6 +507,9 @@ export default function Index() {
       if (!hasIngredients) {
         merged.ingredients_text = segment;
         merged.lang = srcLang; // limba-sursa pentru traducerea automata
+        // Produsul exista in baza dar fara compozitie → o putem completa acolo.
+        const db = prevProduct._db === "food" || prevProduct._db === "beauty" ? prevProduct._db : null;
+        if (prevProduct.code) merged._contrib = draft(String(prevProduct.code), db);
       }
       merged.additives_tags = [
         ...new Set([...(prevProduct.additives_tags ?? []), ...tags]),
@@ -499,7 +526,46 @@ export default function Index() {
         additives_tags: tags,
         nutriments: {},
         categories_tags: [],
+        // Produs negasit nicaieri → il putem adauga in baza publica.
+        ...(notFoundCodeRef.current ? { _contrib: draft(notFoundCodeRef.current, null) } : {}),
       });
+    }
+  }
+
+  // Trimiterea rezultatului pozei in Open Food Facts / Open Beauty Facts.
+  const [contribState, setContribState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [contribDoneDb, setContribDoneDb] = useState<ContribDb>("beauty");
+  const contribDraft: ContribDraft | null = product?._contrib ?? null;
+
+  function confirmAction(message: string, okLabel: string): Promise<boolean> {
+    if (Platform.OS === "web") {
+      return Promise.resolve(typeof window !== "undefined" && window.confirm(message));
+    }
+    return new Promise((resolve) =>
+      Alert.alert("", message, [
+        { text: t("contribCancel"), style: "cancel", onPress: () => resolve(false) },
+        { text: okLabel, onPress: () => resolve(true) },
+      ], { cancelable: true, onDismiss: () => resolve(false) })
+    );
+  }
+
+  async function sendContribution(db: ContribDb) {
+    if (!contribDraft || contribState === "sending") return;
+    const dbName = CONTRIB_DBS[db].name;
+    // Fara cont al aplicatiei configurat: deschidem pagina produsului pe site.
+    if (!canSubmitDirectly) {
+      Linking.openURL(contribEditUrl(contribDraft, db));
+      return;
+    }
+    const ok = await confirmAction(t("contribConfirm", { db: dbName }), t("contribOk"));
+    if (!ok) return;
+    setContribState("sending");
+    try {
+      await submitContribution(contribDraft, db);
+      setContribDoneDb(db);
+      setContribState("done");
+    } catch {
+      setContribState("error");
     }
   }
 
@@ -1256,22 +1322,25 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 <Text style={styles.ocrFillButtonText}>📷 {t("readIngredients")}</Text>
               </TouchableOpacity>
             )}
-            {error === t("errorNotFound") && (
-              <TouchableOpacity
-                style={[styles.retryButton, { marginTop: 10 }]}
-                onPress={() =>
-                  Linking.openURL(
-                    barcode
-                      ? `https://world.openfoodfacts.org/product/${barcode}`
-                      : "https://world.openfoodfacts.org/"
-                  )
-                }
-                accessibilityRole="button"
-                accessibilityLabel={t("addToOffBtn")}
-              >
-                <Text style={styles.retryButtonText}>🌍 {t("addToOffBtn")}</Text>
-              </TouchableOpacity>
-            )}
+            {/* Nu stim daca produsul negasit e aliment sau cosmetic, asa ca oferim ambele baze:
+                parfumurile/cosmeticele trebuie adaugate in Open Beauty Facts, nu in Open Food Facts. */}
+            {error === t("errorNotFound") &&
+              [
+                { base: "https://world.openfoodfacts.org", label: t("addToOffBtn"), icon: "🍎" },
+                { base: "https://world.openbeautyfacts.org", label: t("addToObfBtn"), icon: "🧴" },
+              ].map(({ base, label, icon }) => (
+                <TouchableOpacity
+                  key={base}
+                  style={[styles.retryButton, { marginTop: 10 }]}
+                  onPress={() => Linking.openURL(barcode ? `${base}/product/${barcode}` : `${base}/`)}
+                  accessibilityRole="button"
+                  accessibilityLabel={label}
+                >
+                  <Text style={styles.retryButtonText}>
+                    {icon} {label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             <TouchableOpacity
               style={styles.retryButton}
               onPress={() => (barcode ? fetchProduct() : openScanner())}
@@ -1456,6 +1525,42 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
             >
               <Text style={styles.ocrFillButtonText}>📷 {t("readIngredients")}</Text>
             </TouchableOpacity>
+
+            {/* Dupa poza: rezultatul poate fi salvat in baza publica, ca urmatorul
+                utilizator care scaneaza acelasi cod sa-l gaseasca gata analizat. */}
+            {contribDraft && (
+              <View style={styles.contribBox}>
+                {contribState === "done" ? (
+                  <Text style={styles.contribText}>
+                    ✅ {t("contribDone", { db: CONTRIB_DBS[contribDoneDb].name })}
+                  </Text>
+                ) : (
+                  <>
+                    <Text style={styles.contribText}>{t("contribHint")}</Text>
+                    {(contribDraft.db ? [contribDraft.db] : (["beauty", "food"] as ContribDb[])).map((db) => (
+                      <TouchableOpacity
+                        key={db}
+                        style={[styles.retryButton, { marginTop: 10, opacity: contribState === "sending" ? 0.6 : 1 }]}
+                        disabled={contribState === "sending"}
+                        onPress={() => sendContribution(db)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t("contribSend", { db: CONTRIB_DBS[db].name })}
+                      >
+                        <Text style={styles.retryButtonText}>
+                          {db === "beauty" ? "🧴" : "🍎"} {t("contribSend", { db: CONTRIB_DBS[db].name })}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                    {contribState === "sending" && (
+                      <ActivityIndicator style={{ marginTop: 10 }} color={colors.primary} />
+                    )}
+                    {contribState === "error" && (
+                      <Text style={[styles.contribText, { marginTop: 8 }]}>⚠️ {t("contribError")}</Text>
+                    )}
+                  </>
+                )}
+              </View>
+            )}
 
             {palm && (
               <View style={styles.palmBox}>
@@ -1900,6 +2005,15 @@ const makeStyles = (c: ThemeColors) =>
     marginTop: 10,
   },
   ocrFillButtonText: { color: c.primary, fontSize: 13.5, fontWeight: "800" },
+  contribBox: {
+    backgroundColor: c.surface,
+    borderWidth: 1,
+    borderColor: c.border,
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 10,
+  },
+  contribText: { color: c.text, fontSize: 13.5, lineHeight: 19 },
   // Gauge de scor
   scoreSection: {
     flexDirection: "row",
