@@ -113,6 +113,20 @@ describe("continutul cererii", () => {
     expect(body.lang).toBe("pl");
   });
 
+  // Un parfum trimis in Open Food Facts nu-l gaseste nimeni in Open Beauty Facts.
+  // A perfume sent to Open Food Facts can't be found by anyone in Open Beauty Facts.
+  it("trimite baza aleasa: implicit alimente, iar cosmeticele in Open Beauty Facts", async () => {
+    const mod = loadModule("https://exemplu.test/contrib");
+    global.fetch = jest.fn(() => Promise.resolve(res(200, { status: 1 }))) as any;
+
+    await mod.contributeProduct(draft);
+    await mod.contributeProduct({ ...draft, db: "beauty" });
+
+    const calls = (global.fetch as jest.Mock).mock.calls;
+    expect(JSON.parse(calls[0][1].body).db).toBe("food");
+    expect(JSON.parse(calls[1][1].body).db).toBe("beauty");
+  });
+
   it("acelasi telefon pastreaza acelasi app_uuid intre trimiteri", async () => {
     const mod = loadModule("https://exemplu.test/contrib");
     global.fetch = jest.fn(() => Promise.resolve(res(200, { status: 1 }))) as any;

@@ -20,6 +20,7 @@ import {
   contributeProduct,
   isContributionEnabled,
   type ContributeErrorKind,
+  type ContributionDb,
 } from "../utils/offContribute";
 import { PALETTES, useTheme, type ThemeColors } from "../utils/theme";
 
@@ -55,6 +56,7 @@ export default function Contribute() {
     barcode?: string;
     name?: string;
     ingredients?: string;
+    db?: string;
   }>();
   const barcode = String(params.barcode ?? "");
 
@@ -65,6 +67,11 @@ export default function Contribute() {
   const [name, setName] = useState(String(params.name ?? ""));
   const [brand, setBrand] = useState("");
   const [ingredients, setIngredients] = useState(String(params.ingredients ?? ""));
+  // Alimentele merg in Open Food Facts, cosmeticele si parfumurile in Open
+  // Beauty Facts — altfel un parfum ajunge in baza gresita si nimeni nu-l gaseste.
+  // Food goes to Open Food Facts, cosmetics and perfumes to Open Beauty Facts —
+  // otherwise a perfume lands in the wrong database and nobody finds it.
+  const [db, setDb] = useState<ContributionDb>(params.db === "beauty" ? "beauty" : "food");
 
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -84,6 +91,7 @@ export default function Contribute() {
       productName: name,
       brands: brand,
       ingredientsText: ingredients,
+      db,
       lang: i18n.language,
     });
     setSending(false);
@@ -168,6 +176,30 @@ export default function Contribute() {
                 <View style={styles.readonlyBox}>
                   <Ionicons name="barcode-outline" size={18} color={colors.textMuted} />
                   <Text style={styles.readonlyTxt}>{barcode || "—"}</Text>
+                </View>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>{t("contribType")}</Text>
+                <View style={styles.typeRow}>
+                  {(["food", "beauty"] as ContributionDb[]).map((d) => {
+                    const on = db === d;
+                    const label = d === "food" ? t("contribTypeFood") : t("contribTypeBeauty");
+                    return (
+                      <TouchableOpacity
+                        key={d}
+                        style={[styles.typeChip, on && styles.typeChipOn]}
+                        onPress={() => setDb(d)}
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected: on }}
+                        accessibilityLabel={label}
+                      >
+                        <Text style={[styles.typeChipTxt, on && styles.typeChipTxtOn]}>
+                          {d === "food" ? "🍎" : "🧴"} {label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
 
@@ -306,6 +338,21 @@ const makeStyles = (c: ThemeColors) =>
       color: c.text,
     },
     inputMulti: { minHeight: 110 },
+
+    typeRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
+    typeChip: {
+      flexGrow: 1,
+      alignItems: "center",
+      backgroundColor: c.inputBg,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 11,
+    },
+    typeChipOn: { backgroundColor: c.primary, borderColor: c.primary },
+    typeChipTxt: { fontSize: 14, fontWeight: "700", color: c.text },
+    typeChipTxtOn: { color: "#fff" },
 
     readonlyBox: {
       flexDirection: "row",

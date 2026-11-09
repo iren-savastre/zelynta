@@ -53,6 +53,8 @@ export function isContributionEnabled(): boolean {
   return PROXY_URL.length > 0;
 }
 
+export type ContributionDb = "food" | "beauty";
+
 export type ContributionDraft = {
   barcode: string;
   /** Numele produsului, asa cum apare pe ambalaj. */
@@ -67,6 +69,13 @@ export type ContributionDraft = {
   /** Categorii, text liber separat prin virgula. Optional. */
   /** Categories, free text separated by commas. Optional. */
   categories?: string;
+  /**
+   * Baza in care ajunge produsul: "food" → Open Food Facts, "beauty" → Open
+   * Beauty Facts (cosmetice, parfumuri). Implicit "food".
+   * Which database the product goes to: "food" → Open Food Facts, "beauty" →
+   * Open Beauty Facts (cosmetics, perfumes). Defaults to "food".
+   */
+  db?: ContributionDb;
   /** Limba in care sunt scrise textele de mai sus (cod din 2 litere). */
   /** The language the texts above are written in (2-letter code). */
   lang: string;
@@ -119,6 +128,7 @@ export async function contributeProduct(
     app_version: APP_VERSION,
     app_uuid: appUuid,
     lang,
+    db: draft.db === "beauty" ? "beauty" : "food",
     [`product_name_${lang}`]: name,
   };
   if (draft.brands?.trim()) payload.brands = draft.brands.trim();

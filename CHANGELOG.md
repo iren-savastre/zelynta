@@ -6,6 +6,7 @@ versionare [SemVer](https://semver.org/).
 ## [Unreleased] — pregătire lansare
 
 ### Adăugat
+- Serverul pentru adăugarea produselor lipsă (Supabase Edge Function `off-contribute`): ține parola contului Open Food Facts doar pe server, limitează trimiterile (20/zi per instalare) și trimite alimentele în Open Food Facts, iar cosmeticele și parfumurile în Open Beauty Facts. În ecranul „Adaugă produsul” se alege tipul produsului.
 - Detecție automată a limbii după IP (app + landing + pagini legale), fallback engleză.
 - Pagini legale (12) traduse integral în 9 limbi, cu selector de limbă și disclaimer „RO oficial".
 - Teste unitare (Jest/jest-expo) pentru scoring, detecție palmier și traducere.
