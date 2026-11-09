@@ -135,6 +135,30 @@ Deno.serve(async (req) => {
     return reply(429, { ok: false, error: "too many" });
   }
 
+  // ---- Produsul exista deja? ----
+  // Trimiterea catre product_jqm2 si EDITEAZA un produs existent, deci cine ar
+  // apela functia direct (nu din aplicatie) ar putea suprascrie numele unor
+  // produse reale cu contul Zelynta. Acceptam doar produse care chiar lipsesc.
+  // ---- Does the product already exist? ----
+  // Posting to product_jqm2 also EDITS an existing product, so anyone calling
+  // the function directly (not from the app) could overwrite the names of real
+  // products with the Zelynta account. We only accept products that are truly missing.
+  try {
+    const res = await fetch(`${DBS[db]}/api/v2/product/${code}?fields=code`, {
+      headers: { "User-Agent": "Zelynta/" + appVersion + " (suport@zelynta.com)" },
+    });
+    const data = await res.json().catch(() => null);
+    // „found with a different product type": codul exista deja in cealalta baza
+    // (ex. aliment trimis ca parfum) — tot produs existent, nu-l mutam.
+    // "found with a different product type": the code already exists in the other
+    // database (e.g. a food submitted as a perfume) — still an existing product, we don't move it.
+    const exists = data?.status === 1 || /different product type/i.test(String(data?.status_verbose ?? ""));
+    if (exists) return reply(422, { ok: false, error: "exists" });
+  } catch (e) {
+    console.error("off-contribute OFF lookup", code, db, String(e));
+    return reply(502, { ok: false, error: "upstream" });
+  }
+
   // ---- Trimiterea catre OFF / OBF ----
   // ---- Forwarding to OFF / OBF ----
   // app_uuid catre OFF: stabil per instalare, dar trecut prin hash cu sare,
