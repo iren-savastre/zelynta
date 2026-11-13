@@ -1,4 +1,4 @@
-import { cacheGetEntry, cacheSet, cacheClearPrefix, CACHE_SCHEMA_VERSION } from "./cache";
+import { cacheGetEntry, cacheSet, CACHE_SCHEMA_VERSION } from "./cache";
 
 const PREFIX = "zelynta_product_";
 
@@ -58,10 +58,4 @@ export async function setCachedProduct(barcode: string, product: any): Promise<v
     schemaVersion: CACHE_SCHEMA_VERSION,
   };
   await cacheSet(keyFor(barcode), entry, PRODUCT_TTL_MS);
-}
-
-/** Goleste cache-ul de produse (folosit de „sterge toate datele"). */
-/** Empties the product cache (used by "delete all data"). */
-export async function clearProductCache(): Promise<void> {
-  await cacheClearPrefix(PREFIX);
 }

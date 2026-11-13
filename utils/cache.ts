@@ -10,7 +10,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //
 // Schema version: if the shape of the stored data changes, bumping it
 // automatically invalidates everything old, with no migration and no corrupt data.
-export const CACHE_SCHEMA_VERSION = 1;
+// 2: produsele au acum si nutriscore_grade + nova_group // products now also carry nutriscore_grade + nova_group
+export const CACHE_SCHEMA_VERSION = 2;
 
 type Entry<T> = {
   schemaVersion: number;
@@ -68,18 +69,5 @@ export async function cacheSet<T>(key: string, data: T, ttlMs: number): Promise<
   } catch {
     // ex. quota depasita — mergem mai departe fara cache
     // e.g. quota exceeded — we carry on without the cache
-  }
-}
-
-/** Sterge toate intrarile care incep cu prefixul dat. */
-/** Deletes all entries that start with the given prefix. */
-export async function cacheClearPrefix(prefix: string): Promise<void> {
-  try {
-    const keys = await AsyncStorage.getAllKeys();
-    const mine = keys.filter((k) => k.startsWith(prefix));
-    if (mine.length) await AsyncStorage.multiRemove(mine);
-  } catch {
-    // ignoram
-    // ignored
   }
 }

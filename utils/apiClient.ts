@@ -34,6 +34,7 @@ export const APP_LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", 
 //   ingredients_text*                                 -> getAdditives/getCosmetics
 //   ingredients                                       -> hasIngredients()
 //   categories, categories_tags                       -> detectia de cosmetice
+//   nutriscore_grade, nova_group                      -> utils/foodGrades.ts
 // The fields requested from the API. Without `fields`, OpenFoodFacts sends
 // the entire product (often over 100 KB: edit history, all languages, all
 // photos). The list below is extracted from the code, not assumed — each
@@ -45,6 +46,7 @@ export const APP_LANGS = ["ro", "en", "fr", "it", "es", "de", "ru", "pl", "nl", 
 //   ingredients_text*                                 -> getAdditives/getCosmetics
 //   ingredients                                       -> hasIngredients()
 //   categories, categories_tags                       -> cosmetics detection
+//   nutriscore_grade, nova_group                      -> utils/foodGrades.ts
 export const PRODUCT_FIELDS = [
   "code",
   "product_name",
@@ -57,6 +59,8 @@ export const PRODUCT_FIELDS = [
   "categories_tags",
   "packaging",
   "packaging_tags",
+  "nutriscore_grade",
+  "nova_group",
   "ingredients",
   "ingredients_text",
   "ingredients_text_en",
@@ -117,7 +121,6 @@ export async function lookupProductByBarcode(code: string): Promise<LookupResult
 
   let fallback: any = null;
   let notFound = 0; // baze care au raspuns clar „nu am produsul" // databases that clearly answered "I don't have the product"
-  let networkErrors = 0; // baze care nu au raspuns deloc // databases that didn't respond at all
   let rateLimited = 0; // baze care au raspuns 429 // databases that responded 429
   let upstreamErrors = 0; // baze care au raspuns 5xx / JSON invalid // databases that responded 5xx / invalid JSON
 
@@ -133,7 +136,8 @@ export async function lookupProductByBarcode(code: string): Promise<LookupResult
       // utilizator rezultatul e acelasi — nu stim nimic despre produs.
       // No response: offline, DNS down, or timeout (AbortError). For the
       // user the result is the same — we know nothing about the product.
-      networkErrors++;
+      // Nu-l numaram: e cazul final, NETWORK_ERROR, de la sfarsitul functiei.
+      // We don't count it: it's the final case, NETWORK_ERROR, at the end of the function.
       continue;
     }
 

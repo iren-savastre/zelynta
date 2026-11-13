@@ -105,12 +105,6 @@ export async function removeFromHistory(barcode: string): Promise<void> {
   } catch {}
 }
 
-export async function clearHistory(): Promise<void> {
-  try {
-    await AsyncStorage.removeItem(KEY);
-  } catch {}
-}
-
 // GDPR / control utilizator: șterge toate datele de conținut de pe dispozitiv
 // (istoric, favorite, coș, cache traduceri, cache produse și categorii).
 // Preferințele UI (temă, limbă, paletă) rămân, pentru a nu reseta experiența.

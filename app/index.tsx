@@ -46,6 +46,7 @@ import { pickM } from "../i18n/methodology";
 import BodyDiagram from "../components/BodyDiagram";
 import { organsForAdditive, organName } from "../utils/bodyMap";
 import { localizeInci } from "../utils/inci";
+import { NOVA_COLORS, NUTRI_COLORS, novaGroup, nutriScoreGrade } from "../utils/foodGrades";
 import {
   extractAdditiveTags,
   extractIngredientsSegment,
@@ -1005,6 +1006,10 @@ useEffect(() => {
     : packaging === "carton" ? t("packagingCarton")
     : packaging === "plastic" ? t("packagingPlastic")
     : t("packagingUnknown");
+  // Nutri-Score si NOVA vin direct din OFF; lipsesc => nu afisam nimic
+  // Nutri-Score and NOVA come straight from OFF; missing => we show nothing
+  const nutriGrade = product ? nutriScoreGrade(product) : null;
+  const nova = product ? novaGroup(product) : null;
 const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
 
   return (
@@ -1730,6 +1735,39 @@ const additiveDesc = selectedAdditive ? selectedAdditive.desc : "";
                 </View>
               </View>
             ))}
+
+            {(nutriGrade || nova) && (
+              <View style={styles.gradesRow}>
+                {nutriGrade && (
+                  <View style={styles.gradeCol}>
+                    <Text style={styles.scoreLabel}>{t("nutriScoreLabel")}</Text>
+                    <View
+                      style={[styles.novaBadge, { backgroundColor: NUTRI_COLORS[nutriGrade] }]}
+                      accessible
+                      accessibilityLabel={`${t("nutriScoreLabel")} ${nutriGrade.toUpperCase()}`}
+                    >
+                      {/* galbenul (C) cere text inchis, altfel nu se citeste */}
+                      {/* the yellow (C) needs dark text, otherwise it's unreadable */}
+                      <Text
+                        style={[styles.novaBadgeText, nutriGrade === "c" && { color: "#1F2937" }]}
+                      >
+                        {nutriGrade.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+                {nova && (
+                  <View style={styles.gradeCol}>
+                    <Text style={styles.scoreLabel}>{t("novaLabel")}</Text>
+                    <View style={[styles.novaBadge, { backgroundColor: NOVA_COLORS[nova] }]}>
+                      <Text style={styles.novaBadgeText}>
+                        {nova} · {t(`nova${nova}`)}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
 
            {packaging !== "unknown" && (
               <>
@@ -2654,6 +2692,8 @@ const makeStyles = (c: ThemeColors) =>
     paddingHorizontal: 14,
   },
   novaBadgeText: { color: "#FFFFFF", fontSize: 15, fontWeight: "700" },
+  gradesRow: { flexDirection: "row", flexWrap: "wrap", columnGap: 24 },
+  gradeCol: { flexShrink: 1 },
   microNote: {
     fontSize: 13,
     color: "#B45309",
