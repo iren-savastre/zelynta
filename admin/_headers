@@ -1,0 +1,11 @@
+# Netlify: antete HTTP pentru panoul de admin (citit automat la publicare).
+# Netlify: HTTP headers for the admin panel (read automatically on deploy).
+/*
+  # nu aparem in Google — adminul nu e pentru public
+  # stay out of Google — the admin isn't for the public
+  X-Robots-Tag: noindex, nofollow
+  # nimeni nu poate incadra adminul in alt site (clickjacking)
+  # nobody can frame the admin inside another site (clickjacking)
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
