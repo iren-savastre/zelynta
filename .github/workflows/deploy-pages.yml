@@ -64,6 +64,10 @@ jobs:
         # `experiments.baseUrl` in app.json makes it work under /app.
         # Run AFTER optimize, so the HTML minifier doesn't touch the Expo
         # bundle (it's already minified by Metro).
+        env:
+          # Adresa functiei „Adaugă produsul" — nu e secreta (parola OFF sta in Supabase).
+          # Address of the "Add the product" function — not secret (the OFF password lives in Supabase).
+          EXPO_PUBLIC_CONTRIB_URL: https://zzqyenqxmnsnryzvigew.supabase.co/functions/v1/off-contribute
         run: |
           npx expo export -p web --output-dir dist-web
           mkdir -p build/app
